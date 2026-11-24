@@ -1,0 +1,146 @@
+:root {
+  /* Tipografía Corporativa Minimalista */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Plus Jakarta Sans', 'Inter', sans-serif;
+
+  /* Superficies y Fondos Minimalistas */
+  --bg-canvas: #eef1f6;
+  --bg-canvas-dark: #1c1f24;
+  --bg-surface: #ffffff;
+  --bg-surface-muted: #f8fafc;
+  --bg-input: #f8fafc;
+  --bg-input-focus: #ffffff;
+
+  /* Texto */
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --text-inverse: #ffffff;
+
+  /* Bordes y Divisores */
+  --border-subtle: #e2e8f0;
+  --border-input: #e2e8f0;
+  --border-strong: #cbd5e1;
+
+  /* Tema 1: Royal Indigo Corporativo (Inspirado en Imagen 2 - Dashboard Split Card) */
+  --brand-primary: #4f55f1;
+  --brand-primary-hover: #3f44d9;
+  --brand-primary-soft: rgba(79, 85, 241, 0.1);
+  --brand-gradient: linear-gradient(145deg, #565cf6 0%, #3d42d9 55%, #2e31a6 100%);
+  --brand-accent: #f97316;
+  --brand-glow: rgba(79, 85, 241, 0.22);
+
+  /* Tema 2: Emerald Teal Corporativo (Inspirado en Imagen 1 - PRIX Editorial Split) */
+  --teal-primary: #0b2e2b;
+  --teal-primary-hover: #124641;
+  --teal-soft: rgba(13, 116, 105, 0.1);
+  --teal-gradient: linear-gradient(150deg, #0b3936 0%, #092927 60%, #051c1b 100%);
+  --teal-accent: #ea580c;
+
+  /* Estados Semánticos */
+  --status-success: #10b981;
+  --status-success-bg: #ecfdf5;
+  --status-warning: #f59e0b;
+  --status-warning-bg: #fffbeb;
+  --status-danger: #ef4444;
+  --status-danger-bg: #fef2f2;
+
+  /* Radios y Sombras Minimalistas */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 26px;
+  --radius-pill: 9999px;
+
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 4px 12px rgba(15, 23, 42, 0.06);
+  --shadow-card: 0 24px 60px -15px rgba(15, 23, 42, 0.12), 0 4px 16px -4px rgba(15, 23, 42, 0.05);
+  --shadow-floating: 0 16px 36px -8px rgba(15, 23, 42, 0.18);
+  --transition-fast: 160ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-brand-theme='emerald'] {
+  --brand-primary: #0b2e2b;
+  --brand-primary-hover: #134742;
+  --brand-primary-soft: rgba(11, 46, 43, 0.09);
+  --brand-gradient: linear-gradient(150deg, #114b46 0%, #0a2e2b 58%, #061c1a 100%);
+  --brand-accent: #f97316;
+  --brand-glow: rgba(11, 46, 43, 0.2);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  min-height: 100vh;
+  font-family: var(--font-sans);
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+/* Enlace de acción minimalista con efecto hover corporativo */
+.forgot-password-link {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 2px 0;
+  transition: color var(--transition-fast), transform var(--transition-fast);
+}
+
+.forgot-password-link:hover {
+  color: var(--brand-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.forgot-password-link:focus-visible {
+  outline: none;
+  color: var(--brand-primary);
+  text-decoration: underline;
+}
+
+/* Utilidades de diseño Atomic Design */
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes pulseDot {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

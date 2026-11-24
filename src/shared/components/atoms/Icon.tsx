@@ -1,0 +1,205 @@
+import React from 'react';
+
+export type IconName =
+  | 'eye'
+  | 'eye-off'
+  | 'google'
+  | 'facebook'
+  | 'microsoft'
+  | 'receipt'
+  | 'shield'
+  | 'check'
+  | 'sparkles'
+  | 'store'
+  | 'calculator'
+  | 'logout'
+  | 'user'
+  | 'arrow-right'
+  | 'lock'
+  | 'mail'
+  | 'building'
+  | 'package'
+  | 'alert'
+  | 'chevron-down';
+
+export interface IconProps {
+  name: IconName;
+  size?: number;
+  className?: string;
+  style?: React.CSSProperties;
+}
+
+export const Icon: React.FC<IconProps> = ({ name, size = 18, className, style }) => {
+  switch (name) {
+    case 'eye':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" className={className} style={style}>
+          <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+          <circle cx="12" cy="12" r="3" />
+        </svg>
+      );
+    case 'eye-off':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" className={className} style={style}>
+          <path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49" />
+          <path d="M14.084 14.158a3 3 0 0 1-4.242-4.242" />
+          <path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143" />
+          <path d="m2 2 20 20" />
+        </svg>
+      );
+    case 'google':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" className={className} style={style}>
+          <path fill="#EA4335" d="M12 5c1.617 0 3.082.592 4.223 1.568l3.157-3.157C17.452 1.612 14.965.5 12 .5 7.392.5 3.413 3.138 1.484 7.01l3.679 2.852C6.038 7.25 8.779 5 12 5z" />
+          <path fill="#4285F4" d="M23.49 12.275c0-.85-.075-1.675-.215-2.475H12v4.685h6.45c-.275 1.49-1.12 2.755-2.385 3.605l3.695 2.865c2.16-1.99 3.73-4.92 3.73-8.68z" />
+          <path fill="#FBBC05" d="M5.163 14.138A7.03 7.03 0 0 1 4.78 12c0-.745.135-1.468.383-2.138L1.484 7.01A11.49 11.49 0 0 0 .5 12c0 1.855.443 3.608 1.23 5.155l3.433-3.017z" />
+          <path fill="#34A853" d="M12 23.5c3.24 0 5.955-1.07 7.94-2.91l-3.695-2.865c-1.075.72-2.45 1.15-4.245 1.15-3.22 0-5.96-2.175-6.935-5.1L1.485 16.63C3.415 20.5 7.39 23.5 12 23.5z" />
+        </svg>
+      );
+    case 'facebook':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" className={className} style={style}>
+          <circle cx="12" cy="12" r="11" fill="#1877F2" />
+          <path
+            fill="#FFFFFF"
+            d="M15.117 15.64l.492-3.208h-3.078v-2.082c0-.878.43-1.734 1.81-1.734h1.4V5.885s-1.27-.217-2.485-.217c-2.536 0-4.194 1.537-4.194 4.32v2.444H6.24v3.208h2.822v7.756a11.16 11.16 0 0 0 3.469 0V15.64h2.586z"
+          />
+        </svg>
+      );
+    case 'microsoft':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" className={className} style={style}>
+          <rect x="2" y="2" width="9.2" height="9.2" fill="#F25022" rx="1" />
+          <rect x="12.8" y="2" width="9.2" height="9.2" fill="#7FBA00" rx="1" />
+          <rect x="2" y="12.8" width="9.2" height="9.2" fill="#00A4EF" rx="1" />
+          <rect x="12.8" y="12.8" width="9.2" height="9.2" fill="#FFB900" rx="1" />
+        </svg>
+      );
+    case 'receipt':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" className={className} style={style}>
+          <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z" />
+          <path d="M14 8H8" />
+          <path d="M16 12H8" />
+          <path d="M13 16H8" />
+        </svg>
+      );
+    case 'shield':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" className={className} style={style}>
+          <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+          <path d="m9 12 2 2 4-4" />
+        </svg>
+      );
+    case 'check':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" className={className} style={style}>
+          <path d="M20 6 9 17l-5-5" />
+        </svg>
+      );
+    case 'sparkles':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" className={className} style={style}>
+          <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
+        </svg>
+      );
+    case 'store':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" className={className} style={style}>
+          <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7" />
+          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+          <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4" />
+          <path d="M2 7h20" />
+        </svg>
+      );
+    case 'calculator':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" className={className} style={style}>
+          <rect width="16" height="20" x="4" y="2" rx="2" />
+          <line x1="8" x2="16" y1="6" y2="6" />
+          <line x1="16" x2="16" y1="14" y2="18" />
+          <path d="M16 10h.01" />
+          <path d="M12 10h.01" />
+          <path d="M8 10h.01" />
+          <path d="M12 14h.01" />
+          <path d="M8 14h.01" />
+          <path d="M12 18h.01" />
+          <path d="M8 18h.01" />
+        </svg>
+      );
+    case 'logout':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" className={className} style={style}>
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+          <polyline points="16 17 21 12 16 7" />
+          <line x1="21" x2="9" y1="12" y2="12" />
+        </svg>
+      );
+    case 'user':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" className={className} style={style}>
+          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
+      );
+    case 'arrow-right':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} style={style}>
+          <path d="m9 18 6-6-6-6" />
+        </svg>
+      );
+    case 'lock':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" className={className} style={style}>
+          <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+        </svg>
+      );
+    case 'mail':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" className={className} style={style}>
+          <rect width="20" height="16" x="2" y="4" rx="2" />
+          <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+        </svg>
+      );
+    case 'building':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" className={className} style={style}>
+          <rect width="16" height="20" x="4" y="2" rx="2" ry="2" />
+          <path d="M9 22v-4h6v4" />
+          <path d="M8 6h.01" />
+          <path d="M16 6h.01" />
+          <path d="M12 6h.01" />
+          <path d="M12 10h.01" />
+          <path d="M12 14h.01" />
+          <path d="M16 10h.01" />
+          <path d="M16 14h.01" />
+          <path d="M8 10h.01" />
+          <path d="M8 14h.01" />
+        </svg>
+      );
+    case 'package':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" className={className} style={style}>
+          <path d="m7.5 4.27 9 5.15" />
+          <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+          <path d="m3.3 7 8.7 5 8.7-5" />
+          <path d="M12 22V12" />
+        </svg>
+      );
+    case 'alert':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" className={className} style={style}>
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" x2="12" y1="8" y2="12" />
+          <line x1="12" x2="12.01" y1="16" y2="16" />
+        </svg>
+      );
+    case 'chevron-down':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" className={className} style={style}>
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      );
+  }
+};
