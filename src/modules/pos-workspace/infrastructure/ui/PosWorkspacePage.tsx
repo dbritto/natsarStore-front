@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
-  AlertBanner,
   Badge,
   BubbleGrowthCard,
   Button,
   Divider,
   FormField,
+  FriendlyModal,
   Icon,
   PeriodOption,
   RadialMultiRingCard,
@@ -16,6 +16,7 @@ import {
   WorkspaceSectionId,
   WorkspaceShellTemplate,
 } from '@shared/components';
+import { FriendlyErrorMapper, FriendlyNotice } from '@shared/domain/FriendlyErrorMapper';
 import { UserSession } from '@modules/auth/domain/models/UserSession.model';
 import {
   CustomerRegimeType,
@@ -64,6 +65,7 @@ export const PosWorkspacePage: React.FC<PosWorkspacePageProps> = ({
   const [period, setPeriod] = useState<AnalyticsPeriod>('weekly');
   const [model, setModel] = useState<DashboardAnalyticsModel | null>(null);
   const [searchFilter, setSearchFilter] = useState('');
+  const [modalNotice, setModalNotice] = useState<FriendlyNotice | null>(null);
 
   // Estado del simulador tributario (Módulo Clientes / DIAN)
   const simulateTaxUseCase = useMemo(() => new SimulatePosCheckoutUseCase(), []);
@@ -446,7 +448,37 @@ export const PosWorkspacePage: React.FC<PosWorkspacePageProps> = ({
         <Divider margin="4px 0" />
 
         {taxSimulationResult.isFailure ? (
-          <AlertBanner tone="danger" message={taxSimulationResult.error!} />
+          <div
+            style={{
+              backgroundColor: '#F8FAFC',
+              borderRadius: '16px',
+              padding: '18px',
+              border: '1px dashed #CBD5E1',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '12px',
+            }}
+          >
+            <span style={{ fontSize: '0.83rem', color: '#64748B' }}>
+              Completa un NIT válido y un subtotal mayor a cero para calcular la liquidación.
+            </span>
+            <Button
+              type="button"
+              size="sm"
+              variant="subtle"
+              onClick={() =>
+                setModalNotice(
+                  FriendlyErrorMapper.toFriendlyNotice(
+                    taxSimulationResult.error!,
+                    'Revisa los datos para el cálculo'
+                  )
+                )
+              }
+            >
+              Ver detalle
+            </Button>
+          </div>
         ) : (
           (() => {
             const s = taxSimulationResult.getValue().props;
@@ -733,6 +765,15 @@ export const PosWorkspacePage: React.FC<PosWorkspacePageProps> = ({
       onLogout={onLogout}
     >
       {renderActiveContent()}
+
+      <FriendlyModal
+        isOpen={Boolean(modalNotice)}
+        title={modalNotice?.title ?? ''}
+        message={modalNotice?.message ?? ''}
+        tone={modalNotice?.tone}
+        actionLabel={modalNotice?.actionLabel}
+        onClose={() => setModalNotice(null)}
+      />
     </WorkspaceShellTemplate>
   );
 };

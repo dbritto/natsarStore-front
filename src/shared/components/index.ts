@@ -18,6 +18,7 @@ export * from './atoms/Typography';
 export * from './molecules/AlertBanner';
 export * from './molecules/FloatingWidgetCard';
 export * from './molecules/FormField';
+export * from './molecules/FriendlyModal';
 export * from './molecules/HeaderIconButton';
 export * from './molecules/PasswordField';
 export * from './molecules/SidebarNavItem';

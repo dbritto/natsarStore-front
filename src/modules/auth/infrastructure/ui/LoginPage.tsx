@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import {
-  AlertBanner,
   AuthSplitTemplate,
   BrandLogo,
   Button,
   Divider,
   FormField,
+  FriendlyModal,
   PasswordField,
   SocialAuthButton,
   SocialProvider,
   Typography,
 } from '@shared/components';
+import { FriendlyErrorMapper, FriendlyNotice } from '@shared/domain/FriendlyErrorMapper';
 
 export interface LoginPageProps {
   initialEmail: string;
@@ -19,7 +20,8 @@ export interface LoginPageProps {
 
 /**
  * Adaptador de Entrada UI (Driving Adapter - Módulo Auth)
- * Construido 100% ensamblando átomos, moléculas, organismos y plantillas desde `@shared/components`.
+ * Presenta todos los avisos y errores suavizados a través de `FriendlyModal` de `@shared/components`,
+ * sin mostrar errores crudos ni códigos de estado en el formulario.
  */
 export const LoginPage: React.FC<LoginPageProps> = ({
   initialEmail,
@@ -28,24 +30,36 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [infoMessage, setInfoMessage] = useState<string | null>(null);
+  const [modalNotice, setModalNotice] = useState<FriendlyNotice | null>(null);
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMessage(null);
-    setInfoMessage(null);
     setIsLoading(true);
     const err = await onSubmitLogin(email, password, true);
     setIsLoading(false);
     if (err) {
-      setErrorMessage(err);
+      setModalNotice(FriendlyErrorMapper.toFriendlyNotice(err));
     }
   };
 
   const handleSocialLogin = (_provider: SocialProvider) => {
-    setErrorMessage(null);
-    setInfoMessage('En estos momentos este servicio no se encuentra disponible.');
+    setModalNotice({
+      title: 'Servicio no disponible temporalmente',
+      message:
+        'En estos momentos este servicio no se encuentra disponible. Puedes iniciar sesión directamente con tu correo electrónico y contraseña.',
+      tone: 'info',
+      actionLabel: 'Entendido',
+    });
+  };
+
+  const handleForgotPassword = () => {
+    setModalNotice({
+      title: 'Recuperación de contraseña',
+      message:
+        'Por políticas de seguridad corporativa, comunícate con el administrador de NatsarStore para que te asigne una nueva clave de acceso.',
+      tone: 'info',
+      actionLabel: 'Entendido',
+    });
   };
 
   return (
@@ -83,23 +97,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
           </div>
         </div>
 
-        {errorMessage && (
-          <AlertBanner
-            tone="danger"
-            message={errorMessage}
-            onClose={() => setErrorMessage(null)}
-          />
-        )}
-
-        {infoMessage && !errorMessage && (
-          <AlertBanner
-            tone="info"
-            message={infoMessage}
-            onClose={() => setInfoMessage(null)}
-          />
-        )}
-
-        {/* Formulario de Autenticación */}
+        {/* Formulario de Autenticación (sin errores crudos inline) */}
         <form
           onSubmit={handleFormSubmit}
           noValidate
@@ -128,9 +126,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
             <button
               type="button"
               className="forgot-password-link"
-              onClick={() =>
-                setInfoMessage('Comunícate con el administrador de NatsarStore para restablecer tu contraseña.')
-              }
+              onClick={handleForgotPassword}
             >
               ¿Olvidaste tu contraseña?
             </button>
@@ -165,6 +161,16 @@ export const LoginPage: React.FC<LoginPageProps> = ({
           />
         </div>
       </div>
+
+      {/* Modal compartido para suavizar errores y avisos al cliente */}
+      <FriendlyModal
+        isOpen={Boolean(modalNotice)}
+        title={modalNotice?.title ?? ''}
+        message={modalNotice?.message ?? ''}
+        tone={modalNotice?.tone}
+        actionLabel={modalNotice?.actionLabel}
+        onClose={() => setModalNotice(null)}
+      />
     </AuthSplitTemplate>
   );
 };

@@ -1,18 +1,20 @@
+import { FriendlyErrorMapper } from '@shared/domain/FriendlyErrorMapper';
 import { ApiEnvelope, HttpClientPort, HttpRequestOptions } from './HttpClientPort';
 
 /**
- * Adaptador de Salida (Driven Adapter) HTTP que implementa el contrato del Shared Kernel del Backend Factus POS:
- * - Inyecta automáticamente X-Request-ID (UUID v4 para idempotencia y prevención de doble clic)
- * - Inyecta X-Channel-ID: 'WEB'
- * - Inyecta Accept-Language: 'es-CO'
- * - Inyecta Authorization: Bearer <accessToken> cuando existe sesión activa
+ * Adaptador de Salida (Driven Adapter) HTTP de NatsarStore:
+ * - Inyecta automáticamente X-Request-ID (UUID v4 para idempotencia)
+ * - Inyecta X-Channel-ID: 'WEB' y Accept-Language: 'es-CO'
+ * - Suaviza cualquier fallo HTTP o de red mediante FriendlyErrorMapper para no exponer
+ *   jamás códigos de estado (400, 401, 500, etc.) ni errores técnicos al cliente.
  */
 export class FetchHttpClientAdapter implements HttpClientPort {
   private readonly baseUrl: string;
   private readonly getAccessToken: () => string | null;
 
-  constructor(baseUrl = '', getAccessToken: () => string | null = () => null) {
-    this.baseUrl = baseUrl;
+  constructor(baseUrl?: string, getAccessToken: () => string | null = () => null) {
+    const envUrl = (import.meta.env?.VITE_API_URL as string | undefined) ?? '';
+    this.baseUrl = (baseUrl ?? envUrl).replace(/\/+$/, '');
     this.getAccessToken = getAccessToken;
   }
 
@@ -60,27 +62,39 @@ export class FetchHttpClientAdapter implements HttpClientPort {
     body?: unknown,
     options?: HttpRequestOptions
   ): Promise<ApiEnvelope<T>> {
-    const isMutation = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method);
-    const response = await fetch(this.buildUrl(url, options?.params), {
-      method,
-      headers: this.buildHeaders(isMutation, options?.headers),
-      body: isMutation && body !== undefined ? JSON.stringify(body) : undefined,
-      signal: options?.signal,
-    });
+    try {
+      const isMutation = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method);
+      const response = await fetch(this.buildUrl(url, options?.params), {
+        method,
+        headers: this.buildHeaders(isMutation, options?.headers),
+        body: isMutation && body !== undefined ? JSON.stringify(body) : undefined,
+        signal: options?.signal,
+      });
 
-    const json = (await response.json().catch(() => null)) as ApiEnvelope<T> | null;
-    if (!response.ok) {
+      const json = (await response.json().catch(() => null)) as ApiEnvelope<T> | null;
+      if (!response.ok) {
+        const friendly = FriendlyErrorMapper.fromHttpStatus(
+          response.status,
+          json?.error || json?.message
+        );
+        return {
+          success: false,
+          error: friendly.message,
+        };
+      }
+
+      return (
+        json ?? {
+          success: true,
+        }
+      );
+    } catch {
+      const friendly = FriendlyErrorMapper.fromNetworkError();
       return {
         success: false,
-        error: json?.error || json?.message || `Error HTTP ${response.status}`,
+        error: friendly.message,
       };
     }
-
-    return (
-      json ?? {
-        success: true,
-      }
-    );
   }
 
   public get<T>(url: string, options?: HttpRequestOptions): Promise<ApiEnvelope<T>> {
