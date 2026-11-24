@@ -43,9 +43,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({
     }
   };
 
-  const handleSocialLogin = (provider: SocialProvider) => {
+  const handleSocialLogin = (_provider: SocialProvider) => {
     setErrorMessage(null);
-    setInfoMessage(`El inicio de sesión con ${provider.toUpperCase()} requiere configuración de proveedor OAuth.`);
+    setInfoMessage('En estos momentos este servicio no se encuentra disponible.');
   };
 
   return (
