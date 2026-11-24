@@ -1,39 +1,89 @@
 import React from 'react';
-import { TopNavbar, TopNavbarProps } from '../organisms/TopNavbar';
+import { SidebarNav, WorkspaceSectionId } from '../organisms/SidebarNav';
+import { DashboardHeader } from '../organisms/DashboardHeader';
 
-export interface WorkspaceShellTemplateProps extends TopNavbarProps {
+export interface WorkspaceShellTemplateProps {
+  activeSection?: WorkspaceSectionId;
+  onSelectSection?: (section: WorkspaceSectionId) => void;
+  pageTitle?: string;
+  dateSubtitle?: string;
+  userFullName: string;
+  userRoleLabel?: string;
+  userEmail?: string;
+  primaryRole?: string;
+  isSuperAdmin?: boolean;
+  alertCount?: number;
+  onRefresh?: () => void;
+  onSearchClick?: () => void;
+  onLogout: () => void;
   children: React.ReactNode;
 }
 
 /**
  * Template WorkspaceShellTemplate (Atomic Design):
- * Estructura base minimalista y corporativa para las vistas operativas de NatsarStore.
+ * Layout corporativo minimalista con Sidebar blanca redondeada a la izquierda
+ * y área de contenido Bento Grid a la derecha, fiel a la referencia DealDeck.
  */
 export const WorkspaceShellTemplate: React.FC<WorkspaceShellTemplateProps> = ({
+  activeSection = 'dashboard',
+  onSelectSection = () => {},
+  pageTitle = 'Panel Operativo POS',
+  dateSubtitle,
+  userFullName,
+  userRoleLabel,
+  userEmail,
+  primaryRole,
+  alertCount = 0,
+  onRefresh,
+  onSearchClick,
+  onLogout,
   children,
-  ...navbarProps
 }) => {
+  const effectiveRole = userRoleLabel || primaryRole || 'Operador';
+  const effectiveDateSubtitle = dateSubtitle || userEmail || new Date().toLocaleDateString('es-CO', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
   return (
     <div
       style={{
         minHeight: '100vh',
-        backgroundColor: 'var(--bg-canvas)',
+        backgroundColor: '#F2F4F9',
+        padding: '22px 26px',
         display: 'flex',
-        flexDirection: 'column',
+        gap: '28px',
+        alignItems: 'flex-start',
       }}
     >
-      <TopNavbar {...navbarProps} />
-      <main
+      <SidebarNav
+        activeSection={activeSection}
+        onSelectSection={onSelectSection}
+        alertCount={alertCount}
+        onLogout={onLogout}
+      />
+
+      <div
         style={{
           flex: 1,
-          width: '100%',
-          maxWidth: '1260px',
-          margin: '0 auto',
-          padding: '28px 24px 48px',
+          minWidth: 0,
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
-        {children}
-      </main>
+        <DashboardHeader
+          title={pageTitle}
+          dateSubtitle={effectiveDateSubtitle}
+          userFullName={userFullName}
+          userRoleLabel={effectiveRole}
+          alertCount={alertCount}
+          onRefresh={onRefresh}
+          onSearchClick={onSearchClick}
+        />
+
+        <main style={{ width: '100%' }}>{children}</main>
+      </div>
     </div>
   );
 };
