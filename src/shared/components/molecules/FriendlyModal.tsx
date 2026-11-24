@@ -9,13 +9,15 @@ export interface FriendlyModalProps {
   message: string;
   tone?: FriendlyNoticeTone;
   actionLabel?: string;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  onConfirm?: () => void;
   onClose: () => void;
 }
 
 /**
  * Molécula FriendlyModal (src/shared/components/molecules):
- * Modal corporativo minimalista para presentar avisos y errores suavizados al usuario final,
- * sin exponer códigos de estado HTTP ni mensajes técnicos bruscos.
+ * Modal corporativo minimalista para presentar avisos, errores suavizados y confirmaciones al usuario final.
  */
 export const FriendlyModal: React.FC<FriendlyModalProps> = ({
   isOpen,
@@ -23,6 +25,9 @@ export const FriendlyModal: React.FC<FriendlyModalProps> = ({
   message,
   tone = 'warning',
   actionLabel = 'Entendido',
+  confirmLabel,
+  cancelLabel,
+  onConfirm,
   onClose,
 }) => {
   useEffect(() => {
@@ -146,17 +151,40 @@ export const FriendlyModal: React.FC<FriendlyModalProps> = ({
           {message}
         </p>
 
-        {/* Botón Principal de Cierre */}
-        <div style={{ width: '100%', marginTop: '6px' }}>
-          <Button
-            type="button"
-            variant="primary"
-            size="md"
-            fullWidth
-            onClick={onClose}
-          >
-            {actionLabel}
-          </Button>
+        {/* Botones de Acción */}
+        <div style={{ width: '100%', marginTop: '6px', display: 'flex', gap: '10px' }}>
+          {onConfirm ? (
+            <>
+              <Button
+                type="button"
+                variant="ghost"
+                size="md"
+                fullWidth
+                onClick={onClose}
+              >
+                {cancelLabel || 'Cancelar'}
+              </Button>
+              <Button
+                type="button"
+                variant="primary"
+                size="md"
+                fullWidth
+                onClick={onConfirm}
+              >
+                {confirmLabel || actionLabel}
+              </Button>
+            </>
+          ) : (
+            <Button
+              type="button"
+              variant="primary"
+              size="md"
+              fullWidth
+              onClick={onClose}
+            >
+              {actionLabel}
+            </Button>
+          )}
         </div>
       </div>
     </div>

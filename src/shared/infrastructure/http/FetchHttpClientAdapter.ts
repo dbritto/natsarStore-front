@@ -64,10 +64,12 @@ export class FetchHttpClientAdapter implements HttpClientPort {
   ): Promise<ApiEnvelope<T>> {
     try {
       const isMutation = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method);
+      const isFormData = typeof FormData !== 'undefined' && body instanceof FormData;
+
       const response = await fetch(this.buildUrl(url, options?.params), {
         method,
-        headers: this.buildHeaders(isMutation, options?.headers),
-        body: isMutation && body !== undefined ? JSON.stringify(body) : undefined,
+        headers: this.buildHeaders(isMutation && !isFormData, options?.headers),
+        body: isMutation && body !== undefined ? (isFormData ? (body as BodyInit) : JSON.stringify(body)) : undefined,
         signal: options?.signal,
       });
 

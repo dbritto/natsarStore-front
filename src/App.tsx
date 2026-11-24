@@ -9,13 +9,33 @@ import { UserSession } from '@modules/auth/domain/models/UserSession.model';
 import { LoginPage } from '@modules/auth/infrastructure/ui/LoginPage';
 import { HttpWorkspaceRepositoryAdapter } from '@modules/pos-workspace/infrastructure/adapters/HttpWorkspaceRepositoryAdapter';
 import { GetWorkspaceAnalyticsUseCase } from '@modules/pos-workspace/application/use-cases/GetWorkspaceAnalyticsUseCase';
+import { HttpCatalogRepositoryAdapter } from '@modules/catalog/infrastructure/adapters/HttpCatalogRepositoryAdapter';
+import {
+  CreateCatalogProductUseCase,
+  DeleteCatalogProductUseCase,
+  GetCatalogProductsUseCase,
+  GetProductCategoriesUseCase,
+  UpdateCatalogProductUseCase,
+  UploadProductImageUseCase,
+} from '@modules/catalog/application/use-cases/CatalogUseCases';
 import { PosWorkspacePage } from '@modules/pos-workspace/infrastructure/ui/PosWorkspacePage';
 
 /**
  * Raíz de Composición Hexagonal (Dependency Injection Container de NatsarStore)
  */
 export const App: React.FC = () => {
-  const { loginUseCase, logoutUseCase, analyticsUseCase, initialData } = useMemo(() => {
+  const {
+    loginUseCase,
+    logoutUseCase,
+    analyticsUseCase,
+    getCatalogProductsUseCase,
+    getProductCategoriesUseCase,
+    createCatalogProductUseCase,
+    updateCatalogProductUseCase,
+    deleteCatalogProductUseCase,
+    uploadProductImageUseCase,
+    initialData,
+  } = useMemo(() => {
     const sessionStorage = new LocalStorageSessionAdapter();
     const apiBaseUrl = (import.meta.env.VITE_API_URL || 'https://sistemapos-dian.onrender.com').replace(/\/+$/, '');
     const httpClient = new FetchHttpClientAdapter(apiBaseUrl, () => {
@@ -24,12 +44,19 @@ export const App: React.FC = () => {
     });
     const authRepository = new HttpAuthRepositoryAdapter(httpClient);
     const workspaceRepository = new HttpWorkspaceRepositoryAdapter(httpClient);
+    const catalogRepository = new HttpCatalogRepositoryAdapter(httpClient);
 
     const restore = new RestoreSessionUseCase(sessionStorage);
     return {
       loginUseCase: new LoginUseCase(authRepository, sessionStorage),
       logoutUseCase: new LogoutUseCase(authRepository, sessionStorage),
       analyticsUseCase: new GetWorkspaceAnalyticsUseCase(workspaceRepository),
+      getCatalogProductsUseCase: new GetCatalogProductsUseCase(catalogRepository),
+      getProductCategoriesUseCase: new GetProductCategoriesUseCase(catalogRepository),
+      createCatalogProductUseCase: new CreateCatalogProductUseCase(catalogRepository),
+      updateCatalogProductUseCase: new UpdateCatalogProductUseCase(catalogRepository),
+      deleteCatalogProductUseCase: new DeleteCatalogProductUseCase(catalogRepository),
+      uploadProductImageUseCase: new UploadProductImageUseCase(catalogRepository),
       initialData: restore.execute(),
     };
   }, []);
@@ -67,6 +94,12 @@ export const App: React.FC = () => {
     <PosWorkspacePage
       session={session}
       analyticsUseCase={analyticsUseCase}
+      getCatalogProductsUseCase={getCatalogProductsUseCase}
+      getProductCategoriesUseCase={getProductCategoriesUseCase}
+      createCatalogProductUseCase={createCatalogProductUseCase}
+      updateCatalogProductUseCase={updateCatalogProductUseCase}
+      deleteCatalogProductUseCase={deleteCatalogProductUseCase}
+      uploadProductImageUseCase={uploadProductImageUseCase}
       onLogout={handleLogout}
     />
   );

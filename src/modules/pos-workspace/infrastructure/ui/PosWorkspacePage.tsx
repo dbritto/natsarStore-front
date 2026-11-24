@@ -28,10 +28,25 @@ import {
 } from '../../domain/models/DashboardAnalytics.model';
 import { SimulatePosCheckoutUseCase } from '../../application/use-cases/SimulatePosCheckoutUseCase';
 import { GetWorkspaceAnalyticsUseCase } from '../../application/use-cases/GetWorkspaceAnalyticsUseCase';
+import {
+  CreateCatalogProductUseCase,
+  DeleteCatalogProductUseCase,
+  GetCatalogProductsUseCase,
+  GetProductCategoriesUseCase,
+  UpdateCatalogProductUseCase,
+  UploadProductImageUseCase,
+} from '../../../catalog/application/use-cases/CatalogUseCases';
+import { CatalogManagementView } from '../../../catalog/infrastructure/ui/CatalogManagementView';
 
 export interface PosWorkspacePageProps {
   session: UserSession;
   analyticsUseCase: GetWorkspaceAnalyticsUseCase;
+  getCatalogProductsUseCase: GetCatalogProductsUseCase;
+  getProductCategoriesUseCase: GetProductCategoriesUseCase;
+  createCatalogProductUseCase: CreateCatalogProductUseCase;
+  updateCatalogProductUseCase: UpdateCatalogProductUseCase;
+  deleteCatalogProductUseCase: DeleteCatalogProductUseCase;
+  uploadProductImageUseCase: UploadProductImageUseCase;
   onLogout: () => void;
 }
 
@@ -59,6 +74,12 @@ const SECTION_TITLES: Record<WorkspaceSectionId, string> = {
 export const PosWorkspacePage: React.FC<PosWorkspacePageProps> = ({
   session,
   analyticsUseCase,
+  getCatalogProductsUseCase,
+  getProductCategoriesUseCase,
+  createCatalogProductUseCase,
+  updateCatalogProductUseCase,
+  deleteCatalogProductUseCase,
+  uploadProductImageUseCase,
   onLogout,
 }) => {
   const [activeSection, setActiveSection] = useState<WorkspaceSectionId>('dashboard');
@@ -212,112 +233,16 @@ export const PosWorkspacePage: React.FC<PosWorkspacePageProps> = ({
     </div>
   );
 
-  const renderCatalogSection = () => {
-    const filtered = catalogItems.filter(
-      (item) =>
-        item.name.toLowerCase().includes(searchFilter.toLowerCase()) ||
-        item.codeReference.toLowerCase().includes(searchFilter.toLowerCase())
-    );
-
-    return (
-      <div
-        style={{
-          backgroundColor: '#FFFFFF',
-          borderRadius: '24px',
-          padding: '26px',
-          boxShadow: '0 8px 24px -12px rgba(15, 23, 42, 0.06)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '20px',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px' }}>
-          <div>
-            <Typography as="h2" variant="h2">
-              Maestro Comercial de Productos (`/api/v1/catalog/items`)
-            </Typography>
-            <Typography variant="caption" tone="muted">
-              Artículos con tributos DIAN (IVA 01, INC 04), códigos de barras múltiples y galería de imágenes
-            </Typography>
-          </div>
-          <div style={{ width: '280px' }}>
-            <FormField
-              placeholder="Filtrar por SKU o nombre..."
-              value={searchFilter}
-              onChange={(e) => setSearchFilter(e.target.value)}
-            />
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {filtered.map((item) => (
-            <div
-              key={item.id}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '16px 20px',
-                borderRadius: '16px',
-                backgroundColor: '#F8FAFC',
-                border: '1px solid #E2E8F0',
-                flexWrap: 'wrap',
-                gap: '12px',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div
-                  style={{
-                    width: '42px',
-                    height: '42px',
-                    borderRadius: '12px',
-                    backgroundColor: '#EEF2FF',
-                    color: '#4D53F4',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Icon name="package" size={20} />
-                </div>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontWeight: 700, fontSize: '0.93rem', color: '#0F172A' }}>
-                      {item.name}
-                    </span>
-                    <Badge tone="brand">{item.tributeCode} • {item.taxRate}%</Badge>
-                  </div>
-                  <span style={{ fontSize: '0.77rem', color: '#64748B' }}>
-                    Referencia: <strong>{item.codeReference}</strong> • Categoría: {item.categoryName}
-                  </span>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
-                <div style={{ textAlign: 'right' }}>
-                  <span style={{ display: 'block', fontSize: '0.72rem', color: '#94A3B8' }}>
-                    Costo Promedio
-                  </span>
-                  <strong style={{ fontSize: '0.86rem', color: '#475569' }}>
-                    $ {item.costPrice.toLocaleString('es-CO')}
-                  </strong>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <span style={{ display: 'block', fontSize: '0.72rem', color: '#94A3B8' }}>
-                    Precio Venta POS
-                  </span>
-                  <strong style={{ fontSize: '1.04rem', color: '#4D53F4', fontFamily: 'var(--font-display)' }}>
-                    $ {item.unitPrice.toLocaleString('es-CO')}
-                  </strong>
-                </div>
-                <TrendPill value="Activo" direction="up" />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
+  const renderCatalogSection = () => (
+    <CatalogManagementView
+      getProductsUseCase={getCatalogProductsUseCase}
+      getCategoriesUseCase={getProductCategoriesUseCase}
+      createProductUseCase={createCatalogProductUseCase}
+      updateProductUseCase={updateCatalogProductUseCase}
+      deleteProductUseCase={deleteCatalogProductUseCase}
+      uploadImageUseCase={uploadProductImageUseCase}
+    />
+  );
 
   const renderCustomersAndTaxSection = () => (
     <div
