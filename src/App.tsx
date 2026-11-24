@@ -17,7 +17,8 @@ import { PosWorkspacePage } from '@modules/pos-workspace/infrastructure/ui/PosWo
 export const App: React.FC = () => {
   const { loginUseCase, logoutUseCase, analyticsUseCase, initialData } = useMemo(() => {
     const sessionStorage = new LocalStorageSessionAdapter();
-    const httpClient = new FetchHttpClientAdapter('', () => {
+    const apiBaseUrl = (import.meta.env.VITE_API_URL || 'https://sistemapos-dian.onrender.com').replace(/\/+$/, '');
+    const httpClient = new FetchHttpClientAdapter(apiBaseUrl, () => {
       const current = sessionStorage.getSession();
       return current?.tokens.accessToken ?? null;
     });
