@@ -50,8 +50,8 @@ export const BubbleGrowthCard: React.FC<BubbleGrowthCardProps> = ({
       }}
     >
       {/* Cabecera */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '10px' }}>
-        <div>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+        <div style={{ minWidth: 0, flex: '1 1 150px' }}>
           <h3
             style={{
               fontFamily: 'var(--font-display)',
@@ -79,7 +79,7 @@ export const BubbleGrowthCard: React.FC<BubbleGrowthCardProps> = ({
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: '132px 1fr',
+          gridTemplateColumns: '132px minmax(0, 1fr)',
           gap: '14px',
           alignItems: 'center',
         }}
@@ -178,7 +178,7 @@ export const BubbleGrowthCard: React.FC<BubbleGrowthCardProps> = ({
         {/* Lista de Barras de Progreso */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {items.map((item) => (
-            <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
               <span
                 style={{
                   width: '24px',
@@ -194,7 +194,7 @@ export const BubbleGrowthCard: React.FC<BubbleGrowthCardProps> = ({
               >
                 {item.badgeIcon}
               </span>
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.77rem' }}>
                   <span style={{ fontWeight: 700, color: '#0F172A' }}>{item.label}</span>
                   <span style={{ fontWeight: 600, color: '#64748B' }}>{item.count}</span>

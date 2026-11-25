@@ -59,8 +59,8 @@ export const RoundedBarChartCard: React.FC<RoundedBarChartCardProps> = ({
       }}
     >
       {/* Cabecera de la tarjeta */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
-        <div>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+        <div style={{ minWidth: 0, flex: '1 1 180px' }}>
           <h3
             style={{
               fontFamily: 'var(--font-display)',
@@ -137,10 +137,11 @@ export const RoundedBarChartCard: React.FC<RoundedBarChartCardProps> = ({
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: '38px 1fr',
-          gap: '12px',
+          gridTemplateColumns: '38px minmax(0, 1fr)',
+          gap: '8px',
           alignItems: 'end',
           paddingTop: '8px',
+          minWidth: 0,
         }}
       >
         {/* Eje Y */}
@@ -165,10 +166,11 @@ export const RoundedBarChartCard: React.FC<RoundedBarChartCardProps> = ({
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: `repeat(${Math.max(1, data.length)}, 1fr)`,
-            gap: '10px',
+            gridTemplateColumns: `repeat(${Math.max(1, data.length)}, minmax(0, 1fr))`,
+            gap: '4px',
             alignItems: 'end',
             height: '168px',
+            minWidth: 0,
           }}
         >
           {data.map((point, idx) => {
@@ -187,20 +189,25 @@ export const RoundedBarChartCard: React.FC<RoundedBarChartCardProps> = ({
                   alignItems: 'center',
                   gap: '10px',
                   cursor: 'pointer',
+                  minWidth: 0,
                 }}
               >
                 <div
                   style={{
                     display: 'flex',
                     alignItems: 'flex-end',
-                    gap: '6px',
+                    justifyContent: 'center',
+                    gap: '4px',
                     height: '136px',
+                    width: '100%',
                   }}
                 >
                   {/* Barra Gris Suave */}
                   <div
                     style={{
-                      width: '16px',
+                      flex: '1 1 0',
+                      minWidth: '4px',
+                      maxWidth: '16px',
                       height: `${hSecondary}px`,
                       borderRadius: '999px',
                       backgroundColor: isSelected ? '#CBD5E1' : '#E2E8F0',
@@ -228,7 +235,9 @@ export const RoundedBarChartCard: React.FC<RoundedBarChartCardProps> = ({
                   {/* Barra Azul Eléctrico */}
                   <div
                     style={{
-                      width: '16px',
+                      flex: '1 1 0',
+                      minWidth: '4px',
+                      maxWidth: '16px',
                       height: `${hPrimary}px`,
                       borderRadius: '999px',
                       backgroundColor: '#4D53F4',
@@ -246,7 +255,7 @@ export const RoundedBarChartCard: React.FC<RoundedBarChartCardProps> = ({
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
-                    maxWidth: '72px',
+                    maxWidth: '100%',
                   }}
                 >
                   {point.label}

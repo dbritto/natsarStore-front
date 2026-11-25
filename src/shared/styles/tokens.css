@@ -319,3 +319,22 @@ svg {
     touch-action: manipulation;
   }
 }
+
+/* ---- Dashboard (clases explícitas, independientes de la serialización del estilo) ---- */
+@media (max-width: 1100px) {
+  .rsp-dash-main {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) !important;
+  }
+}
+
+@media (max-width: 860px) {
+  .rsp-dash-main {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .rsp-kpi-2 {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}

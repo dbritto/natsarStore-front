@@ -58,8 +58,8 @@ export const RadialMultiRingCard: React.FC<RadialMultiRingCardProps> = ({
       }}
     >
       {/* Cabecera */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '10px' }}>
-        <div>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+        <div style={{ minWidth: 0, flex: '1 1 150px' }}>
           <h3
             style={{
               fontFamily: 'var(--font-display)',
@@ -89,11 +89,12 @@ export const RadialMultiRingCard: React.FC<RadialMultiRingCardProps> = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          flexWrap: 'wrap',
           gap: '16px',
           padding: '4px 0',
         }}
       >
-        <svg width="160" height="160" viewBox="0 0 160 160">
+        <svg width="160" height="160" viewBox="0 0 160 160" style={{ flexShrink: 0 }}>
           {radii.map((r, index) => {
             const row = rows[index];
             const circumference = 2 * Math.PI * r;
@@ -156,6 +157,8 @@ export const RadialMultiRingCard: React.FC<RadialMultiRingCardProps> = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '6px 10px',
               fontSize: '0.83rem',
             }}
           >

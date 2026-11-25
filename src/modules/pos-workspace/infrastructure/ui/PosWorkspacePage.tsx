@@ -160,6 +160,7 @@ export const PosWorkspacePage: React.FC<PosWorkspacePageProps> = ({
 
   const renderDashboardBento = () => (
     <div
+      className="rsp-dash-main"
       style={{
         display: 'grid',
         gridTemplateColumns: 'minmax(0, 1.55fr) minmax(320px, 0.95fr)',
@@ -168,8 +169,9 @@ export const PosWorkspacePage: React.FC<PosWorkspacePageProps> = ({
       }}
     >
       {/* Columna Izquierda/Central: 2x2 KPIs arriba + Gráfico de Barras Redondeadas abajo */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '22px', minWidth: 0 }}>
         <div
+          className="rsp-kpi-2"
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
@@ -236,7 +238,7 @@ export const PosWorkspacePage: React.FC<PosWorkspacePageProps> = ({
       </div>
 
       {/* Columna Derecha: Anillos Concéntricos ABC arriba + Burbujas de Bodegas abajo */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '22px', minWidth: 0 }}>
         <RadialMultiRingCard
           title="Estadística de Productos"
           subtitle="Clasificación ABC por margen bruto"
@@ -263,6 +265,7 @@ export const PosWorkspacePage: React.FC<PosWorkspacePageProps> = ({
 
   const renderCustomersAndTaxSection = () => (
     <div
+      className="rsp-dash-main"
       style={{
         display: 'grid',
         gridTemplateColumns: 'minmax(340px, 1.1fr) minmax(340px, 1fr)',
