@@ -28,25 +28,13 @@ import {
 } from '../../domain/models/DashboardAnalytics.model';
 import { SimulatePosCheckoutUseCase } from '../../application/use-cases/SimulatePosCheckoutUseCase';
 import { GetWorkspaceAnalyticsUseCase } from '../../application/use-cases/GetWorkspaceAnalyticsUseCase';
-import {
-  CreateCatalogProductUseCase,
-  DeleteCatalogProductUseCase,
-  GetCatalogProductsUseCase,
-  GetProductCategoriesUseCase,
-  UpdateCatalogProductUseCase,
-  UploadProductImageUseCase,
-} from '../../../catalog/application/use-cases/CatalogUseCases';
-import { CatalogManagementView } from '../../../catalog/infrastructure/ui/CatalogManagementView';
+import { CatalogUseCases } from '@modules/catalog/application/use-cases/CatalogUseCases';
+import { CatalogModuleView } from '@modules/catalog/infrastructure/ui/CatalogModuleView';
 
 export interface PosWorkspacePageProps {
   session: UserSession;
   analyticsUseCase: GetWorkspaceAnalyticsUseCase;
-  getCatalogProductsUseCase: GetCatalogProductsUseCase;
-  getProductCategoriesUseCase: GetProductCategoriesUseCase;
-  createCatalogProductUseCase: CreateCatalogProductUseCase;
-  updateCatalogProductUseCase: UpdateCatalogProductUseCase;
-  deleteCatalogProductUseCase: DeleteCatalogProductUseCase;
-  uploadProductImageUseCase: UploadProductImageUseCase;
+  catalogUseCases: CatalogUseCases;
   onLogout: () => void;
 }
 
@@ -74,12 +62,7 @@ const SECTION_TITLES: Record<WorkspaceSectionId, string> = {
 export const PosWorkspacePage: React.FC<PosWorkspacePageProps> = ({
   session,
   analyticsUseCase,
-  getCatalogProductsUseCase,
-  getProductCategoriesUseCase,
-  createCatalogProductUseCase,
-  updateCatalogProductUseCase,
-  deleteCatalogProductUseCase,
-  uploadProductImageUseCase,
+  catalogUseCases,
   onLogout,
 }) => {
   const [activeSection, setActiveSection] = useState<WorkspaceSectionId>('dashboard');
@@ -231,17 +214,6 @@ export const PosWorkspacePage: React.FC<PosWorkspacePageProps> = ({
         />
       </div>
     </div>
-  );
-
-  const renderCatalogSection = () => (
-    <CatalogManagementView
-      getProductsUseCase={getCatalogProductsUseCase}
-      getCategoriesUseCase={getProductCategoriesUseCase}
-      createProductUseCase={createCatalogProductUseCase}
-      updateProductUseCase={updateCatalogProductUseCase}
-      deleteProductUseCase={deleteCatalogProductUseCase}
-      uploadImageUseCase={uploadProductImageUseCase}
-    />
   );
 
   const renderCustomersAndTaxSection = () => (
@@ -622,7 +594,7 @@ export const PosWorkspacePage: React.FC<PosWorkspacePageProps> = ({
       case 'dashboard':
         return renderDashboardBento();
       case 'catalog':
-        return renderCatalogSection();
+        return <CatalogModuleView catalogUseCases={catalogUseCases} />;
       case 'customers':
         return renderCustomersAndTaxSection();
       case 'inventory':

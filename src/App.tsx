@@ -10,14 +10,7 @@ import { LoginPage } from '@modules/auth/infrastructure/ui/LoginPage';
 import { HttpWorkspaceRepositoryAdapter } from '@modules/pos-workspace/infrastructure/adapters/HttpWorkspaceRepositoryAdapter';
 import { GetWorkspaceAnalyticsUseCase } from '@modules/pos-workspace/application/use-cases/GetWorkspaceAnalyticsUseCase';
 import { HttpCatalogRepositoryAdapter } from '@modules/catalog/infrastructure/adapters/HttpCatalogRepositoryAdapter';
-import {
-  CreateCatalogProductUseCase,
-  DeleteCatalogProductUseCase,
-  GetCatalogProductsUseCase,
-  GetProductCategoriesUseCase,
-  UpdateCatalogProductUseCase,
-  UploadProductImageUseCase,
-} from '@modules/catalog/application/use-cases/CatalogUseCases';
+import { CatalogUseCases } from '@modules/catalog/application/use-cases/CatalogUseCases';
 import { PosWorkspacePage } from '@modules/pos-workspace/infrastructure/ui/PosWorkspacePage';
 
 /**
@@ -28,12 +21,7 @@ export const App: React.FC = () => {
     loginUseCase,
     logoutUseCase,
     analyticsUseCase,
-    getCatalogProductsUseCase,
-    getProductCategoriesUseCase,
-    createCatalogProductUseCase,
-    updateCatalogProductUseCase,
-    deleteCatalogProductUseCase,
-    uploadProductImageUseCase,
+    catalogUseCases,
     initialData,
   } = useMemo(() => {
     const sessionStorage = new LocalStorageSessionAdapter();
@@ -51,12 +39,7 @@ export const App: React.FC = () => {
       loginUseCase: new LoginUseCase(authRepository, sessionStorage),
       logoutUseCase: new LogoutUseCase(authRepository, sessionStorage),
       analyticsUseCase: new GetWorkspaceAnalyticsUseCase(workspaceRepository),
-      getCatalogProductsUseCase: new GetCatalogProductsUseCase(catalogRepository),
-      getProductCategoriesUseCase: new GetProductCategoriesUseCase(catalogRepository),
-      createCatalogProductUseCase: new CreateCatalogProductUseCase(catalogRepository),
-      updateCatalogProductUseCase: new UpdateCatalogProductUseCase(catalogRepository),
-      deleteCatalogProductUseCase: new DeleteCatalogProductUseCase(catalogRepository),
-      uploadProductImageUseCase: new UploadProductImageUseCase(catalogRepository),
+      catalogUseCases: new CatalogUseCases(catalogRepository),
       initialData: restore.execute(),
     };
   }, []);
@@ -94,12 +77,7 @@ export const App: React.FC = () => {
     <PosWorkspacePage
       session={session}
       analyticsUseCase={analyticsUseCase}
-      getCatalogProductsUseCase={getCatalogProductsUseCase}
-      getProductCategoriesUseCase={getProductCategoriesUseCase}
-      createCatalogProductUseCase={createCatalogProductUseCase}
-      updateCatalogProductUseCase={updateCatalogProductUseCase}
-      deleteCatalogProductUseCase={deleteCatalogProductUseCase}
-      uploadProductImageUseCase={uploadProductImageUseCase}
+      catalogUseCases={catalogUseCases}
       onLogout={handleLogout}
     />
   );
