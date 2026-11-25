@@ -13,6 +13,8 @@ import { HttpCatalogRepositoryAdapter } from '@modules/catalog/infrastructure/ad
 import { CatalogUseCases } from '@modules/catalog/application/use-cases/CatalogUseCases';
 import { HttpInventoryRepositoryAdapter } from '@modules/inventory/infrastructure/adapters/HttpInventoryRepositoryAdapter';
 import { InventoryUseCases } from '@modules/inventory/application/use-cases/InventoryUseCases';
+import { HttpLogisticsRepositoryAdapter } from '@modules/logistics/infrastructure/adapters/HttpLogisticsRepositoryAdapter';
+import { LogisticsUseCases } from '@modules/logistics/application/use-cases/LogisticsUseCases';
 import { PosWorkspacePage } from '@modules/pos-workspace/infrastructure/ui/PosWorkspacePage';
 
 /**
@@ -25,6 +27,7 @@ export const App: React.FC = () => {
     analyticsUseCase,
     catalogUseCases,
     inventoryUseCases,
+    logisticsUseCases,
     initialData,
   } = useMemo(() => {
     const sessionStorage = new LocalStorageSessionAdapter();
@@ -37,6 +40,7 @@ export const App: React.FC = () => {
     const workspaceRepository = new HttpWorkspaceRepositoryAdapter(httpClient);
     const catalogRepository = new HttpCatalogRepositoryAdapter(httpClient);
     const inventoryRepository = new HttpInventoryRepositoryAdapter(httpClient);
+    const logisticsRepository = new HttpLogisticsRepositoryAdapter(httpClient);
 
     const restore = new RestoreSessionUseCase(sessionStorage);
     return {
@@ -45,6 +49,7 @@ export const App: React.FC = () => {
       analyticsUseCase: new GetWorkspaceAnalyticsUseCase(workspaceRepository),
       catalogUseCases: new CatalogUseCases(catalogRepository),
       inventoryUseCases: new InventoryUseCases(inventoryRepository),
+      logisticsUseCases: new LogisticsUseCases(logisticsRepository),
       initialData: restore.execute(),
     };
   }, []);
@@ -84,6 +89,7 @@ export const App: React.FC = () => {
       analyticsUseCase={analyticsUseCase}
       catalogUseCases={catalogUseCases}
       inventoryUseCases={inventoryUseCases}
+      logisticsUseCases={logisticsUseCases}
       onLogout={handleLogout}
     />
   );

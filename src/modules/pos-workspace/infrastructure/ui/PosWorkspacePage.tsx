@@ -32,12 +32,15 @@ import { CatalogUseCases } from '@modules/catalog/application/use-cases/CatalogU
 import { CatalogModuleView } from '@modules/catalog/infrastructure/ui/CatalogModuleView';
 import { InventoryUseCases } from '@modules/inventory/application/use-cases/InventoryUseCases';
 import { InventoryModuleView } from '@modules/inventory/infrastructure/ui/InventoryModuleView';
+import { LogisticsUseCases } from '@modules/logistics/application/use-cases/LogisticsUseCases';
+import { LogisticsModuleView } from '@modules/logistics/infrastructure/ui/LogisticsModuleView';
 
 export interface PosWorkspacePageProps {
   session: UserSession;
   analyticsUseCase: GetWorkspaceAnalyticsUseCase;
   catalogUseCases: CatalogUseCases;
   inventoryUseCases: InventoryUseCases;
+  logisticsUseCases: LogisticsUseCases;
   onLogout: () => void;
 }
 
@@ -67,6 +70,7 @@ export const PosWorkspacePage: React.FC<PosWorkspacePageProps> = ({
   analyticsUseCase,
   catalogUseCases,
   inventoryUseCases,
+  logisticsUseCases,
   onLogout,
 }) => {
   const [activeSection, setActiveSection] = useState<WorkspaceSectionId>('dashboard');
@@ -604,18 +608,7 @@ export const PosWorkspacePage: React.FC<PosWorkspacePageProps> = ({
       case 'inventory':
         return <InventoryModuleView inventoryUseCases={inventoryUseCases} />;
       case 'logistics':
-        return renderSwaggerModuleOverview(
-          'Logística de Traslados en 2 Pasos & Tomas Físicas Ciegas',
-          'Módulos de control de mercancía en tránsito y conteos cíclicos auditados por supervisor.',
-          [
-            { method: 'POST', path: '/api/v1/inventory/transfers', summary: 'Despachar traslado desde Bodega Origen (IN_TRANSIT)' },
-            { method: 'GET', path: '/api/v1/inventory/transfers', summary: 'Consultar traslados entrantes y salientes por bodega' },
-            { method: 'PATCH', path: '/api/v1/inventory/transfers/{id}/receive', summary: 'Confirmar recepción total o parcial en Bodega Destino' },
-            { method: 'POST', path: '/api/v1/inventory/counts', summary: 'Abrir sesión de toma física con snapshot ciego' },
-            { method: 'PATCH', path: '/api/v1/inventory/counts/{id}/submit', summary: 'Registrar cantidades físicas contadas por operario' },
-            { method: 'PATCH', path: '/api/v1/inventory/counts/{id}/approve', summary: 'Aprobar conteo y generar ajuste automático al kárdex' },
-          ]
-        );
+        return <LogisticsModuleView logisticsUseCases={logisticsUseCases} />;
       case 'establishments':
         return renderSwaggerModuleOverview(
           'Sedes & Establecimientos POS',
