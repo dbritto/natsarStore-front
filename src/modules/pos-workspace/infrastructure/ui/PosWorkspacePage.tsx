@@ -42,6 +42,8 @@ import { EstablishmentUseCases } from '@modules/establishments/application/use-c
 import { EstablishmentsModuleView } from '@modules/establishments/infrastructure/ui/EstablishmentsModuleView';
 import { SettingsUseCases } from '@modules/settings/application/use-cases/SettingsUseCases';
 import { SettingsModuleView } from '@modules/settings/infrastructure/ui/SettingsModuleView';
+import { PosTerminalUseCases } from '@modules/pos-terminal/application/use-cases/PosTerminalUseCases';
+import { PosTerminalModuleView } from '@modules/pos-terminal/infrastructure/ui/PosTerminalModuleView';
 
 export interface PosWorkspacePageProps {
   session: UserSession;
@@ -53,6 +55,7 @@ export interface PosWorkspacePageProps {
   rbacUseCases: RbacUseCases;
   establishmentUseCases: EstablishmentUseCases;
   settingsUseCases: SettingsUseCases;
+  posTerminalUseCases: PosTerminalUseCases;
   onLogout: () => void;
 }
 
@@ -64,6 +67,7 @@ const PERIOD_OPTIONS: PeriodOption[] = [
 
 const SECTION_TITLES: Record<WorkspaceSectionId, string> = {
   dashboard: 'Reporte de Ventas & Analítica',
+  'pos-terminal': 'Terminal Caja Registradora POS & Facturación DIAN',
   catalog: 'Catálogo de Productos & Códigos de Barras',
   customers: 'Clientes Adquirentes & Motor Tributario DIAN',
   inventory: 'Existencias por Bodega & Kárdex Inmutable',
@@ -87,6 +91,7 @@ export const PosWorkspacePage: React.FC<PosWorkspacePageProps> = ({
   rbacUseCases,
   establishmentUseCases,
   settingsUseCases,
+  posTerminalUseCases,
   onLogout,
 }) => {
   const [activeSection, setActiveSection] = useState<WorkspaceSectionId>('dashboard');
@@ -617,6 +622,15 @@ export const PosWorkspacePage: React.FC<PosWorkspacePageProps> = ({
     switch (activeSection) {
       case 'dashboard':
         return renderDashboardBento();
+      case 'pos-terminal':
+        return (
+          <PosTerminalModuleView
+            cashierFullName={session.fullName}
+            posTerminalUseCases={posTerminalUseCases}
+            catalogUseCases={catalogUseCases}
+            customerUseCases={customerUseCases}
+          />
+        );
       case 'catalog':
         return <CatalogModuleView catalogUseCases={catalogUseCases} />;
       case 'customers':

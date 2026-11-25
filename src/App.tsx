@@ -23,11 +23,13 @@ import { HttpEstablishmentRepositoryAdapter } from '@modules/establishments/infr
 import { EstablishmentUseCases } from '@modules/establishments/application/use-cases/EstablishmentUseCases';
 import { HttpSettingsRepositoryAdapter } from '@modules/settings/infrastructure/adapters/HttpSettingsRepositoryAdapter';
 import { SettingsUseCases } from '@modules/settings/application/use-cases/SettingsUseCases';
+import { HttpPosTerminalRepositoryAdapter } from '@modules/pos-terminal/infrastructure/adapters/HttpPosTerminalRepositoryAdapter';
+import { PosTerminalUseCases } from '@modules/pos-terminal/application/use-cases/PosTerminalUseCases';
 import { PosWorkspacePage } from '@modules/pos-workspace/infrastructure/ui/PosWorkspacePage';
 
 /**
  * Raíz de Composición Hexagonal (Dependency Injection Container de NatsarStore)
- * Conecta el 100% de los módulos del Swagger con Puertos, Adaptadores y Casos de Uso.
+ * Conecta todos los módulos DDD con Puertos, Adaptadores y Casos de Uso.
  */
 export const App: React.FC = () => {
   const {
@@ -41,6 +43,7 @@ export const App: React.FC = () => {
     rbacUseCases,
     establishmentUseCases,
     settingsUseCases,
+    posTerminalUseCases,
     initialData,
   } = useMemo(() => {
     const sessionStorage = new LocalStorageSessionAdapter();
@@ -58,6 +61,7 @@ export const App: React.FC = () => {
     const rbacRepository = new HttpRbacRepositoryAdapter(httpClient);
     const establishmentRepository = new HttpEstablishmentRepositoryAdapter(httpClient);
     const settingsRepository = new HttpSettingsRepositoryAdapter(httpClient);
+    const posTerminalRepository = new HttpPosTerminalRepositoryAdapter(inventoryRepository);
 
     const restore = new RestoreSessionUseCase(sessionStorage);
     return {
@@ -71,6 +75,7 @@ export const App: React.FC = () => {
       rbacUseCases: new RbacUseCases(rbacRepository),
       establishmentUseCases: new EstablishmentUseCases(establishmentRepository),
       settingsUseCases: new SettingsUseCases(settingsRepository),
+      posTerminalUseCases: new PosTerminalUseCases(posTerminalRepository),
       initialData: restore.execute(),
     };
   }, []);
@@ -115,6 +120,7 @@ export const App: React.FC = () => {
       rbacUseCases={rbacUseCases}
       establishmentUseCases={establishmentUseCases}
       settingsUseCases={settingsUseCases}
+      posTerminalUseCases={posTerminalUseCases}
       onLogout={handleLogout}
     />
   );

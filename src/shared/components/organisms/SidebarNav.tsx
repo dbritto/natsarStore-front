@@ -5,6 +5,7 @@ import { SidebarNavItem } from '../molecules/SidebarNavItem';
 
 export type WorkspaceSectionId =
   | 'dashboard'
+  | 'pos-terminal'
   | 'catalog'
   | 'customers'
   | 'inventory'
@@ -46,6 +47,7 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
       groupTitle: 'MENÚ',
       items: [
         { id: 'dashboard', label: 'Reporte & Analítica', icon: 'bar-chart', badgeCount: alertCount },
+        { id: 'pos-terminal', label: 'Caja Registradora POS', icon: 'receipt' },
         { id: 'catalog', label: 'Productos & Catálogo', icon: 'package' },
         { id: 'customers', label: 'Clientes & DIAN', icon: 'users' },
       ],
