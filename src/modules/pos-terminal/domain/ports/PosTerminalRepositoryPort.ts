@@ -2,7 +2,7 @@ import { Result } from '@shared/domain/Result';
 import { CashShiftModel } from '../models/CashShift.model';
 import {
   PosCartLineItem,
-  PosPaymentMethod,
+  PosPaymentLine,
   PosReceiptProps,
 } from '../models/PosCart.model';
 import { CustomerModel } from '@modules/customers/domain/models/Customer.model';
@@ -10,8 +10,7 @@ import { CustomerModel } from '@modules/customers/domain/models/Customer.model';
 export interface EmitPosInvoiceCommand {
   customer: CustomerModel;
   lines: PosCartLineItem[];
-  paymentMethod: PosPaymentMethod;
-  cashTenderedCop: number;
+  payments: PosPaymentLine[];
 }
 
 /**

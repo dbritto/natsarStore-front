@@ -43,16 +43,15 @@ export class PosTerminalUseCases {
     const validOrErr = PosCartModel.validateCheckout({
       isShiftOpen,
       lines: command.lines,
-      paymentMethod: command.paymentMethod,
+      payments: command.payments,
       netPayableCop: liquidation.result.netPayable,
-      cashTenderedCop: command.cashTenderedCop,
     });
 
     if (validOrErr.isFailure) {
       return Result.fail(validOrErr.error!);
     }
 
-    return this.repository.emitInvoice(command);
+    return this.repository.emitInvoice({ ...command, payments: validOrErr.getValue() });
   }
 
   public async getRecentReceipts(): Promise<Result<PosReceiptProps[]>> {

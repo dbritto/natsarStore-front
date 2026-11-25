@@ -142,8 +142,8 @@ export const PosCatalogGrid: React.FC<PosCatalogGridProps> = ({
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
-            gap: '14px',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+            gap: '12px',
           }}
         >
           {products.map((prod) => {

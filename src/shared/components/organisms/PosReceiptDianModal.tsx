@@ -25,6 +25,7 @@ export interface PosReceiptModalData {
     netPayable: number;
   };
   paymentMethod: string;
+  payments?: { label: string; amountCop: number }[];
   cashTenderedCop: number;
   changeDueCop: number;
   cufe: string;
@@ -147,6 +148,28 @@ export const PosReceiptDianModal: React.FC<PosReceiptDianModalProps> = ({
               <span>TOTAL NETO PAGADO:</span>
               <span>{formatCop(receipt.taxSummary.netPayable)}</span>
             </div>
+
+            {receipt.payments && receipt.payments.length > 1 && (
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '3px',
+                  padding: '8px 10px',
+                  borderRadius: '10px',
+                  backgroundColor: '#F5F7FF',
+                  fontSize: '0.78rem',
+                }}
+              >
+                <span style={{ fontWeight: 700, color: '#4D53F4' }}>Pago dividido</span>
+                {receipt.payments.map((p) => (
+                  <div key={p.label} style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ color: '#64748B' }}>{p.label}</span>
+                    <strong>{formatCop(p.amountCop)}</strong>
+                  </div>
+                ))}
+              </div>
+            )}
 
             {receipt.paymentMethod === 'CASH' && (
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: '#047857' }}>

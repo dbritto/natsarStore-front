@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Icon } from '../atoms/Icon';
 
 export interface PosProductCardProps {
@@ -15,7 +15,8 @@ export interface PosProductCardProps {
 
 /**
  * Molécula PosProductCard (Componente Bruto / Presentacional Puro)
- * Tarjeta de producto táctil inspirada en interfaces POS modernas con botón circular '+'.
+ * Tarjeta de producto con imagen cuadrada redondeada, nombre, precio y botón '+'.
+ * Si el producto no tiene imagen (o falla al cargar) muestra un ícono de respaldo.
  */
 export const PosProductCard: React.FC<PosProductCardProps> = ({
   name,
@@ -26,141 +27,133 @@ export const PosProductCard: React.FC<PosProductCardProps> = ({
   isHardware = false,
   onAddToCart,
 }) => {
+  const [imageFailed, setImageFailed] = useState(false);
+  const showImage = Boolean(primaryImageUrl) && !imageFailed;
+
   return (
     <div
       onClick={onAddToCart}
       style={{
         backgroundColor: '#FFFFFF',
-        borderRadius: '20px',
-        padding: '16px 14px 14px',
-        border: '1px solid #E2E8F0',
-        boxShadow: '0 4px 12px rgba(15, 23, 42, 0.03)',
+        borderRadius: '18px',
+        padding: '10px',
+        border: '1px solid #E8ECF4',
         cursor: 'pointer',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'space-between',
-        gap: '12px',
+        gap: '10px',
         transition: 'transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease',
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = 'translateY(-2px)';
-        e.currentTarget.style.boxShadow = '0 8px 20px rgba(77, 83, 244, 0.12)';
+        e.currentTarget.style.boxShadow = '0 10px 22px rgba(77, 83, 244, 0.12)';
         e.currentTarget.style.borderColor = '#C7D2FE';
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = '0 4px 12px rgba(15, 23, 42, 0.03)';
-        e.currentTarget.style.borderColor = '#E2E8F0';
+        e.currentTarget.style.boxShadow = 'none';
+        e.currentTarget.style.borderColor = '#E8ECF4';
       }}
     >
-      {/* Ilustración / Miniatura Circular Central */}
+      {/* Imagen del producto */}
       <div
         style={{
-          width: '72px',
-          height: '72px',
-          borderRadius: '50%',
+          width: '100%',
+          aspectRatio: '1 / 1',
+          borderRadius: '14px',
+          overflow: 'hidden',
           backgroundColor: isFoodOrDrink ? '#FEF3C7' : isHardware ? '#EEF2FF' : '#ECFDF5',
           color: isFoodOrDrink ? '#D97706' : isHardware ? '#4D53F4' : '#059669',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          margin: '0 auto',
-          fontSize: '1.9rem',
-          boxShadow: '0 4px 10px rgba(15, 23, 42, 0.04)',
+          fontSize: '2.4rem',
         }}
       >
-        {primaryImageUrl ? (
+        {showImage ? (
           <img
-            src={primaryImageUrl}
+            src={primaryImageUrl ?? ''}
             alt={name}
-            style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
+            loading="lazy"
+            onError={() => setImageFailed(true)}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
         ) : isFoodOrDrink ? (
           '☕'
         ) : isHardware ? (
-          <Icon name="package" size={30} />
+          <Icon name="package" size={38} />
         ) : (
-          <Icon name="sparkles" size={28} />
+          <Icon name="image" size={36} />
         )}
       </div>
 
-      {/* Nombre & Impuesto */}
-      <div style={{ textAlign: 'center' }}>
+      {/* Nombre y precio con botón '+' */}
+      <div style={{ padding: '0 2px 2px' }}>
         <div
           style={{
-            fontWeight: 700,
-            fontSize: '0.86rem',
-            color: '#0F172A',
+            fontWeight: 600,
+            fontSize: '0.82rem',
+            color: '#1E293B',
             lineHeight: 1.25,
-            minHeight: '34px',
+            minHeight: '32px',
             display: '-webkit-box',
             WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
           }}
+          title={name}
         >
           {name}
         </div>
-        <span
-          style={{
-            fontSize: '0.68rem',
-            color: '#94A3B8',
-            marginTop: '3px',
-            display: 'inline-block',
-          }}
-        >
-          {taxBadgeLabel}
-        </span>
-      </div>
 
-      {/* Precio y Botón Circular '+' */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          paddingTop: '8px',
-          borderTop: '1px solid #F1F5F9',
-        }}
-      >
-        <span
+        <div
           style={{
-            fontFamily: 'var(--font-display)',
-            fontWeight: 800,
-            fontSize: '1rem',
-            color: '#0F172A',
-          }}
-        >
-          {formattedPrice}
-        </span>
-
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onAddToCart();
-          }}
-          style={{
-            width: '30px',
-            height: '30px',
-            borderRadius: '50%',
-            border: 'none',
-            backgroundColor: '#4D53F4',
-            color: '#FFFFFF',
-            display: 'inline-flex',
+            display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '1.1rem',
-            fontWeight: 700,
-            cursor: 'pointer',
-            boxShadow: '0 4px 10px rgba(77, 83, 244, 0.3)',
-            transition: 'transform 0.12s ease',
+            justifyContent: 'space-between',
+            marginTop: '6px',
           }}
-          onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.92)')}
-          onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
         >
-          +
-        </button>
+          <div>
+            <div
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontWeight: 800,
+                fontSize: '0.95rem',
+                color: '#0F172A',
+                lineHeight: 1.1,
+              }}
+            >
+              {formattedPrice}
+            </div>
+            <span style={{ fontSize: '0.64rem', color: '#94A3B8' }}>{taxBadgeLabel}</span>
+          </div>
+
+          <button
+            type="button"
+            aria-label={`Agregar ${name}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              onAddToCart();
+            }}
+            style={{
+              width: '28px',
+              height: '28px',
+              borderRadius: '8px',
+              border: 'none',
+              backgroundColor: '#4D53F4',
+              color: '#FFFFFF',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              flexShrink: 0,
+              boxShadow: '0 4px 10px rgba(77, 83, 244, 0.3)',
+            }}
+          >
+            <Icon name="plus" size={15} />
+          </button>
+        </div>
       </div>
     </div>
   );

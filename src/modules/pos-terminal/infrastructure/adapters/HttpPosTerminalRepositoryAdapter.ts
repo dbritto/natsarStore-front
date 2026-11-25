@@ -91,12 +91,15 @@ export class HttpPosTerminalRepositoryAdapter implements PosTerminalRepositoryPo
     const invoiceNumber = `SETP-${this.consecutiveNumber++}`;
     const cufe = PosCartModel.generateCufeHash(invoiceNumber, netPayable);
 
-    const cashTendered =
-      command.paymentMethod === 'CASH' ? command.cashTenderedCop : netPayable;
-    const changeDue =
-      command.paymentMethod === 'CASH'
-        ? Math.max(0, cashTendered - netPayable)
-        : 0;
+    const amountFor = (method: 'CASH' | 'CARD' | 'TRANSFER_BRE_B') =>
+      command.payments
+        .filter((p) => p.method === method)
+        .reduce((acc, p) => acc + p.amountCop, 0);
+    const cashLine = command.payments.find((p) => p.method === 'CASH');
+    const cashApplied = amountFor('CASH');
+    const cashTendered = cashLine ? (cashLine.tenderedCop ?? cashApplied) : 0;
+    const changeDue = cashLine ? Math.max(0, cashTendered - cashApplied) : 0;
+    const receiptMethod = PosCartModel.resolveReceiptPaymentMethod(command.payments);
 
     // Descontar existencias automáticamente en la Bodega Mostrador Principal (Kárdex POS_SALE)
     if (this.inventoryRepository) {
@@ -118,18 +121,9 @@ export class HttpPosTerminalRepositoryAdapter implements PosTerminalRepositoryPo
     this.currentShift = {
       ...this.currentShift,
       ticketsCount: this.currentShift.ticketsCount + 1,
-      cashSalesCop:
-        command.paymentMethod === 'CASH'
-          ? this.currentShift.cashSalesCop + netPayable
-          : this.currentShift.cashSalesCop,
-      cardSalesCop:
-        command.paymentMethod === 'CARD'
-          ? this.currentShift.cardSalesCop + netPayable
-          : this.currentShift.cardSalesCop,
-      transferSalesCop:
-        command.paymentMethod === 'TRANSFER_BRE_B'
-          ? this.currentShift.transferSalesCop + netPayable
-          : this.currentShift.transferSalesCop,
+      cashSalesCop: this.currentShift.cashSalesCop + cashApplied,
+      cardSalesCop: this.currentShift.cardSalesCop + amountFor('CARD'),
+      transferSalesCop: this.currentShift.transferSalesCop + amountFor('TRANSFER_BRE_B'),
     };
 
     const receipt: PosReceiptProps = {
@@ -142,8 +136,9 @@ export class HttpPosTerminalRepositoryAdapter implements PosTerminalRepositoryPo
       issuedAt: new Date().toISOString(),
       customerName: command.customer.names,
       customerIdentification: command.customer.identificationFormatted,
-      paymentMethod: command.paymentMethod,
-      paymentMethodLabel: PosCartModel.getPaymentMethodLabel(command.paymentMethod),
+      paymentMethod: receiptMethod,
+      paymentMethodLabel: PosCartModel.getReceiptPaymentLabel(command.payments),
+      payments: command.payments.map((p) => ({ ...p })),
       lines: [...command.lines],
       taxSummary: liquidation.result,
       cashTenderedCop: cashTendered,

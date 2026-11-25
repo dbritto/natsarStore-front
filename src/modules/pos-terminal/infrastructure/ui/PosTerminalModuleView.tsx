@@ -8,6 +8,8 @@ import {
   PosCustomerOption,
   PosLiquidationSummary,
   PosMiniKpiCard,
+  PosPaymentLineInput,
+  PosPaymentModal,
   PosProductItemDisplay,
   PosReceiptDianModal,
   PosShiftModal,
@@ -22,7 +24,6 @@ import { CashShiftModel } from '../../domain/models/CashShift.model';
 import {
   PosCartLineItem,
   PosCartModel,
-  PosPaymentMethod,
   PosReceiptProps,
 } from '../../domain/models/PosCart.model';
 import { PosTerminalUseCases } from '../../application/use-cases/PosTerminalUseCases';
@@ -72,8 +73,8 @@ export const PosTerminalModuleView: React.FC<PosTerminalModuleViewProps> = ({
       taxRate: 8,
     },
   ]);
-  const [paymentMethod, setPaymentMethod] = useState<PosPaymentMethod>('CASH');
-  const [cashTenderedText, setCashTenderedText] = useState('100000');
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   // Modales y Avisos
   const [friendlyNotice, setFriendlyNotice] = useState<FriendlyNotice | null>(null);
@@ -116,9 +117,6 @@ export const PosTerminalModuleView: React.FC<PosTerminalModuleViewProps> = ({
   }, [selectedCustomer, cartLines]);
 
   const netPayableCop = liquidation?.result.netPayable ?? 0;
-  const cashTenderedCop = Number(cashTenderedText) || 0;
-  const changeDueCop =
-    paymentMethod === 'CASH' ? Math.max(0, cashTenderedCop - netPayableCop) : 0;
 
   // Acciones del Carrito
   const handleAddProduct = (item: PosProductItemDisplay) => {
@@ -130,8 +128,8 @@ export const PosTerminalModuleView: React.FC<PosTerminalModuleViewProps> = ({
       raw.isTaxExcluded || raw.defaultTaxCode === 'ZZ'
         ? 'ZZ'
         : raw.defaultTaxCode === '04'
-        ? '04'
-        : '01';
+          ? '04'
+          : '01';
 
     setCartLines((prev) => {
       const existing = prev.find((l) => l.catalogItemId === item.id);
@@ -151,6 +149,7 @@ export const PosTerminalModuleView: React.FC<PosTerminalModuleViewProps> = ({
           discountPct: 0,
           tributeCode: taxCode,
           taxRate: raw.defaultTaxRate,
+          imageUrl: fullItem.primaryImageUrl,
         },
       ];
     });
@@ -168,26 +167,26 @@ export const PosTerminalModuleView: React.FC<PosTerminalModuleViewProps> = ({
     );
   };
 
-  const handleCheckout = async () => {
+  const handleCheckout = async (payments: PosPaymentLineInput[]) => {
     if (!selectedCustomer || !shift) return;
 
-    const effectiveCash = paymentMethod === 'CASH' ? cashTenderedCop : netPayableCop;
-
+    setIsProcessingPayment(true);
     const res = await posTerminalUseCases.checkoutAndEmitInvoice(shift.isOpen, {
       customer: selectedCustomer,
       lines: cartLines,
-      paymentMethod,
-      cashTenderedCop: effectiveCash,
+      payments,
     });
+    setIsProcessingPayment(false);
 
     if (res.isFailure) {
       setFriendlyNotice(
-        FriendlyErrorMapper.toFriendlyNotice(res.error!, 'Revisa el ticket antes de cobrar')
+        FriendlyErrorMapper.toFriendlyNotice(res.error!, 'Revisa el pago antes de cobrar')
       );
       return;
     }
 
     const receipt = res.getValue();
+    setIsPaymentModalOpen(false);
     setCartLines([]);
     await loadTerminalData();
     setActiveReceiptModal(receipt);
@@ -241,6 +240,7 @@ export const PosTerminalModuleView: React.FC<PosTerminalModuleViewProps> = ({
         unitPrice: l.unitPrice,
         quantity: l.quantity,
         lineTotal: l.quantity * l.unitPrice,
+        imageUrl: l.imageUrl,
         isDrink: l.tributeCode === '04',
       })),
     [cartLines]
@@ -373,17 +373,22 @@ export const PosTerminalModuleView: React.FC<PosTerminalModuleViewProps> = ({
           onRemoveLine={(id) => handleUpdateLineQty(id, -99999)}
           onClearCart={() => setCartLines([])}
           liquidation={liquidationSummary}
-          paymentMethod={paymentMethod}
-          onSelectPaymentMethod={setPaymentMethod}
-          cashTenderedText={cashTenderedText}
-          onChangeCashTendered={setCashTenderedText}
-          changeDueCop={changeDueCop}
           isShiftOpen={shift.isOpen}
           onOpenShiftModal={() => {
             setCountedClosingCashText(String(shift.expectedDrawerCashCop));
             setIsShiftModalOpen(true);
           }}
-          onCheckout={() => void handleCheckout()}
+          onPay={() => {
+            if (!shift.isOpen) {
+              setFriendlyNotice(
+                FriendlyErrorMapper.toFriendlyNotice(
+                  'El turno de caja se encuentra cerrado. Abre el turno de caja antes de emitir facturas.'
+                )
+              );
+              return;
+            }
+            setIsPaymentModalOpen(true);
+          }}
         />
 
         <PosCatalogGrid
@@ -402,9 +407,27 @@ export const PosTerminalModuleView: React.FC<PosTerminalModuleViewProps> = ({
         />
       </div>
 
-      {/* 3. Componentes Brutos Modales: Tirilla DIAN y Turno */}
+      {/* 3. Modales: Punto de Pago (pagos divididos), Tirilla DIAN y Turno */}
+      <PosPaymentModal
+        isOpen={isPaymentModalOpen}
+        totalCop={netPayableCop}
+        isProcessing={isProcessingPayment}
+        onConfirm={(payments) => void handleCheckout(payments)}
+        onClose={() => setIsPaymentModalOpen(false)}
+      />
+
       <PosReceiptDianModal
-        receipt={activeReceiptModal}
+        receipt={
+          activeReceiptModal
+            ? {
+              ...activeReceiptModal,
+              payments: activeReceiptModal.payments.map((p) => ({
+                label: PosCartModel.getShortMethodLabel(p.method),
+                amountCop: p.amountCop,
+              })),
+            }
+            : null
+        }
         onClose={() => setActiveReceiptModal(null)}
       />
 
