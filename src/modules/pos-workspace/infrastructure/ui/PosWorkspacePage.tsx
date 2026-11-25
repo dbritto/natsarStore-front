@@ -30,11 +30,14 @@ import { SimulatePosCheckoutUseCase } from '../../application/use-cases/Simulate
 import { GetWorkspaceAnalyticsUseCase } from '../../application/use-cases/GetWorkspaceAnalyticsUseCase';
 import { CatalogUseCases } from '@modules/catalog/application/use-cases/CatalogUseCases';
 import { CatalogModuleView } from '@modules/catalog/infrastructure/ui/CatalogModuleView';
+import { InventoryUseCases } from '@modules/inventory/application/use-cases/InventoryUseCases';
+import { InventoryModuleView } from '@modules/inventory/infrastructure/ui/InventoryModuleView';
 
 export interface PosWorkspacePageProps {
   session: UserSession;
   analyticsUseCase: GetWorkspaceAnalyticsUseCase;
   catalogUseCases: CatalogUseCases;
+  inventoryUseCases: InventoryUseCases;
   onLogout: () => void;
 }
 
@@ -63,6 +66,7 @@ export const PosWorkspacePage: React.FC<PosWorkspacePageProps> = ({
   session,
   analyticsUseCase,
   catalogUseCases,
+  inventoryUseCases,
   onLogout,
 }) => {
   const [activeSection, setActiveSection] = useState<WorkspaceSectionId>('dashboard');
@@ -598,7 +602,7 @@ export const PosWorkspacePage: React.FC<PosWorkspacePageProps> = ({
       case 'customers':
         return renderCustomersAndTaxSection();
       case 'inventory':
-        return renderInventoryAndAlertsSection();
+        return <InventoryModuleView inventoryUseCases={inventoryUseCases} />;
       case 'logistics':
         return renderSwaggerModuleOverview(
           'Logística de Traslados en 2 Pasos & Tomas Físicas Ciegas',

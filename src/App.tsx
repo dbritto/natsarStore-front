@@ -11,6 +11,8 @@ import { HttpWorkspaceRepositoryAdapter } from '@modules/pos-workspace/infrastru
 import { GetWorkspaceAnalyticsUseCase } from '@modules/pos-workspace/application/use-cases/GetWorkspaceAnalyticsUseCase';
 import { HttpCatalogRepositoryAdapter } from '@modules/catalog/infrastructure/adapters/HttpCatalogRepositoryAdapter';
 import { CatalogUseCases } from '@modules/catalog/application/use-cases/CatalogUseCases';
+import { HttpInventoryRepositoryAdapter } from '@modules/inventory/infrastructure/adapters/HttpInventoryRepositoryAdapter';
+import { InventoryUseCases } from '@modules/inventory/application/use-cases/InventoryUseCases';
 import { PosWorkspacePage } from '@modules/pos-workspace/infrastructure/ui/PosWorkspacePage';
 
 /**
@@ -22,6 +24,7 @@ export const App: React.FC = () => {
     logoutUseCase,
     analyticsUseCase,
     catalogUseCases,
+    inventoryUseCases,
     initialData,
   } = useMemo(() => {
     const sessionStorage = new LocalStorageSessionAdapter();
@@ -33,6 +36,7 @@ export const App: React.FC = () => {
     const authRepository = new HttpAuthRepositoryAdapter(httpClient);
     const workspaceRepository = new HttpWorkspaceRepositoryAdapter(httpClient);
     const catalogRepository = new HttpCatalogRepositoryAdapter(httpClient);
+    const inventoryRepository = new HttpInventoryRepositoryAdapter(httpClient);
 
     const restore = new RestoreSessionUseCase(sessionStorage);
     return {
@@ -40,6 +44,7 @@ export const App: React.FC = () => {
       logoutUseCase: new LogoutUseCase(authRepository, sessionStorage),
       analyticsUseCase: new GetWorkspaceAnalyticsUseCase(workspaceRepository),
       catalogUseCases: new CatalogUseCases(catalogRepository),
+      inventoryUseCases: new InventoryUseCases(inventoryRepository),
       initialData: restore.execute(),
     };
   }, []);
@@ -78,6 +83,7 @@ export const App: React.FC = () => {
       session={session}
       analyticsUseCase={analyticsUseCase}
       catalogUseCases={catalogUseCases}
+      inventoryUseCases={inventoryUseCases}
       onLogout={handleLogout}
     />
   );
