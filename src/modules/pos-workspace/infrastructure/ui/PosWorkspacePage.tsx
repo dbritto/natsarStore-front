@@ -34,6 +34,8 @@ import { InventoryUseCases } from '@modules/inventory/application/use-cases/Inve
 import { InventoryModuleView } from '@modules/inventory/infrastructure/ui/InventoryModuleView';
 import { LogisticsUseCases } from '@modules/logistics/application/use-cases/LogisticsUseCases';
 import { LogisticsModuleView } from '@modules/logistics/infrastructure/ui/LogisticsModuleView';
+import { CustomerUseCases } from '@modules/customers/application/use-cases/CustomerUseCases';
+import { CustomersModuleView } from '@modules/customers/infrastructure/ui/CustomersModuleView';
 
 export interface PosWorkspacePageProps {
   session: UserSession;
@@ -41,6 +43,7 @@ export interface PosWorkspacePageProps {
   catalogUseCases: CatalogUseCases;
   inventoryUseCases: InventoryUseCases;
   logisticsUseCases: LogisticsUseCases;
+  customerUseCases: CustomerUseCases;
   onLogout: () => void;
 }
 
@@ -71,6 +74,7 @@ export const PosWorkspacePage: React.FC<PosWorkspacePageProps> = ({
   catalogUseCases,
   inventoryUseCases,
   logisticsUseCases,
+  customerUseCases,
   onLogout,
 }) => {
   const [activeSection, setActiveSection] = useState<WorkspaceSectionId>('dashboard');
@@ -604,7 +608,7 @@ export const PosWorkspacePage: React.FC<PosWorkspacePageProps> = ({
       case 'catalog':
         return <CatalogModuleView catalogUseCases={catalogUseCases} />;
       case 'customers':
-        return renderCustomersAndTaxSection();
+        return <CustomersModuleView customerUseCases={customerUseCases} />;
       case 'inventory':
         return <InventoryModuleView inventoryUseCases={inventoryUseCases} />;
       case 'logistics':
