@@ -36,6 +36,8 @@ import { LogisticsUseCases } from '@modules/logistics/application/use-cases/Logi
 import { LogisticsModuleView } from '@modules/logistics/infrastructure/ui/LogisticsModuleView';
 import { CustomerUseCases } from '@modules/customers/application/use-cases/CustomerUseCases';
 import { CustomersModuleView } from '@modules/customers/infrastructure/ui/CustomersModuleView';
+import { RbacUseCases } from '@modules/rbac/application/use-cases/RbacUseCases';
+import { RbacModuleView } from '@modules/rbac/infrastructure/ui/RbacModuleView';
 
 export interface PosWorkspacePageProps {
   session: UserSession;
@@ -44,6 +46,7 @@ export interface PosWorkspacePageProps {
   inventoryUseCases: InventoryUseCases;
   logisticsUseCases: LogisticsUseCases;
   customerUseCases: CustomerUseCases;
+  rbacUseCases: RbacUseCases;
   onLogout: () => void;
 }
 
@@ -75,6 +78,7 @@ export const PosWorkspacePage: React.FC<PosWorkspacePageProps> = ({
   inventoryUseCases,
   logisticsUseCases,
   customerUseCases,
+  rbacUseCases,
   onLogout,
 }) => {
   const [activeSection, setActiveSection] = useState<WorkspaceSectionId>('dashboard');
@@ -625,16 +629,7 @@ export const PosWorkspacePage: React.FC<PosWorkspacePageProps> = ({
           ]
         );
       case 'rbac':
-        return renderSwaggerModuleOverview(
-          'Seguridad RBAC: Usuarios, Roles & Permisos',
-          'Gestión de accesos con comodín dinámico superAdmin:* y tokens JWT RS256.',
-          [
-            { method: 'GET', path: '/api/v1/auth/users', summary: 'Listar colaboradores del POS y sus roles asignados' },
-            { method: 'POST', path: '/api/v1/auth/users', summary: 'Registrar nuevo usuario cajero, supervisor o administrador' },
-            { method: 'GET', path: '/api/v1/auth/roles', summary: 'Consultar catálogo de roles RBAC del sistema' },
-            { method: 'GET', path: '/api/v1/auth/permissions', summary: 'Consultar permisos granulares modulo:accion' },
-          ]
-        );
+        return <RbacModuleView currentUserId={session.id} rbacUseCases={rbacUseCases} />;
       case 'settings':
         return renderSwaggerModuleOverview(
           'Configuración Global Singleton & Gestor Multimedia',
