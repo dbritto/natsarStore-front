@@ -44,9 +44,13 @@ import { SettingsUseCases } from '@modules/settings/application/use-cases/Settin
 import { SettingsModuleView } from '@modules/settings/infrastructure/ui/SettingsModuleView';
 import { PosTerminalUseCases } from '@modules/pos-terminal/application/use-cases/PosTerminalUseCases';
 import { PosTerminalModuleView } from '@modules/pos-terminal/infrastructure/ui/PosTerminalModuleView';
+import { UserProfileModuleView } from '@modules/auth/infrastructure/ui/UserProfileModuleView';
 
 export interface PosWorkspacePageProps {
   session: UserSession;
+  sessionRemainingSeconds: number;
+  autoRefreshEnabled: boolean;
+  isRefreshingToken: boolean;
   analyticsUseCase: GetWorkspaceAnalyticsUseCase;
   catalogUseCases: CatalogUseCases;
   inventoryUseCases: InventoryUseCases;
@@ -56,6 +60,10 @@ export interface PosWorkspacePageProps {
   establishmentUseCases: EstablishmentUseCases;
   settingsUseCases: SettingsUseCases;
   posTerminalUseCases: PosTerminalUseCases;
+  onToggleAutoRefresh: (enabled: boolean) => void;
+  onRefreshSessionToken: () => Promise<boolean>;
+  onSimulateExpirationCountdown: (seconds: number) => void;
+  onUpdateSession: (updatedSession: UserSession) => void;
   onLogout: () => void;
 }
 
@@ -75,6 +83,7 @@ const SECTION_TITLES: Record<WorkspaceSectionId, string> = {
   establishments: 'Sedes & Establecimientos POS',
   rbac: 'Usuarios, Roles & Permisos RBAC',
   settings: 'Configuración Global & Multimedia',
+  profile: 'Mi Perfil & Actualización de Datos',
 };
 
 /**
@@ -83,6 +92,9 @@ const SECTION_TITLES: Record<WorkspaceSectionId, string> = {
  */
 export const PosWorkspacePage: React.FC<PosWorkspacePageProps> = ({
   session,
+  sessionRemainingSeconds,
+  autoRefreshEnabled,
+  isRefreshingToken,
   analyticsUseCase,
   catalogUseCases,
   inventoryUseCases,
@@ -92,6 +104,10 @@ export const PosWorkspacePage: React.FC<PosWorkspacePageProps> = ({
   establishmentUseCases,
   settingsUseCases,
   posTerminalUseCases,
+  onToggleAutoRefresh,
+  onRefreshSessionToken,
+  onSimulateExpirationCountdown,
+  onUpdateSession,
   onLogout,
 }) => {
   const [activeSection, setActiveSection] = useState<WorkspaceSectionId>('dashboard');
@@ -645,8 +661,32 @@ export const PosWorkspacePage: React.FC<PosWorkspacePageProps> = ({
         return <RbacModuleView currentUserId={session.id} rbacUseCases={rbacUseCases} />;
       case 'settings':
         return <SettingsModuleView settingsUseCases={settingsUseCases} />;
+      case 'profile':
+        return (
+          <UserProfileModuleView
+            session={session}
+            rbacUseCases={rbacUseCases}
+            sessionRemainingSeconds={sessionRemainingSeconds}
+            autoRefreshEnabled={autoRefreshEnabled}
+            isRefreshingToken={isRefreshingToken}
+            onToggleAutoRefresh={onToggleAutoRefresh}
+            onRefreshSessionToken={onRefreshSessionToken}
+            onSimulateExpirationCountdown={onSimulateExpirationCountdown}
+            onUpdateSession={onUpdateSession}
+            onLogout={onLogout}
+          />
+        );
     }
   };
+
+  const docTypeLabel =
+    session.identificationTypeCode === '31'
+      ? 'NIT'
+      : session.identificationTypeCode === '22'
+      ? 'CE'
+      : session.identificationTypeCode === '41'
+      ? 'PAS'
+      : 'CC';
 
   return (
     <WorkspaceShellTemplate
@@ -656,9 +696,19 @@ export const PosWorkspacePage: React.FC<PosWorkspacePageProps> = ({
       dateSubtitle={formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1)}
       userFullName={session.fullName}
       userRoleLabel={session.primaryRoleLabel}
+      userEmail={session.email}
+      userIdentification={`${docTypeLabel} ${session.identificationNumber}`}
+      userEstablishment={session.establishmentName}
+      userRoles={session.roles}
+      userPermissions={session.permissions}
+      userPhotoUrl={session.photoUrl}
+      sessionRemainingSeconds={sessionRemainingSeconds}
+      isRefreshingToken={isRefreshingToken}
       alertCount={analytics.kpis.criticalAlertsCount}
       onRefresh={() => void loadAnalytics(period)}
       onSearchClick={() => setActiveSection('catalog')}
+      onRefreshSessionToken={() => void onRefreshSessionToken()}
+      onOpenProfileSettings={() => setActiveSection('profile')}
       onLogout={onLogout}
     >
       {renderActiveContent()}

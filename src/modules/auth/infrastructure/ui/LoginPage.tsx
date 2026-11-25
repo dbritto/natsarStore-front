@@ -15,6 +15,8 @@ import { FriendlyErrorMapper, FriendlyNotice } from '@shared/domain/FriendlyErro
 
 export interface LoginPageProps {
   initialEmail: string;
+  initialNotice?: FriendlyNotice | null;
+  onClearInitialNotice?: () => void;
   onSubmitLogin: (email: string, password: string, rememberMe: boolean) => Promise<string | null>;
 }
 
@@ -25,12 +27,14 @@ export interface LoginPageProps {
  */
 export const LoginPage: React.FC<LoginPageProps> = ({
   initialEmail,
+  initialNotice = null,
+  onClearInitialNotice,
   onSubmitLogin,
 }) => {
   const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [modalNotice, setModalNotice] = useState<FriendlyNotice | null>(null);
+  const [modalNotice, setModalNotice] = useState<FriendlyNotice | null>(initialNotice);
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -164,12 +168,15 @@ export const LoginPage: React.FC<LoginPageProps> = ({
 
       {/* Modal compartido para suavizar errores y avisos al cliente */}
       <FriendlyModal
-        isOpen={Boolean(modalNotice)}
-        title={modalNotice?.title ?? ''}
-        message={modalNotice?.message ?? ''}
-        tone={modalNotice?.tone}
-        actionLabel={modalNotice?.actionLabel}
-        onClose={() => setModalNotice(null)}
+        isOpen={Boolean(modalNotice || initialNotice)}
+        title={(modalNotice ?? initialNotice)?.title ?? ''}
+        message={(modalNotice ?? initialNotice)?.message ?? ''}
+        tone={(modalNotice ?? initialNotice)?.tone}
+        actionLabel={(modalNotice ?? initialNotice)?.actionLabel}
+        onClose={() => {
+          setModalNotice(null);
+          onClearInitialNotice?.();
+        }}
       />
     </AuthSplitTemplate>
   );

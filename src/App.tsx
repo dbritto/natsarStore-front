@@ -1,9 +1,11 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { FriendlyNotice } from '@shared/domain/FriendlyErrorMapper';
 import { FetchHttpClientAdapter } from '@shared/infrastructure/http/FetchHttpClientAdapter';
 import { LocalStorageSessionAdapter } from '@modules/auth/infrastructure/adapters/LocalStorageSessionAdapter';
 import { HttpAuthRepositoryAdapter } from '@modules/auth/infrastructure/adapters/HttpAuthRepositoryAdapter';
 import { LoginUseCase } from '@modules/auth/application/use-cases/LoginUseCase';
 import { LogoutUseCase } from '@modules/auth/application/use-cases/LogoutUseCase';
+import { RefreshTokenUseCase } from '@modules/auth/application/use-cases/RefreshTokenUseCase';
 import { RestoreSessionUseCase } from '@modules/auth/application/use-cases/RestoreSessionUseCase';
 import { UserSession } from '@modules/auth/domain/models/UserSession.model';
 import { LoginPage } from '@modules/auth/infrastructure/ui/LoginPage';
@@ -27,14 +29,25 @@ import { HttpPosTerminalRepositoryAdapter } from '@modules/pos-terminal/infrastr
 import { PosTerminalUseCases } from '@modules/pos-terminal/application/use-cases/PosTerminalUseCases';
 import { PosWorkspacePage } from '@modules/pos-workspace/infrastructure/ui/PosWorkspacePage';
 
+const SESSION_EXPIRED_NOTICE: FriendlyNotice = {
+  title: 'Tu sesión ha finalizado por tiempo',
+  message:
+    'El tiempo de vigencia de tu sesión ha concluido por seguridad y dejó de estar activa. Por favor inicia sesión nuevamente para continuar.',
+  tone: 'warning',
+  actionLabel: 'Iniciar sesión',
+};
+
 /**
  * Raíz de Composición Hexagonal (Dependency Injection Container de NatsarStore)
- * Conecta todos los módulos DDD con Puertos, Adaptadores y Casos de Uso.
+ * Conecta todos los módulos DDD con Puertos, Adaptadores, Refresh Token y control de expiración.
  */
 export const App: React.FC = () => {
   const {
+    sessionStorage,
+    httpClient,
     loginUseCase,
     logoutUseCase,
+    refreshTokenUseCase,
     analyticsUseCase,
     catalogUseCases,
     inventoryUseCases,
@@ -47,10 +60,15 @@ export const App: React.FC = () => {
     initialData,
   } = useMemo(() => {
     const sessionStorage = new LocalStorageSessionAdapter();
-    const apiBaseUrl = (import.meta.env.VITE_API_URL || 'https://sistemapos-dian.onrender.com').replace(/\/+$/, '');
+    const apiBaseUrl = (
+      import.meta.env.VITE_API_URL || 'https://sistemapos-dian.onrender.com'
+    ).replace(/\/+$/, '');
     const httpClient = new FetchHttpClientAdapter(apiBaseUrl, () => {
       const current = sessionStorage.getSession();
-      return current?.tokens.accessToken ?? null;
+      if (!current || current.isExpired()) {
+        return null;
+      }
+      return current.tokens.accessToken;
     });
     const authRepository = new HttpAuthRepositoryAdapter(httpClient);
     const workspaceRepository = new HttpWorkspaceRepositoryAdapter(httpClient);
@@ -65,8 +83,11 @@ export const App: React.FC = () => {
 
     const restore = new RestoreSessionUseCase(sessionStorage);
     return {
+      sessionStorage,
+      httpClient,
       loginUseCase: new LoginUseCase(authRepository, sessionStorage),
       logoutUseCase: new LogoutUseCase(authRepository, sessionStorage),
+      refreshTokenUseCase: new RefreshTokenUseCase(authRepository, sessionStorage),
       analyticsUseCase: new GetWorkspaceAnalyticsUseCase(workspaceRepository),
       catalogUseCases: new CatalogUseCases(catalogRepository),
       inventoryUseCases: new InventoryUseCases(inventoryRepository),
@@ -81,6 +102,92 @@ export const App: React.FC = () => {
   }, []);
 
   const [session, setSession] = useState<UserSession | null>(initialData.session);
+  const [sessionRemainingSeconds, setSessionRemainingSeconds] = useState<number>(() =>
+    initialData.session ? initialData.session.getRemainingSeconds() : 0
+  );
+  const [autoRefreshEnabled, setAutoRefreshEnabled] = useState<boolean>(false);
+  const [isRefreshingToken, setIsRefreshingToken] = useState<boolean>(false);
+  const [expiredNotice, setExpiredNotice] = useState<FriendlyNotice | null>(null);
+
+  const sessionRef = useRef<UserSession | null>(session);
+  sessionRef.current = session;
+  const autoRefreshAttemptedForTokenRef = useRef<string | null>(null);
+
+  const handleSessionExpired = useCallback(() => {
+    sessionStorage.clearSession();
+    setSession(null);
+    setSessionRemainingSeconds(0);
+    setExpiredNotice(SESSION_EXPIRED_NOTICE);
+  }, [sessionStorage]);
+
+  const handleRefreshSessionToken = useCallback(async (): Promise<boolean> => {
+    const current = sessionRef.current;
+    if (!current) return false;
+    setIsRefreshingToken(true);
+    const res = await refreshTokenUseCase.execute(current);
+    setIsRefreshingToken(false);
+    if (res.isSuccess) {
+      const updated = res.getValue();
+      setSession(updated);
+      setSessionRemainingSeconds(updated.getRemainingSeconds());
+      autoRefreshAttemptedForTokenRef.current = null;
+      return true;
+    }
+    return false;
+  }, [refreshTokenUseCase]);
+
+  // Conectar interceptor HTTP 401 -> Refresh Token -> Si falla o expiró, cerrar sesión
+  useEffect(() => {
+    httpClient.configureSessionLifecycle({
+      onUnauthorizedRefresh: async () => {
+        const current = sessionRef.current;
+        if (!current || current.isExpired()) {
+          return null;
+        }
+        const res = await refreshTokenUseCase.execute(current);
+        if (res.isSuccess) {
+          const updated = res.getValue();
+          setSession(updated);
+          setSessionRemainingSeconds(updated.getRemainingSeconds());
+          return updated.tokens.accessToken;
+        }
+        return null;
+      },
+      onSessionExpired: handleSessionExpired,
+    });
+  }, [httpClient, refreshTokenUseCase, handleSessionExpired]);
+
+  // Reloj guardián de vigencia de sesión (1 segundo):
+  // Cuando el tiempo pasa y llega a 0, la sesión deja de funcionar inmediatamente.
+  useEffect(() => {
+    if (!session) return;
+
+    const tick = () => {
+      const active = sessionRef.current;
+      if (!active) return;
+
+      const remaining = active.getRemainingSeconds();
+      setSessionRemainingSeconds(remaining);
+
+      if (remaining <= 0 || active.isExpired()) {
+        handleSessionExpired();
+        return;
+      }
+
+      if (
+        autoRefreshEnabled &&
+        remaining <= 35 &&
+        autoRefreshAttemptedForTokenRef.current !== active.tokens.accessToken
+      ) {
+        autoRefreshAttemptedForTokenRef.current = active.tokens.accessToken;
+        void handleRefreshSessionToken();
+      }
+    };
+
+    tick();
+    const intervalId = window.setInterval(tick, 1000);
+    return () => window.clearInterval(intervalId);
+  }, [session, autoRefreshEnabled, handleSessionExpired, handleRefreshSessionToken]);
 
   const handleLogin = async (
     email: string,
@@ -91,19 +198,38 @@ export const App: React.FC = () => {
     if (result.isFailure) {
       return result.error;
     }
-    setSession(result.getValue());
+    const newSession = result.getValue();
+    setExpiredNotice(null);
+    setSession(newSession);
+    setSessionRemainingSeconds(newSession.getRemainingSeconds());
     return null;
   };
 
   const handleLogout = async () => {
     await logoutUseCase.execute();
     setSession(null);
+    setSessionRemainingSeconds(0);
+  };
+
+  const handleUpdateSession = (updatedSession: UserSession) => {
+    sessionStorage.saveSession(updatedSession);
+    setSession(updatedSession);
+    setSessionRemainingSeconds(updatedSession.getRemainingSeconds());
+  };
+
+  const handleSimulateExpirationCountdown = (seconds: number) => {
+    if (!session) return;
+    setAutoRefreshEnabled(false);
+    const simulated = session.withForcedRemainingSeconds(seconds);
+    handleUpdateSession(simulated);
   };
 
   if (!session) {
     return (
       <LoginPage
         initialEmail={initialData.rememberedEmail}
+        initialNotice={expiredNotice}
+        onClearInitialNotice={() => setExpiredNotice(null)}
         onSubmitLogin={handleLogin}
       />
     );
@@ -112,6 +238,9 @@ export const App: React.FC = () => {
   return (
     <PosWorkspacePage
       session={session}
+      sessionRemainingSeconds={sessionRemainingSeconds}
+      autoRefreshEnabled={autoRefreshEnabled}
+      isRefreshingToken={isRefreshingToken}
       analyticsUseCase={analyticsUseCase}
       catalogUseCases={catalogUseCases}
       inventoryUseCases={inventoryUseCases}
@@ -121,6 +250,10 @@ export const App: React.FC = () => {
       establishmentUseCases={establishmentUseCases}
       settingsUseCases={settingsUseCases}
       posTerminalUseCases={posTerminalUseCases}
+      onToggleAutoRefresh={setAutoRefreshEnabled}
+      onRefreshSessionToken={handleRefreshSessionToken}
+      onSimulateExpirationCountdown={handleSimulateExpirationCountdown}
+      onUpdateSession={handleUpdateSession}
       onLogout={handleLogout}
     />
   );

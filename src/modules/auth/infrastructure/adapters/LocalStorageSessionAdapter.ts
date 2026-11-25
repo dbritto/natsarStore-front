@@ -1,5 +1,5 @@
 import { AuthTokensDto, AuthTokensModel } from '../../domain/models/AuthTokens.model';
-import { UserSession } from '../../domain/models/UserSession.model';
+import { UserProfileOverrides, UserSession } from '../../domain/models/UserSession.model';
 import { SessionStoragePort } from '../../domain/ports/SessionStoragePort';
 
 const SESSION_KEY = 'factus_pos_active_session_v1';
@@ -8,10 +8,13 @@ const REMEMBER_EMAIL_KEY = 'factus_pos_remembered_email_v1';
 interface StoredSessionPayload {
   email: string;
   tokens: AuthTokensDto;
+  profileOverrides?: UserProfileOverrides;
 }
 
 /**
  * Adaptador de Salida (Driven Adapter) para persistencia de sesión en LocalStorage.
+ * Conserva las marcas de tiempo exactas de expiración del token para que recargar la página
+ * no reinicie el temporizador y descarta sesiones cuyo tiempo haya caducado.
  */
 export class LocalStorageSessionAdapter implements SessionStoragePort {
   public saveSession(session: UserSession): void {
@@ -25,7 +28,11 @@ export class LocalStorageSessionAdapter implements SessionStoragePort {
           refreshExpiresIn: session.tokens.refreshExpiresIn,
           tokenType: session.tokens.tokenType,
           connectionMode: session.tokens.connectionMode,
+          issuedAtMs: session.tokens.issuedAtMs,
+          accessExpiresAtMs: session.tokens.accessExpiresAtMs,
+          refreshExpiresAtMs: session.tokens.refreshExpiresAtMs,
         },
+        profileOverrides: session.getProfileOverrides(),
       };
       localStorage.setItem(SESSION_KEY, JSON.stringify(payload));
     } catch {
@@ -40,7 +47,12 @@ export class LocalStorageSessionAdapter implements SessionStoragePort {
       const parsed = JSON.parse(raw) as StoredSessionPayload;
       if (!parsed?.tokens?.accessToken) return null;
       const tokensModel = new AuthTokensModel(parsed.tokens);
-      return UserSession.fromTokens(tokensModel, parsed.email);
+      const session = UserSession.fromTokens(tokensModel, parsed.email, parsed.profileOverrides);
+      if (session.isExpired()) {
+        this.clearSession();
+        return null;
+      }
+      return session;
     } catch {
       return null;
     }
