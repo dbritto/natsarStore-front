@@ -31,6 +31,7 @@ export interface SidebarNavProps {
   alertCount?: number;
   onLogout?: () => void;
   onHideSidebar?: () => void;
+  isDrawer?: boolean;
 }
 
 /**
@@ -44,6 +45,7 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
   onSelectSection,
   alertCount = 0,
   onHideSidebar,
+  isDrawer = false,
 }) => {
   const navGroups: SidebarNavGroup[] = [
     {
@@ -89,19 +91,21 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
   return (
     <aside
       style={{
-        width: '254px',
+        width: isDrawer ? '100%' : '254px',
         flexShrink: 0,
         backgroundColor: '#FFFFFF',
-        borderRadius: '26px',
+        borderRadius: isDrawer ? '0 26px 26px 0' : '26px',
         padding: '24px 18px 22px',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'flex-start',
         boxShadow: '0 10px 30px -15px rgba(15, 23, 42, 0.06)',
         border: '1px solid rgba(226, 232, 240, 0.7)',
-        minHeight: 'calc(100vh - 44px)',
-        position: 'sticky',
-        top: '22px',
+        minHeight: isDrawer ? '100%' : 'calc(100vh - 44px)',
+        height: isDrawer ? '100%' : undefined,
+        overflowY: isDrawer ? 'auto' : undefined,
+        position: isDrawer ? 'relative' : 'sticky',
+        top: isDrawer ? 0 : '22px',
         transition: 'all 0.22s ease',
       }}
     >

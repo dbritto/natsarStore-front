@@ -155,3 +155,167 @@ textarea {
     transform: scale(1);
   }
 }
+
+
+/* ==========================================================================
+   RESPONSIVE (Tablet y Móvil) — Capa global del sistema de diseño atómico.
+   Los componentes usan estilos en línea; estas reglas sobrescriben las
+   cuadrículas fijas con !important según el ancho de pantalla.
+   ========================================================================== */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+img,
+svg {
+  max-width: 100%;
+}
+
+.rsp-header-right {
+  margin-left: auto;
+}
+
+/* ---- Tablet landscape / laptop pequeño (≤ 1100px) ---- */
+@media (max-width: 1100px) {
+  [style*="grid-template-columns: minmax(3"],
+  [style*="grid-template-columns: minmax(0, 1.55fr)"] {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr) !important;
+  }
+}
+
+/* ---- Tablet vertical (≤ 860px) ---- */
+@media (max-width: 860px) {
+  /* Layouts principales de 2 columnas pasan a una sola columna */
+  [style*="grid-template-columns: minmax(3"],
+  [style*="grid-template-columns: minmax(0, 1.55fr)"],
+  .rsp-auth-card {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  /* Formularios densos de 4-5 columnas pasan a 2 columnas */
+  [style*="grid-template-columns: 1fr 1fr 1fr 1fr"],
+  [style*="grid-template-columns: 1.5fr 0.7fr"],
+  [style*="grid-template-columns: 1.6fr 1fr 0.8fr auto"],
+  [style*="grid-template-columns: 1.8fr 0.8fr auto"],
+  [style*="grid-template-columns: 1.2fr 1fr 1fr"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  /* Paneles pegajosos (carrito, etc.) dejan de ser sticky al apilarse */
+  [style*="position: sticky"] {
+    position: static !important;
+  }
+
+  .rsp-hide-tablet {
+    display: none !important;
+  }
+
+  .rsp-auth-card {
+    max-width: 520px !important;
+  }
+}
+
+/* ---- Móvil (≤ 640px) ---- */
+@media (max-width: 640px) {
+  /* Cualquier cuadrícula de columnas en fr (formularios) pasa a 1 columna */
+  [style*="grid-template-columns: 1"]:not([style*="grid-template-columns: 132px"]),
+  [style*="grid-template-columns: 2"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  /* Tarjetas con ancho mínimo grande no desbordan la pantalla */
+  [style*="repeat(auto-fit, minmax(2"],
+  [style*="repeat(auto-fill, minmax(2"],
+  [style*="repeat(auto-fit, minmax(3"],
+  [style*="repeat(auto-fill, minmax(3"] {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)) !important;
+  }
+
+  /* Catálogos de productos: 2 columnas compactas */
+  [style*="minmax(150px, 1fr)"],
+  [style*="minmax(170px, 1fr)"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  [style*="min-width: 260px"],
+  [style*="min-width: 280px"] {
+    min-width: 0 !important;
+  }
+
+  /* Menos relleno en tarjetas y contenedores */
+  [style*="padding: 22px"],
+  [style*="padding: 24px"],
+  [style*="padding: 26px"] {
+    padding: 14px !important;
+  }
+
+  .rsp-auth-form {
+    padding: 22px 10px !important;
+  }
+
+  /* Cabecera */
+  .rsp-title {
+    font-size: 1.12rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .rsp-user-text {
+    display: none !important;
+  }
+
+  /* Evita el zoom automático de iOS al enfocar campos */
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  /* Modales como hoja inferior (bottom sheet) */
+  .rsp-modal-overlay {
+    padding: 0 !important;
+    align-items: flex-end !important;
+  }
+
+  .rsp-modal {
+    max-width: 100% !important;
+    max-height: 92vh !important;
+    border-radius: 22px 22px 0 0 !important;
+  }
+
+  .rsp-modal-footer {
+    flex-wrap: wrap !important;
+  }
+
+  .rsp-modal-footer > * {
+    flex: 1 1 140px;
+  }
+}
+
+/* ---- Móvil pequeño (≤ 480px) ---- */
+@media (max-width: 480px) {
+  [style*="repeat(2, minmax(0, 1fr))"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  [style*="minmax(150px, 1fr)"],
+  [style*="minmax(170px, 1fr)"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  [style*="grid-template-columns: 132px"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+/* Pantallas táctiles: objetivos de toque más cómodos en botones de texto */
+@media (pointer: coarse) {
+  button {
+    touch-action: manipulation;
+  }
+}

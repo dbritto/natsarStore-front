@@ -39,6 +39,7 @@ export const DialogModal: React.FC<DialogModalProps> = ({
     <div
       role="dialog"
       aria-modal="true"
+      className="rsp-modal-overlay"
       onClick={onClose}
       style={{
         position: 'fixed',
@@ -54,6 +55,7 @@ export const DialogModal: React.FC<DialogModalProps> = ({
       }}
     >
       <div
+        className="rsp-modal"
         onClick={(e) => e.stopPropagation()}
         style={{
           width: '100%',
@@ -134,6 +136,7 @@ export const DialogModal: React.FC<DialogModalProps> = ({
         {/* Pie opcional */}
         {footer && (
           <div
+            className="rsp-modal-footer"
             style={{
               padding: '16px 26px',
               borderTop: '1px solid #E2E8F0',

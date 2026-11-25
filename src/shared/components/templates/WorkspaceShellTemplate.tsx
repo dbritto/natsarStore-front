@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SidebarNav, WorkspaceSectionId } from '../organisms/SidebarNav';
 import { DashboardHeader } from '../organisms/DashboardHeader';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
 
 const SIDEBAR_VISIBILITY_KEY = 'natsar_pos_sidebar_visible_v1';
 
@@ -32,12 +33,13 @@ export interface WorkspaceShellTemplateProps {
 
 /**
  * Template WorkspaceShellTemplate (Atomic Design):
- * Layout corporativo minimalista con Sidebar blanca redondeada a la izquierda
- * y área de contenido Bento Grid a la derecha, fiel a la referencia DealDeck.
+ * Layout corporativo con Sidebar a la izquierda y contenido a la derecha.
+ * En tablet y móvil (≤ 1100px) la barra lateral se convierte en un cajón deslizable
+ * que se abre desde el botón de menú y se cierra al elegir una sección.
  */
 export const WorkspaceShellTemplate: React.FC<WorkspaceShellTemplateProps> = ({
   activeSection = 'dashboard',
-  onSelectSection = () => {},
+  onSelectSection = () => { },
   pageTitle = 'Panel Operativo POS',
   dateSubtitle,
   userFullName,
@@ -59,6 +61,9 @@ export const WorkspaceShellTemplate: React.FC<WorkspaceShellTemplateProps> = ({
   onLogout,
   children,
 }) => {
+  const isCompact = useMediaQuery('(max-width: 1100px)');
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
   const [isSidebarVisible, setIsSidebarVisible] = useState<boolean>(() => {
     try {
       const saved = localStorage.getItem(SIDEBAR_VISIBILITY_KEY);
@@ -68,7 +73,24 @@ export const WorkspaceShellTemplate: React.FC<WorkspaceShellTemplateProps> = ({
     }
   });
 
+  useEffect(() => {
+    if (!isCompact) setIsDrawerOpen(false);
+  }, [isCompact]);
+
+  useEffect(() => {
+    if (!isCompact || !isDrawerOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsDrawerOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isCompact, isDrawerOpen]);
+
   const handleToggleSidebar = () => {
+    if (isCompact) {
+      setIsDrawerOpen((prev) => !prev);
+      return;
+    }
     setIsSidebarVisible((prev) => {
       const next = !prev;
       try {
@@ -80,6 +102,13 @@ export const WorkspaceShellTemplate: React.FC<WorkspaceShellTemplateProps> = ({
     });
   };
 
+  const handleSelectSection = (section: WorkspaceSectionId) => {
+    onSelectSection(section);
+    if (isCompact) setIsDrawerOpen(false);
+  };
+
+  const sidebarVisible = isCompact ? isDrawerOpen : isSidebarVisible;
+
   const effectiveRole = userRoleLabel || primaryRole || 'Operador';
   const effectiveDateSubtitle =
     dateSubtitle ||
@@ -90,6 +119,7 @@ export const WorkspaceShellTemplate: React.FC<WorkspaceShellTemplateProps> = ({
       month: 'long',
       day: 'numeric',
     });
+
   return (
     <div
       style={{
@@ -97,19 +127,56 @@ export const WorkspaceShellTemplate: React.FC<WorkspaceShellTemplateProps> = ({
         backgroundColor: '#F2F4F9',
         padding: '22px 26px',
         display: 'flex',
-        gap: isSidebarVisible ? '28px' : '0px',
+        gap: !isCompact && isSidebarVisible ? '28px' : '0px',
         alignItems: 'flex-start',
         transition: 'gap 0.22s ease',
       }}
     >
-      {isSidebarVisible && (
+      {/* Escritorio: barra lateral fija */}
+      {!isCompact && isSidebarVisible && (
         <SidebarNav
           activeSection={activeSection}
-          onSelectSection={onSelectSection}
+          onSelectSection={handleSelectSection}
           alertCount={alertCount}
           onLogout={onLogout}
           onHideSidebar={handleToggleSidebar}
         />
+      )}
+
+      {/* Tablet / Móvil: cajón deslizable con fondo oscurecido */}
+      {isCompact && isDrawerOpen && (
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 9000, display: 'flex' }}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Menú de navegación"
+        >
+          <div
+            style={{
+              width: 'min(300px, 86vw)',
+              height: '100%',
+              animation: 'fadeInModal 160ms ease-out',
+              boxShadow: '0 0 40px rgba(15, 23, 42, 0.3)',
+            }}
+          >
+            <SidebarNav
+              isDrawer
+              activeSection={activeSection}
+              onSelectSection={handleSelectSection}
+              alertCount={alertCount}
+              onLogout={onLogout}
+              onHideSidebar={handleToggleSidebar}
+            />
+          </div>
+          <div
+            onClick={() => setIsDrawerOpen(false)}
+            style={{
+              flex: 1,
+              backgroundColor: 'rgba(15, 23, 42, 0.5)',
+              backdropFilter: 'blur(3px)',
+            }}
+          />
+        </div>
       )}
 
       <div
@@ -134,7 +201,7 @@ export const WorkspaceShellTemplate: React.FC<WorkspaceShellTemplateProps> = ({
           sessionRemainingSeconds={sessionRemainingSeconds}
           isRefreshingToken={isRefreshingToken}
           alertCount={alertCount}
-          isSidebarVisible={isSidebarVisible}
+          isSidebarVisible={sidebarVisible}
           onToggleSidebar={handleToggleSidebar}
           onRefresh={onRefresh}
           onSearchClick={onSearchClick}
@@ -143,7 +210,7 @@ export const WorkspaceShellTemplate: React.FC<WorkspaceShellTemplateProps> = ({
           onLogout={onLogout}
         />
 
-        <main style={{ width: '100%' }}>{children}</main>
+        <main style={{ width: '100%', minWidth: 0 }}>{children}</main>
       </div>
     </div>
   );

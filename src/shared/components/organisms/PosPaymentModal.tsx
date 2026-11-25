@@ -167,7 +167,7 @@ export const PosPaymentModal: React.FC<PosPaymentModalProps> = ({
 
         {mode === 'single' ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '8px' }}>
               {METHODS.map((m) => (
                 <Button
                   key={m.id}
@@ -193,7 +193,7 @@ export const PosPaymentModal: React.FC<PosPaymentModalProps> = ({
                   gap: '10px',
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
                   <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#0F172A' }}>
                     Efectivo recibido
                     <input
@@ -229,7 +229,7 @@ export const PosPaymentModal: React.FC<PosPaymentModalProps> = ({
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '6px' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                   {[
                     { label: 'Exacto', val: total },
                     { label: '$50k', val: 50000 },
@@ -295,8 +295,8 @@ export const PosPaymentModal: React.FC<PosPaymentModalProps> = ({
                 {remaining === 0
                   ? '✔ Pago completo'
                   : remaining > 0
-                  ? `Faltan ${formatCop(remaining)}`
-                  : `Sobran ${formatCop(Math.abs(remaining))}`}
+                    ? `Faltan ${formatCop(remaining)}`
+                    : `Sobran ${formatCop(Math.abs(remaining))}`}
               </div>
             </div>
           </div>

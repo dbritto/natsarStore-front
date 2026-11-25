@@ -139,6 +139,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
         <div>
           <h1
+            className="rsp-title"
             style={{
               fontFamily: 'var(--font-display)',
               fontSize: '1.68rem',
@@ -163,7 +164,10 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
         </div>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+      <div
+        className="rsp-header-right"
+        style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}
+      >
         <HeaderIconButton
           icon="search"
           ariaLabel="Buscar en NatsarStore"
@@ -240,7 +244,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               </div>
             )}
 
-            <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+            <div className="rsp-user-text" style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
               <span
                 style={{
                   fontSize: '0.86rem',
@@ -301,7 +305,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 position: 'absolute',
                 top: 'calc(100% + 10px)',
                 right: 0,
-                width: '360px',
+                width: 'min(360px, calc(100vw - 32px))',
                 backgroundColor: '#FFFFFF',
                 borderRadius: '24px',
                 padding: '20px',

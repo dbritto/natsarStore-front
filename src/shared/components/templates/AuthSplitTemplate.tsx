@@ -25,6 +25,7 @@ export const AuthSplitTemplate: React.FC<AuthSplitTemplateProps> = ({ children }
       }}
     >
       <main
+        className="rsp-auth-card"
         style={{
           position: 'relative',
           width: '100%',
@@ -54,11 +55,12 @@ export const AuthSplitTemplate: React.FC<AuthSplitTemplateProps> = ({ children }
           }}
         />
 
-        <aside>
+        <aside className="rsp-hide-tablet">
           <CorporateShowcaseHero />
         </aside>
 
         <section
+          className="rsp-auth-form"
           style={{
             padding: '34px 44px',
             display: 'flex',

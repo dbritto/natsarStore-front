@@ -50,6 +50,7 @@ export const PosCartItemRow: React.FC<PosCartItemRowProps> = ({
         padding: '10px 0',
         display: 'flex',
         alignItems: 'center',
+        flexWrap: 'wrap',
         gap: '10px',
         borderBottom: '1px solid #F1F5F9',
       }}
@@ -82,7 +83,7 @@ export const PosCartItemRow: React.FC<PosCartItemRowProps> = ({
         )}
       </div>
 
-      <div style={{ flex: 1, minWidth: 0 }}>
+      <div style={{ flex: '1 1 110px', minWidth: 0 }}>
         <div
           style={{
             fontWeight: 600,

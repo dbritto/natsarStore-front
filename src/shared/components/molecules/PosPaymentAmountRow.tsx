@@ -28,6 +28,7 @@ export const PosPaymentAmountRow: React.FC<PosPaymentAmountRowProps> = ({
       style={{
         display: 'flex',
         alignItems: 'center',
+        flexWrap: 'wrap',
         gap: '10px',
         padding: '10px 12px',
         borderRadius: '14px',
@@ -37,7 +38,7 @@ export const PosPaymentAmountRow: React.FC<PosPaymentAmountRowProps> = ({
       }}
     >
       <span style={{ fontSize: '1.2rem', width: '26px', textAlign: 'center' }}>{emoji}</span>
-      <span style={{ flex: 1, fontWeight: 700, fontSize: '0.84rem', color: '#0F172A' }}>{label}</span>
+      <span style={{ flex: '1 1 90px', fontWeight: 700, fontSize: '0.84rem', color: '#0F172A' }}>{label}</span>
 
       <button
         type="button"
