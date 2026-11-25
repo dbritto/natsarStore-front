@@ -19,10 +19,15 @@ import { HttpCustomerRepositoryAdapter } from '@modules/customers/infrastructure
 import { CustomerUseCases } from '@modules/customers/application/use-cases/CustomerUseCases';
 import { HttpRbacRepositoryAdapter } from '@modules/rbac/infrastructure/adapters/HttpRbacRepositoryAdapter';
 import { RbacUseCases } from '@modules/rbac/application/use-cases/RbacUseCases';
+import { HttpEstablishmentRepositoryAdapter } from '@modules/establishments/infrastructure/adapters/HttpEstablishmentRepositoryAdapter';
+import { EstablishmentUseCases } from '@modules/establishments/application/use-cases/EstablishmentUseCases';
+import { HttpSettingsRepositoryAdapter } from '@modules/settings/infrastructure/adapters/HttpSettingsRepositoryAdapter';
+import { SettingsUseCases } from '@modules/settings/application/use-cases/SettingsUseCases';
 import { PosWorkspacePage } from '@modules/pos-workspace/infrastructure/ui/PosWorkspacePage';
 
 /**
  * Raíz de Composición Hexagonal (Dependency Injection Container de NatsarStore)
+ * Conecta el 100% de los módulos del Swagger con Puertos, Adaptadores y Casos de Uso.
  */
 export const App: React.FC = () => {
   const {
@@ -34,6 +39,8 @@ export const App: React.FC = () => {
     logisticsUseCases,
     customerUseCases,
     rbacUseCases,
+    establishmentUseCases,
+    settingsUseCases,
     initialData,
   } = useMemo(() => {
     const sessionStorage = new LocalStorageSessionAdapter();
@@ -49,6 +56,8 @@ export const App: React.FC = () => {
     const logisticsRepository = new HttpLogisticsRepositoryAdapter(httpClient);
     const customerRepository = new HttpCustomerRepositoryAdapter(httpClient);
     const rbacRepository = new HttpRbacRepositoryAdapter(httpClient);
+    const establishmentRepository = new HttpEstablishmentRepositoryAdapter(httpClient);
+    const settingsRepository = new HttpSettingsRepositoryAdapter(httpClient);
 
     const restore = new RestoreSessionUseCase(sessionStorage);
     return {
@@ -60,6 +69,8 @@ export const App: React.FC = () => {
       logisticsUseCases: new LogisticsUseCases(logisticsRepository),
       customerUseCases: new CustomerUseCases(customerRepository),
       rbacUseCases: new RbacUseCases(rbacRepository),
+      establishmentUseCases: new EstablishmentUseCases(establishmentRepository),
+      settingsUseCases: new SettingsUseCases(settingsRepository),
       initialData: restore.execute(),
     };
   }, []);
@@ -102,6 +113,8 @@ export const App: React.FC = () => {
       logisticsUseCases={logisticsUseCases}
       customerUseCases={customerUseCases}
       rbacUseCases={rbacUseCases}
+      establishmentUseCases={establishmentUseCases}
+      settingsUseCases={settingsUseCases}
       onLogout={handleLogout}
     />
   );

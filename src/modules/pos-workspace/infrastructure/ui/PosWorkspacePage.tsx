@@ -38,6 +38,10 @@ import { CustomerUseCases } from '@modules/customers/application/use-cases/Custo
 import { CustomersModuleView } from '@modules/customers/infrastructure/ui/CustomersModuleView';
 import { RbacUseCases } from '@modules/rbac/application/use-cases/RbacUseCases';
 import { RbacModuleView } from '@modules/rbac/infrastructure/ui/RbacModuleView';
+import { EstablishmentUseCases } from '@modules/establishments/application/use-cases/EstablishmentUseCases';
+import { EstablishmentsModuleView } from '@modules/establishments/infrastructure/ui/EstablishmentsModuleView';
+import { SettingsUseCases } from '@modules/settings/application/use-cases/SettingsUseCases';
+import { SettingsModuleView } from '@modules/settings/infrastructure/ui/SettingsModuleView';
 
 export interface PosWorkspacePageProps {
   session: UserSession;
@@ -47,6 +51,8 @@ export interface PosWorkspacePageProps {
   logisticsUseCases: LogisticsUseCases;
   customerUseCases: CustomerUseCases;
   rbacUseCases: RbacUseCases;
+  establishmentUseCases: EstablishmentUseCases;
+  settingsUseCases: SettingsUseCases;
   onLogout: () => void;
 }
 
@@ -79,6 +85,8 @@ export const PosWorkspacePage: React.FC<PosWorkspacePageProps> = ({
   logisticsUseCases,
   customerUseCases,
   rbacUseCases,
+  establishmentUseCases,
+  settingsUseCases,
   onLogout,
 }) => {
   const [activeSection, setActiveSection] = useState<WorkspaceSectionId>('dashboard');
@@ -618,29 +626,11 @@ export const PosWorkspacePage: React.FC<PosWorkspacePageProps> = ({
       case 'logistics':
         return <LogisticsModuleView logisticsUseCases={logisticsUseCases} />;
       case 'establishments':
-        return renderSwaggerModuleOverview(
-          'Sedes & Establecimientos POS',
-          'Administración de sucursales comerciales, bodegas asociadas y rangos de numeración DIAN.',
-          [
-            { method: 'GET', path: '/api/v1/establishments', summary: 'Listar sedes activas con paginación y filtro' },
-            { method: 'POST', path: '/api/v1/establishments', summary: 'Crear nueva sede o punto de venta comercial' },
-            { method: 'PATCH', path: '/api/v1/establishments/{id}', summary: 'Actualizar dirección, teléfono o estado de sede' },
-            { method: 'GET', path: '/api/v1/inventory/warehouses', summary: 'Consultar bodegas (POS_STORE, BACKROOM, CENTRAL) por sede' },
-          ]
-        );
+        return <EstablishmentsModuleView establishmentUseCases={establishmentUseCases} />;
       case 'rbac':
         return <RbacModuleView currentUserId={session.id} rbacUseCases={rbacUseCases} />;
       case 'settings':
-        return renderSwaggerModuleOverview(
-          'Configuración Global Singleton & Gestor Multimedia',
-          'Parámetros de negocio hidratados en caliente y almacenamiento polimórfico de archivos.',
-          [
-            { method: 'GET', path: '/api/v1/settings', summary: 'Consultar configuraciones globales de NatsarStore' },
-            { method: 'PATCH', path: '/api/v1/settings/{id}', summary: 'Actualizar parámetro del sistema en caliente' },
-            { method: 'POST', path: '/api/v1/media/upload', summary: 'Subir imagen o documento con vinculación polimórfica' },
-            { method: 'GET', path: '/api/v1/media/categories', summary: 'Listar categorías multimedia (avatares, productos, soportes)' },
-          ]
-        );
+        return <SettingsModuleView settingsUseCases={settingsUseCases} />;
     }
   };
 
