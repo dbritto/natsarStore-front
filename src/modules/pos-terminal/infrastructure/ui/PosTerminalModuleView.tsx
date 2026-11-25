@@ -248,354 +248,386 @@ export const PosTerminalModuleView: React.FC<PosTerminalModuleViewProps> = ({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
-      {/* Fila Superior de KPIs del Turno de Caja */}
+      {/* Fila Superior de KPIs del Turno de Caja (Versión Ultra-Compacta para Priorizar la Caja) */}
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          gap: '18px',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: '12px',
         }}
       >
-        <StatMetricCard
-          featured
-          title={`Turno ${shift.shiftCode}`}
-          value={CashShiftModel.formatCop(shift.totalShiftSalesCop)}
-          trendValue={shift.isOpen ? 'TURNO ABIERTO' : 'TURNO CERRADO'}
-          trendDirection={shift.isOpen ? 'up' : 'down'}
-          comparisonLine1="Total recaudado"
-          comparisonLine2="en turno actual"
-          icon="store"
-        />
-        <StatMetricCard
-          title="Efectivo en Gaveta"
-          value={CashShiftModel.formatCop(shift.expectedDrawerCashCop)}
-          trendValue={`Base ${CashShiftModel.formatCop(shift.raw.openingCashCop)}`}
-          trendDirection="up"
-          comparisonLine1="Base inicial +"
-          comparisonLine2="ventas en efectivo"
-          icon="calculator"
-        />
-        <StatMetricCard
-          title="Tarjetas & Bre-B QR"
-          value={CashShiftModel.formatCop(
-            shift.raw.cardSalesCop + shift.raw.transferSalesCop
-          )}
-          trendValue="Medios Digitales"
-          trendDirection="up"
-          comparisonLine1="Datáfono y pagos"
-          comparisonLine2="inmediatos QR"
-          icon="shield"
-        />
-        <StatMetricCard
-          title="Facturas Emitidas"
-          value={String(shift.raw.ticketsCount)}
-          trendValue="SETP DIAN"
-          trendDirection="up"
-          comparisonLine1="Comprobantes UBL 2.1"
-          comparisonLine2="del turno"
-          icon="receipt"
-        />
+        {/* KPI 1: Turno */}
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '16px',
+            padding: '10px 14px',
+            border: '1px solid #E2E8F0',
+            boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+          }}
+        >
+          <div
+            style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '10px',
+              backgroundColor: '#EEF2FF',
+              color: '#4D53F4',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <Icon name="store" size={18} />
+          </div>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '4px' }}>
+              <span style={{ fontSize: '0.7rem', fontWeight: 600, color: '#64748B', textTransform: 'uppercase' }}>
+                Turno {shift.shiftCode}
+              </span>
+              <span
+                style={{
+                  fontSize: '0.62rem',
+                  fontWeight: 700,
+                  padding: '1px 5px',
+                  borderRadius: '999px',
+                  backgroundColor: shift.isOpen ? '#ECFDF5' : '#FEF2F2',
+                  color: shift.isOpen ? '#059669' : '#DC2626',
+                }}
+              >
+                {shift.isOpen ? 'Abierto' : 'Cerrado'}
+              </span>
+            </div>
+            <div
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontWeight: 800,
+                fontSize: '1.05rem',
+                color: '#0F172A',
+                lineHeight: 1.2,
+              }}
+            >
+              {CashShiftModel.formatCop(shift.totalShiftSalesCop)}
+            </div>
+          </div>
+        </div>
+
+        {/* KPI 2: Efectivo en Gaveta */}
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '16px',
+            padding: '10px 14px',
+            border: '1px solid #E2E8F0',
+            boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+          }}
+        >
+          <div
+            style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '10px',
+              backgroundColor: '#ECFDF5',
+              color: '#059669',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <Icon name="calculator" size={18} />
+          </div>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '4px' }}>
+              <span style={{ fontSize: '0.7rem', fontWeight: 600, color: '#64748B', textTransform: 'uppercase' }}>
+                Efectivo en Gaveta
+              </span>
+              <span style={{ fontSize: '0.62rem', color: '#64748B' }}>
+                Base {CashShiftModel.formatCop(shift.raw.openingCashCop)}
+              </span>
+            </div>
+            <div
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontWeight: 800,
+                fontSize: '1.05rem',
+                color: '#0F172A',
+                lineHeight: 1.2,
+              }}
+            >
+              {CashShiftModel.formatCop(shift.expectedDrawerCashCop)}
+            </div>
+          </div>
+        </div>
+
+        {/* KPI 3: Tarjetas & Bre-B */}
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '16px',
+            padding: '10px 14px',
+            border: '1px solid #E2E8F0',
+            boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+          }}
+        >
+          <div
+            style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '10px',
+              backgroundColor: '#F3E8FF',
+              color: '#7C3AED',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <Icon name="shield" size={18} />
+          </div>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '4px' }}>
+              <span style={{ fontSize: '0.7rem', fontWeight: 600, color: '#64748B', textTransform: 'uppercase' }}>
+                Tarjetas & Bre-B QR
+              </span>
+              <span style={{ fontSize: '0.62rem', color: '#7C3AED', fontWeight: 700 }}>
+                Digital
+              </span>
+            </div>
+            <div
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontWeight: 800,
+                fontSize: '1.05rem',
+                color: '#0F172A',
+                lineHeight: 1.2,
+              }}
+            >
+              {CashShiftModel.formatCop(
+                shift.raw.cardSalesCop + shift.raw.transferSalesCop
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* KPI 4: Facturas Emitidas */}
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '16px',
+            padding: '10px 14px',
+            border: '1px solid #E2E8F0',
+            boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+          }}
+        >
+          <div
+            style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '10px',
+              backgroundColor: '#FEF3C7',
+              color: '#D97706',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <Icon name="receipt" size={18} />
+          </div>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '4px' }}>
+              <span style={{ fontSize: '0.7rem', fontWeight: 600, color: '#64748B', textTransform: 'uppercase' }}>
+                Facturas Emitidas
+              </span>
+              <span style={{ fontSize: '0.62rem', color: '#D97706', fontWeight: 700 }}>
+                SETP DIAN
+              </span>
+            </div>
+            <div
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontWeight: 800,
+                fontSize: '1.05rem',
+                color: '#0F172A',
+                lineHeight: 1.2,
+              }}
+            >
+              {shift.raw.ticketsCount} facturas
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Layout Principal TPV: Catálogo Táctil a la izquierda + Ticket Caja Registradora a la derecha */}
+      {/* Layout Principal TPV Inspirado en PosyMart: Venta Actual a la Izquierda + Catálogo Táctil a la Derecha */}
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'minmax(360px, 1.35fr) minmax(350px, 1fr)',
-          gap: '22px',
+          gridTemplateColumns: 'minmax(350px, 1.05fr) minmax(420px, 1.65fr)',
+          gap: '20px',
           alignItems: 'start',
         }}
       >
-        {/* COLUMNA IZQUIERDA: CATÁLOGO TÁCTIL DE MOSTRADOR & HISTORIAL DE TICKETS */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <div
-            style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: '24px',
-              padding: '22px',
-              boxShadow: '0 8px 24px -12px rgba(15, 23, 42, 0.06)',
-              border: '1px solid rgba(226, 232, 240, 0.7)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '16px',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-              <div>
-                <Typography as="h2" variant="h2">
-                  Catálogo Táctil de Mostrador
-                </Typography>
-                <Typography variant="caption" tone="muted">
-                  Toca cualquier producto o escanea su código de barras para agregarlo al ticket
-                </Typography>
-              </div>
-
-              <Button
-                type="button"
-                variant={shift.isOpen ? 'outline' : 'primary'}
-                size="sm"
-                leftIcon={<Icon name="lock" size={14} />}
-                onClick={() => {
-                  setCountedClosingCashText(String(shift.expectedDrawerCashCop));
-                  setIsShiftModalOpen(true);
-                }}
-              >
-                {shift.isOpen ? 'Arqueo / Cerrar Turno' : 'Abrir Turno de Caja'}
-              </Button>
-            </div>
-
-            <FormField
-              placeholder="Escanear código de barras EAN o buscar producto por nombre / SKU..."
-              value={searchProduct}
-              onChange={(e) => setSearchProduct(e.target.value)}
-              leftSlot={<Icon name="barcode" size={18} />}
-            />
-
-            {/* Botones Táctiles de Categorías POS */}
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-              <Button
-                type="button"
-                size="sm"
-                variant={activeCategoryId === '' ? 'primary' : 'outline'}
-                onClick={() => setActiveCategoryId('')}
-              >
-                Todos los Artículos
-              </Button>
-              {categories.map((cat) => (
-                <Button
-                  key={cat.id}
-                  type="button"
-                  size="sm"
-                  variant={activeCategoryId === cat.id ? 'primary' : 'outline'}
-                  leftIcon={<ColorDot colorHex={cat.colorHex} size={10} />}
-                  onClick={() => setActiveCategoryId(cat.id)}
-                >
-                  {cat.name}
-                </Button>
-              ))}
-            </div>
-
-            {/* Grilla Táctil de Productos POS */}
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(205px, 1fr))',
-                gap: '12px',
-              }}
-            >
-              {products.map((prod) => (
-                <button
-                  key={prod.id}
-                  type="button"
-                  onClick={() => handleAddProductToCart(prod)}
-                  style={{
-                    textAlign: 'left',
-                    padding: '16px',
-                    borderRadius: '18px',
-                    backgroundColor: '#F8FAFC',
-                    border: '1px solid #E2E8F0',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    gap: '12px',
-                    transition: 'all var(--transition-fast)',
-                  }}
-                >
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px', marginBottom: '6px' }}>
-                      <Badge tone="brand">{prod.codeReference}</Badge>
-                      <Badge tone="neutral">{prod.taxBadgeLabel}</Badge>
-                    </div>
-                    <div style={{ fontWeight: 800, fontSize: '0.9rem', color: '#0F172A', lineHeight: 1.3 }}>
-                      {prod.name}
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '8px', borderTop: '1px solid #E2E8F0' }}>
-                    <span
-                      style={{
-                        fontFamily: 'var(--font-display)',
-                        fontWeight: 800,
-                        fontSize: '1.04rem',
-                        color: '#4D53F4',
-                      }}
-                    >
-                      {prod.formattedBasePrice}
-                    </span>
-                    <span
-                      style={{
-                        width: '28px',
-                        height: '28px',
-                        borderRadius: '8px',
-                        backgroundColor: '#EEF2FF',
-                        color: '#4D53F4',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontWeight: 800,
-                      }}
-                    >
-                      +
-                    </span>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Historial de Comprobantes Emitidos en el Turno */}
-          {recentReceipts.length > 0 && (
-            <div
-              style={{
-                backgroundColor: '#FFFFFF',
-                borderRadius: '24px',
-                padding: '22px',
-                boxShadow: '0 8px 24px -12px rgba(15, 23, 42, 0.06)',
-                border: '1px solid rgba(226, 232, 240, 0.7)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '12px',
-              }}
-            >
-              <Typography as="h3" variant="h3">
-                Últimas Facturas Emitidas en este Turno
-              </Typography>
-              {recentReceipts.map((rec) => (
-                <div
-                  key={rec.id}
-                  style={{
-                    padding: '12px 16px',
-                    borderRadius: '14px',
-                    backgroundColor: '#F8FAFC',
-                    border: '1px solid #E2E8F0',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    flexWrap: 'wrap',
-                    gap: '12px',
-                  }}
-                >
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <strong style={{ fontSize: '0.9rem', color: '#0F172A' }}>
-                        {rec.invoiceNumber}
-                      </strong>
-                      <Badge tone="success" dot>
-                        Validada DIAN
-                      </Badge>
-                    </div>
-                    <span style={{ fontSize: '0.76rem', color: '#64748B' }}>
-                      Cliente: {rec.customerName} ({rec.customerIdentification}) • {rec.paymentMethodLabel}
-                    </span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <strong style={{ fontFamily: 'var(--font-display)', color: '#4D53F4' }}>
-                      {CashShiftModel.formatCop(rec.taxSummary.netPayable)}
-                    </strong>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      leftIcon={<Icon name="receipt" size={14} />}
-                      onClick={() => setActiveReceiptModal(rec)}
-                    >
-                      Ver Tirilla QR
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* COLUMNA DERECHA: TICKET DE VENTA POS & CAJA REGISTRADORA DIAN */}
+        {/* COLUMNA IZQUIERDA: VENTA ACTUAL (CURRENT SALE) / TICKET DE CAJA */}
         <div
           style={{
             backgroundColor: '#FFFFFF',
             borderRadius: '24px',
-            padding: '24px',
-            boxShadow: '0 14px 34px -12px rgba(15, 23, 42, 0.08)',
+            padding: '22px',
+            boxShadow: '0 10px 30px -10px rgba(15, 23, 42, 0.07)',
             border: '1px solid rgba(226, 232, 240, 0.85)',
             display: 'flex',
             flexDirection: 'column',
             gap: '16px',
             position: 'sticky',
-            top: '22px',
+            top: '20px',
           }}
         >
+          {/* Cabecera del Ticket */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div>
-              <Typography as="h2" variant="h2">
-                Ticket de Caja POS
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Typography as="h2" variant="h2" style={{ fontSize: '1.25rem', fontWeight: 800 }}>
+                Venta Actual
               </Typography>
-              <span style={{ fontSize: '0.76rem', color: '#64748B' }}>
-                Resolución DIAN SETP 18760000001
-              </span>
+              <Badge tone="brand">
+                {cartLines.reduce((acc, l) => acc + l.quantity, 0)} artículos
+              </Badge>
             </div>
-            {cartLines.length > 0 && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={handleClearCart}
-                style={{ color: '#EF4444' }}
-              >
-                Vaciar
-              </Button>
-            )}
+
+            <Button
+              type="button"
+              variant={shift.isOpen ? 'outline' : 'primary'}
+              size="sm"
+              leftIcon={<Icon name="lock" size={13} />}
+              onClick={() => {
+                setCountedClosingCashText(String(shift.expectedDrawerCashCop));
+                setIsShiftModalOpen(true);
+              }}
+              style={{ fontSize: '0.74rem', padding: '4px 10px' }}
+            >
+              {shift.isOpen ? 'Arqueo Turno' : 'Abrir Turno'}
+            </Button>
           </div>
 
-          {/* Selector de Cliente Adquirente DIAN */}
-          <SelectField
-            label="Cliente / Adquirente DIAN"
-            value={selectedCustomer?.id ?? ''}
-            onChange={(e) => setSelectedCustomerId(e.target.value)}
-            options={customers.map((c) => ({
-              value: c.id,
-              label: `${c.names} (${c.identificationFormatted})`,
-            }))}
-          />
+          {/* Selector Rápido de Cliente DIAN */}
+          <div
+            style={{
+              padding: '10px 12px',
+              backgroundColor: '#F8FAFC',
+              borderRadius: '14px',
+              border: '1px solid #E2E8F0',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '6px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>
+                Adquirente / Factura DIAN
+              </span>
+              <span style={{ fontSize: '0.68rem', color: '#4D53F4', fontWeight: 700 }}>
+                {selectedCustomer?.identificationFormatted}
+              </span>
+            </div>
+            <select
+              value={selectedCustomer?.id ?? ''}
+              onChange={(e) => setSelectedCustomerId(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '6px 10px',
+                borderRadius: '8px',
+                border: '1px solid #CBD5E1',
+                backgroundColor: '#FFFFFF',
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                color: '#0F172A',
+                outline: 'none',
+              }}
+            >
+              {customers.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.names} ({c.identificationFormatted})
+                </option>
+              ))}
+            </select>
+          </div>
 
-          {/* Renglones del Carrito POS */}
+          {/* Lista de Productos en la Venta (Scrollable) */}
           <div
             style={{
               display: 'flex',
               flexDirection: 'column',
               gap: '8px',
-              maxHeight: '240px',
+              maxHeight: '260px',
               overflowY: 'auto',
+              paddingRight: '4px',
             }}
           >
             {cartLines.length === 0 ? (
               <div
                 style={{
-                  padding: '28px 16px',
+                  padding: '36px 16px',
                   textAlign: 'center',
                   borderRadius: '16px',
                   backgroundColor: '#F8FAFC',
                   border: '1.5px dashed #CBD5E1',
                   color: '#94A3B8',
-                  fontSize: '0.84rem',
+                  fontSize: '0.82rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '8px',
                 }}
               >
-                Selecciona artículos del catálogo táctil para armar la venta.
+                <Icon name="package" size={26} style={{ color: '#CBD5E1' }} />
+                <span>La canasta está vacía. Selecciona productos del menú para comenzar.</span>
               </div>
             ) : (
               cartLines.map((line) => (
                 <div
                   key={line.catalogItemId}
                   style={{
-                    padding: '10px 14px',
+                    padding: '8px 12px',
                     borderRadius: '14px',
                     backgroundColor: '#F8FAFC',
                     border: '1px solid #E2E8F0',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'space-between',
                     gap: '10px',
                   }}
                 >
+                  {/* Miniatura visual del producto */}
+                  <div
+                    style={{
+                      width: '38px',
+                      height: '38px',
+                      borderRadius: '10px',
+                      backgroundColor: '#EEF2FF',
+                      color: '#4D53F4',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontWeight: 800,
+                      fontSize: '0.78rem',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {line.tributeCode === '04' ? '☕' : '📦'}
+                  </div>
+
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div
                       style={{
@@ -606,101 +638,140 @@ export const PosTerminalModuleView: React.FC<PosTerminalModuleViewProps> = ({
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                       }}
+                      title={line.name}
                     >
                       {line.name}
                     </div>
-                    <span style={{ fontSize: '0.73rem', color: '#64748B' }}>
-                      $ {line.unitPrice.toLocaleString('es-CO')} c/u •{' '}
-                      {line.tributeCode === '04'
-                        ? `INC ${line.taxRate}%`
-                        : `IVA ${line.taxRate}%`}
+                    <span style={{ fontSize: '0.72rem', color: '#64748B' }}>
+                      $ {line.unitPrice.toLocaleString('es-CO')}
                     </span>
                   </div>
 
-                  {/* Controles - / + */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  {/* Selector - / + */}
+                  <div
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '8px',
+                      border: '1px solid #CBD5E1',
+                      overflow: 'hidden',
+                    }}
+                  >
                     <button
                       type="button"
                       onClick={() => handleUpdateLineQty(line.catalogItemId, -1)}
                       style={{
-                        width: '26px',
-                        height: '26px',
-                        borderRadius: '8px',
-                        border: '1px solid #CBD5E1',
-                        backgroundColor: '#FFFFFF',
+                        width: '24px',
+                        height: '24px',
+                        border: 'none',
+                        backgroundColor: 'transparent',
                         cursor: 'pointer',
-                        fontWeight: 800,
+                        fontWeight: 700,
+                        color: '#475569',
                       }}
                     >
                       -
                     </button>
-                    <strong style={{ fontSize: '0.86rem', minWidth: '18px', textAlign: 'center' }}>
+                    <span
+                      style={{
+                        fontSize: '0.8rem',
+                        fontWeight: 800,
+                        minWidth: '20px',
+                        textAlign: 'center',
+                      }}
+                    >
                       {line.quantity}
-                    </strong>
+                    </span>
                     <button
                       type="button"
                       onClick={() => handleUpdateLineQty(line.catalogItemId, 1)}
                       style={{
-                        width: '26px',
-                        height: '26px',
-                        borderRadius: '8px',
-                        border: '1px solid #CBD5E1',
-                        backgroundColor: '#FFFFFF',
+                        width: '24px',
+                        height: '24px',
+                        border: 'none',
+                        backgroundColor: 'transparent',
                         cursor: 'pointer',
-                        fontWeight: 800,
+                        fontWeight: 700,
+                        color: '#475569',
                       }}
                     >
                       +
                     </button>
                   </div>
 
-                  <strong style={{ fontSize: '0.86rem', color: '#0F172A', minWidth: '78px', textAlign: 'right' }}>
+                  {/* Subtotal del Renglón */}
+                  <div
+                    style={{
+                      fontWeight: 800,
+                      fontSize: '0.86rem',
+                      color: '#0F172A',
+                      minWidth: '72px',
+                      textAlign: 'right',
+                    }}
+                  >
                     $ {(line.quantity * line.unitPrice).toLocaleString('es-CO')}
-                  </strong>
+                  </div>
+
+                  {/* Botón Borrar */}
+                  <button
+                    type="button"
+                    onClick={() => handleUpdateLineQty(line.catalogItemId, -line.quantity)}
+                    style={{
+                      border: 'none',
+                      backgroundColor: 'transparent',
+                      color: '#94A3B8',
+                      cursor: 'pointer',
+                      padding: '2px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                    }}
+                    title="Eliminar de la venta"
+                  >
+                    <Icon name="trash" size={14} />
+                  </button>
                 </div>
               ))
             )}
           </div>
 
-          {/* Resumen Fiscal DIAN en Vivo */}
+          {/* Desglose Financiero & Total */}
           {liquidation && (
             <div
               style={{
-                padding: '14px 16px',
+                padding: '12px 14px',
                 borderRadius: '16px',
                 backgroundColor: '#F8FAFC',
                 border: '1px solid #E2E8F0',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '6px',
-                fontSize: '0.82rem',
+                gap: '5px',
+                fontSize: '0.8rem',
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: '#64748B' }}>Subtotal Base:</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', color: '#64748B' }}>
+                <span>Subtotal Base:</span>
                 <strong>{CashShiftModel.formatCop(liquidation.result.taxableBase)}</strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', color: '#047857' }}>
-                <span>+ Impuestos (IVA / INC):</span>
+                <span>Impuestos (IVA / INC):</span>
                 <strong>+ {CashShiftModel.formatCop(liquidation.result.totalTaxes)}</strong>
               </div>
               {liquidation.result.totalWithholdings > 0 && (
                 <div style={{ display: 'flex', justifyContent: 'space-between', color: '#B45309' }}>
-                  <span>- Retenciones Ley (Empresa):</span>
-                  <strong>
-                    - {CashShiftModel.formatCop(liquidation.result.totalWithholdings)}
-                  </strong>
+                  <span>Retenciones:</span>
+                  <strong>- {CashShiftModel.formatCop(liquidation.result.totalWithholdings)}</strong>
                 </div>
               )}
               <Divider margin="4px 0" />
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                 <span style={{ fontWeight: 800, fontSize: '0.95rem', color: '#0F172A' }}>
-                  Total Neto a Cobrar:
+                  Total a Pagar:
                 </span>
                 <span
                   style={{
                     fontFamily: 'var(--font-display)',
-                    fontSize: '1.42rem',
+                    fontSize: '1.45rem',
                     fontWeight: 800,
                     color: '#4D53F4',
                   }}
@@ -711,12 +782,12 @@ export const PosTerminalModuleView: React.FC<PosTerminalModuleViewProps> = ({
             </div>
           )}
 
-          {/* Selector de Medio de Pago POS */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <span style={{ fontSize: '0.79rem', fontWeight: 700, color: '#0F172A' }}>
-              Medio de Pago en Caja
+          {/* Medios de Pago */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>
+              Medio de Pago
             </span>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px' }}>
               {(
                 [
                   { id: 'CASH', label: '💵 Efectivo' },
@@ -730,6 +801,7 @@ export const PosTerminalModuleView: React.FC<PosTerminalModuleViewProps> = ({
                   size="sm"
                   variant={paymentMethod === pm.id ? 'primary' : 'outline'}
                   onClick={() => setPaymentMethod(pm.id)}
+                  style={{ fontSize: '0.76rem', height: '32px' }}
                 >
                   {pm.label}
                 </Button>
@@ -741,30 +813,30 @@ export const PosTerminalModuleView: React.FC<PosTerminalModuleViewProps> = ({
           {paymentMethod === 'CASH' && cartLines.length > 0 && (
             <div
               style={{
-                padding: '12px 14px',
+                padding: '10px 12px',
                 borderRadius: '14px',
                 backgroundColor: '#EEF2FF',
                 border: '1px solid #C7D2FE',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '10px',
+                gap: '8px',
               }}
             >
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', alignItems: 'center' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '8px', alignItems: 'center' }}>
                 <FormField
                   type="number"
-                  label="Efectivo Recibido (COP)"
+                  label="Efectivo Recibido"
                   value={cashTenderedText}
                   onChange={(e) => setCashTenderedText(e.target.value)}
                 />
                 <div style={{ textAlign: 'right' }}>
-                  <span style={{ display: 'block', fontSize: '0.74rem', color: '#475569', fontWeight: 600 }}>
-                    Cambio / Vueltas a Devolver
+                  <span style={{ display: 'block', fontSize: '0.7rem', color: '#475569', fontWeight: 600 }}>
+                    Vueltas / Cambio
                   </span>
                   <strong
                     style={{
                       fontFamily: 'var(--font-display)',
-                      fontSize: '1.22rem',
+                      fontSize: '1.15rem',
                       color: cashTenderedCop >= netPayableCop ? '#047857' : '#DC2626',
                     }}
                   >
@@ -773,12 +845,12 @@ export const PosTerminalModuleView: React.FC<PosTerminalModuleViewProps> = ({
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: '5px' }}>
                 {[
                   { label: 'Exacto', val: netPayableCop },
-                  { label: '$50.000', val: 50000 },
-                  { label: '$100.000', val: 100000 },
-                  { label: '$200.000', val: 200000 },
+                  { label: '$50k', val: 50000 },
+                  { label: '$100k', val: 100000 },
+                  { label: '$200k', val: 200000 },
                 ].map((bill) => (
                   <Button
                     key={bill.label}
@@ -786,7 +858,7 @@ export const PosTerminalModuleView: React.FC<PosTerminalModuleViewProps> = ({
                     size="sm"
                     variant="outline"
                     onClick={() => setCashTenderedText(String(bill.val))}
-                    style={{ flex: 1, height: '30px', fontSize: '0.73rem' }}
+                    style={{ flex: 1, height: '28px', fontSize: '0.7rem', padding: '0 4px', backgroundColor: '#FFFFFF' }}
                   >
                     {bill.label}
                   </Button>
@@ -795,16 +867,330 @@ export const PosTerminalModuleView: React.FC<PosTerminalModuleViewProps> = ({
             </div>
           )}
 
-          <Button
-            type="button"
-            variant="primary"
-            size="lg"
-            fullWidth
-            leftIcon={<Icon name="receipt" size={18} />}
-            onClick={() => void handleEmitInvoice()}
+          {/* Botones de Acción: Vaciar y Pagar/Facturar */}
+          <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+            {cartLines.length > 0 && (
+              <Button
+                type="button"
+                variant="outline"
+                size="md"
+                onClick={handleClearCart}
+                style={{
+                  color: '#64748B',
+                  borderColor: '#CBD5E1',
+                  minWidth: '110px',
+                }}
+              >
+                Vaciar
+              </Button>
+            )}
+
+            <Button
+              type="button"
+              variant="primary"
+              size="lg"
+              fullWidth
+              disabled={cartLines.length === 0}
+              leftIcon={<Icon name="receipt" size={18} />}
+              onClick={() => void handleEmitInvoice()}
+              style={{
+                boxShadow: '0 8px 20px rgba(77, 83, 244, 0.35)',
+                fontSize: '0.94rem',
+                fontWeight: 700,
+              }}
+            >
+              {cartLines.length > 0
+                ? `Cobrar ${CashShiftModel.formatCop(netPayableCop)}`
+                : 'Cobrar Venta'}
+            </Button>
+          </div>
+        </div>
+
+        {/* COLUMNA DERECHA: CATÁLOGO TÁCTIL DE PRODUCTOS (GRID CON TARJETAS MINIMALISTAS) */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '24px',
+              padding: '22px',
+              boxShadow: '0 8px 24px -12px rgba(15, 23, 42, 0.06)',
+              border: '1px solid rgba(226, 232, 240, 0.85)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px',
+            }}
           >
-            Facturar y Emitir Tirilla DIAN
-          </Button>
+            {/* Buscador de Productos y Código de Barras */}
+            <FormField
+              placeholder="Buscar producto por nombre, SKU o escanear código de barras..."
+              value={searchProduct}
+              onChange={(e) => setSearchProduct(e.target.value)}
+              leftSlot={<Icon name="search" size={18} />}
+            />
+
+            {/* Píldoras de Categorías (Estilo PosyMart) */}
+            <div
+              style={{
+                display: 'flex',
+                gap: '8px',
+                overflowX: 'auto',
+                paddingBottom: '4px',
+                scrollbarWidth: 'none',
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setActiveCategoryId('')}
+                style={{
+                  padding: '6px 16px',
+                  borderRadius: '999px',
+                  border: 'none',
+                  backgroundColor: activeCategoryId === '' ? '#4D53F4' : '#F1F5F9',
+                  color: activeCategoryId === '' ? '#FFFFFF' : '#475569',
+                  fontWeight: 700,
+                  fontSize: '0.78rem',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  transition: 'all 0.16s ease',
+                }}
+              >
+                Todos
+              </button>
+
+              {categories.map((cat) => {
+                const isActive = activeCategoryId === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => setActiveCategoryId(cat.id)}
+                    style={{
+                      padding: '6px 16px',
+                      borderRadius: '999px',
+                      border: 'none',
+                      backgroundColor: isActive ? '#4D53F4' : '#F1F5F9',
+                      color: isActive ? '#FFFFFF' : '#475569',
+                      fontWeight: 700,
+                      fontSize: '0.78rem',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      transition: 'all 0.16s ease',
+                    }}
+                  >
+                    <ColorDot colorHex={cat.colorHex} size={8} />
+                    <span>{cat.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Grilla de Tarjetas de Productos (Estilo PosyMart con Ilustración, Nombre, Precio y Botón '+') */}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+                gap: '14px',
+              }}
+            >
+              {products.map((prod) => {
+                const isFoodOrDrink = prod.raw.defaultTaxCode === '04' || prod.categoryId === 'cat-cafe-002';
+                const isHardware = prod.categoryId === 'cat-hardware-003';
+
+                return (
+                  <div
+                    key={prod.id}
+                    onClick={() => handleAddProductToCart(prod)}
+                    style={{
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '20px',
+                      padding: '16px 14px 14px',
+                      border: '1px solid #E2E8F0',
+                      boxShadow: '0 4px 12px rgba(15, 23, 42, 0.03)',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      gap: '12px',
+                      transition: 'transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = '0 8px 20px rgba(77, 83, 244, 0.12)';
+                      e.currentTarget.style.borderColor = '#C7D2FE';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(15, 23, 42, 0.03)';
+                      e.currentTarget.style.borderColor = '#E2E8F0';
+                    }}
+                  >
+                    {/* Ilustración / Miniatura Circular Central (como en el PosyMart) */}
+                    <div
+                      style={{
+                        width: '72px',
+                        height: '72px',
+                        borderRadius: '50%',
+                        backgroundColor: isFoodOrDrink
+                          ? '#FEF3C7'
+                          : isHardware
+                          ? '#EEF2FF'
+                          : '#ECFDF5',
+                        color: isFoodOrDrink
+                          ? '#D97706'
+                          : isHardware
+                          ? '#4D53F4'
+                          : '#059669',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        margin: '0 auto',
+                        fontSize: '1.9rem',
+                        boxShadow: '0 4px 10px rgba(15, 23, 42, 0.04)',
+                      }}
+                    >
+                      {prod.primaryImageUrl ? (
+                        <img
+                          src={prod.primaryImageUrl}
+                          alt={prod.name}
+                          style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
+                        />
+                      ) : isFoodOrDrink ? (
+                        '☕'
+                      ) : isHardware ? (
+                        <Icon name="package" size={30} />
+                      ) : (
+                        <Icon name="sparkles" size={28} />
+                      )}
+                    </div>
+
+                    {/* Título & Detalle */}
+                    <div style={{ textAlign: 'center' }}>
+                      <div
+                        style={{
+                          fontWeight: 700,
+                          fontSize: '0.86rem',
+                          color: '#0F172A',
+                          lineHeight: 1.25,
+                          minHeight: '34px',
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        {prod.name}
+                      </div>
+                      <span
+                        style={{
+                          fontSize: '0.68rem',
+                          color: '#94A3B8',
+                          marginTop: '3px',
+                          display: 'inline-block',
+                        }}
+                      >
+                        {prod.taxBadgeLabel}
+                      </span>
+                    </div>
+
+                    {/* Precio y Botón Circular '+' (Estilo exacto de la referencia) */}
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        paddingTop: '8px',
+                        borderTop: '1px solid #F1F5F9',
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontFamily: 'var(--font-display)',
+                          fontWeight: 800,
+                          fontSize: '1rem',
+                          color: '#0F172A',
+                        }}
+                      >
+                        {prod.formattedBasePrice}
+                      </span>
+
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAddProductToCart(prod);
+                        }}
+                        style={{
+                          width: '30px',
+                          height: '30px',
+                          borderRadius: '50%',
+                          border: 'none',
+                          backgroundColor: '#4D53F4',
+                          color: '#FFFFFF',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '1.1rem',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          boxShadow: '0 4px 10px rgba(77, 83, 244, 0.3)',
+                          transition: 'transform 0.12s ease',
+                        }}
+                        onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.92)')}
+                        onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Historial Plegable de Comprobantes Emitidos en el Turno */}
+          {recentReceipts.length > 0 && (
+            <div
+              style={{
+                backgroundColor: '#FFFFFF',
+                borderRadius: '20px',
+                padding: '16px 20px',
+                boxShadow: '0 4px 14px rgba(15, 23, 42, 0.04)',
+                border: '1px solid rgba(226, 232, 240, 0.85)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '12px',
+              }}
+            >
+              <div>
+                <strong style={{ fontSize: '0.86rem', color: '#0F172A' }}>
+                  Última Factura Emitida: {recentReceipts[0]?.invoiceNumber}
+                </strong>
+                <p style={{ fontSize: '0.75rem', color: '#64748B', marginTop: '2px' }}>
+                  {recentReceipts[0]?.customerName} • {recentReceipts[0]?.paymentMethodLabel}
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <strong style={{ fontFamily: 'var(--font-display)', color: '#4D53F4', fontSize: '0.95rem' }}>
+                  {CashShiftModel.formatCop(recentReceipts[0]?.taxSummary.netPayable ?? 0)}
+                </strong>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  leftIcon={<Icon name="receipt" size={13} />}
+                  onClick={() => setActiveReceiptModal(recentReceipts[0])}
+                >
+                  Ver Tirilla QR
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
