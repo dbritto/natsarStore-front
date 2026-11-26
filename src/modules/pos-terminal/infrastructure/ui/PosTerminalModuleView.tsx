@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
+  Button,
   FriendlyModal,
+  Icon,
   PosCartLineDisplay,
   PosCartPanel,
   PosCatalogGrid,
@@ -27,6 +29,12 @@ import {
   PosReceiptProps,
 } from '../../domain/models/PosCart.model';
 import { PosTerminalUseCases } from '../../application/use-cases/PosTerminalUseCases';
+import {
+  CustomerDisplayState,
+  listenForCustomerDisplayRequests,
+  openCustomerDisplayWindow,
+  publishCustomerDisplayState,
+} from '../sync/CustomerDisplayChannel';
 
 export interface PosTerminalModuleViewProps {
   cashierFullName: string;
@@ -303,10 +311,104 @@ export const PosTerminalModuleView: React.FC<PosTerminalModuleViewProps> = ({
     };
   }, [recentReceipts]);
 
+  // Sincronización en tiempo real con la Pantalla de Atención al Cliente (Customer Facing Display)
+  const getCurrentCustomerDisplayState = (): CustomerDisplayState => {
+    return {
+      cashierName: cashierFullName,
+      customerName: selectedCustomer ? selectedCustomer.names : 'Consumidor Final',
+      lines: cartLines.map((l) => ({
+        id: l.catalogItemId,
+        name: l.name,
+        unitPrice: l.unitPrice,
+        quantity: l.quantity,
+        lineTotal: l.quantity * l.unitPrice,
+        imageUrl: l.imageUrl,
+        taxRate: l.taxRate,
+      })),
+      liquidation: liquidationSummary,
+      isPaymentInProgress: isPaymentModalOpen,
+      completedReceipt: activeReceiptModal
+        ? {
+            invoiceNumber: activeReceiptModal.invoiceNumber,
+            totalCop: activeReceiptModal.taxSummary.netPayable,
+            customerName: activeReceiptModal.customerName,
+          }
+        : null,
+      updatedAt: Date.now(),
+    };
+  };
+
+  useEffect(() => {
+    publishCustomerDisplayState(getCurrentCustomerDisplayState());
+  }, [
+    cartLines,
+    selectedCustomer,
+    liquidationSummary,
+    isPaymentModalOpen,
+    activeReceiptModal,
+    cashierFullName,
+  ]);
+
+  useEffect(() => {
+    const cleanup = listenForCustomerDisplayRequests(() => getCurrentCustomerDisplayState());
+    return () => cleanup();
+  }, [
+    cartLines,
+    selectedCustomer,
+    liquidationSummary,
+    isPaymentModalOpen,
+    activeReceiptModal,
+    cashierFullName,
+  ]);
+
   if (!shift) return null;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      {/* 0. Barra Superior de Control de Terminal & Pantalla Cliente */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '12px',
+          backgroundColor: '#FFFFFF',
+          padding: '12px 18px',
+          borderRadius: '16px',
+          border: '1px solid #E2E8F0',
+          boxShadow: '0 1px 3px rgba(15, 23, 42, 0.03)',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '0.88rem', fontWeight: 800, color: '#0F172A' }}>
+            Terminal de Caja Registradora POS
+          </span>
+          <span style={{ fontSize: '0.78rem', color: '#64748B' }}>
+            • Cajero en turno: <strong>{cashierFullName}</strong>
+          </span>
+        </div>
+
+        {/* BOTÓN SOLICITADO: Abrir pantalla cliente */}
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          leftIcon={<Icon name="monitor" size={15} />}
+          onClick={openCustomerDisplayWindow}
+          title="Abrir visor para el cliente en otra pantalla o pestaña"
+          style={{
+            fontSize: '0.8rem',
+            fontWeight: 700,
+            color: '#4F55F1',
+            borderColor: '#C7D2FE',
+            backgroundColor: '#EEF2FF',
+          }}
+        >
+          Abrir pantalla cliente
+        </Button>
+      </div>
+
       {/* 1. Componentes Brutos: Fila de Mini KPIs Superiores */}
       <div
         style={{
@@ -374,6 +476,7 @@ export const PosTerminalModuleView: React.FC<PosTerminalModuleViewProps> = ({
           onClearCart={() => setCartLines([])}
           liquidation={liquidationSummary}
           isShiftOpen={shift.isOpen}
+          onOpenCustomerDisplay={openCustomerDisplayWindow}
           onOpenShiftModal={() => {
             setCountedClosingCashText(String(shift.expectedDrawerCashCop));
             setIsShiftModalOpen(true);

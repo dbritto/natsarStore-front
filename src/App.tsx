@@ -29,6 +29,7 @@ import { HttpPosTerminalRepositoryAdapter } from '@modules/pos-terminal/infrastr
 import { PosTerminalUseCases } from '@modules/pos-terminal/application/use-cases/PosTerminalUseCases';
 import { PosWorkspacePage } from '@modules/pos-workspace/infrastructure/ui/PosWorkspacePage';
 import { EcommerceStorefrontPage } from '@modules/storefront';
+import { CustomerFacingDisplayPage } from '@modules/pos-terminal/infrastructure/ui/CustomerFacingDisplayPage';
 
 const SESSION_EXPIRED_NOTICE: FriendlyNotice = {
   title: 'Tu sesión ha finalizado por tiempo',
@@ -227,6 +228,16 @@ export const App: React.FC = () => {
     const simulated = session.withForcedRemainingSeconds(seconds);
     handleUpdateSession(simulated);
   };
+
+  // 0. Pantalla Secundaria Orientada al Cliente (Customer Facing Display)
+  // Accesible en pestaña o monitor secundario y sincronizada en tiempo real con el POS
+  if (
+    typeof window !== 'undefined' &&
+    (window.location.search.includes('view=customer-display') ||
+      window.location.hash.includes('customer-display'))
+  ) {
+    return <CustomerFacingDisplayPage />;
+  }
 
   // 1. Vista de Portal de Login Completo
   if (currentView === 'login') {

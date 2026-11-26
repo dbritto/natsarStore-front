@@ -39,6 +39,7 @@ export interface PosCartPanelProps {
   liquidation: PosLiquidationSummary | null;
   isShiftOpen: boolean;
   onOpenShiftModal: () => void;
+  onOpenCustomerDisplay?: () => void;
   onPay: () => void;
 }
 
@@ -59,6 +60,7 @@ export const PosCartPanel: React.FC<PosCartPanelProps> = ({
   liquidation,
   isShiftOpen,
   onOpenShiftModal,
+  onOpenCustomerDisplay,
   onPay,
 }) => {
   const selectedCustomer = customers.find((c) => c.id === selectedCustomerId) ?? customers[0];
@@ -89,7 +91,7 @@ export const PosCartPanel: React.FC<PosCartPanelProps> = ({
       }}
     >
       {/* Cabecera */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <h2 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
             Venta Actual
@@ -97,16 +99,32 @@ export const PosCartPanel: React.FC<PosCartPanelProps> = ({
           <Badge tone="brand">{totalItemsCount}</Badge>
         </div>
 
-        <Button
-          type="button"
-          variant={isShiftOpen ? 'outline' : 'primary'}
-          size="sm"
-          leftIcon={<Icon name="lock" size={13} />}
-          onClick={onOpenShiftModal}
-          style={{ fontSize: '0.74rem', padding: '4px 10px' }}
-        >
-          {isShiftOpen ? 'Arqueo' : 'Abrir Turno'}
-        </Button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          {onOpenCustomerDisplay && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              leftIcon={<Icon name="monitor" size={13} />}
+              onClick={onOpenCustomerDisplay}
+              title="Abrir vista de cliente en otra pantalla o pestaña"
+              style={{ fontSize: '0.74rem', padding: '4px 10px', color: '#4F55F1', borderColor: '#C7D2FE' }}
+            >
+              Abrir pantalla cliente
+            </Button>
+          )}
+
+          <Button
+            type="button"
+            variant={isShiftOpen ? 'outline' : 'primary'}
+            size="sm"
+            leftIcon={<Icon name="lock" size={13} />}
+            onClick={onOpenShiftModal}
+            style={{ fontSize: '0.74rem', padding: '4px 10px' }}
+          >
+            {isShiftOpen ? 'Arqueo' : 'Abrir Turno'}
+          </Button>
+        </div>
       </div>
 
       {/* Adquirente */}
