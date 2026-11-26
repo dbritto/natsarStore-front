@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Icon } from '@shared/components/atoms/Icon';
 
 export interface CategoryItem {
@@ -17,9 +17,9 @@ export interface CategorySliderProps {
 }
 
 /**
- * Componente Slider de Categorías (Organismo E-Commerce)
- * Permite navegar horizontalmente por las categorías con botones de desplazamiento suave (‹ ›)
- * y seleccionar categorías para filtrar los productos en tiempo real.
+ * Componente Slider de Categorías de Alta Intuición (Organismo E-Commerce)
+ * Con desplazamiento táctil/drag suave, máscaras de desvanecimiento en bordes,
+ * flechas inteligentes con desactivación automática en extremos y conteos de productos.
  */
 export const CategorySlider: React.FC<CategorySliderProps> = ({
   categories,
@@ -28,12 +28,68 @@ export const CategorySlider: React.FC<CategorySliderProps> = ({
   totalProductsCount,
 }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  // Estados para arrastrar con mouse (drag to scroll)
+  const isDragging = useRef(false);
+  const startX = useRef(0);
+  const scrollLeftPos = useRef(0);
+  const hasMoved = useRef(false);
+
+  const checkScrollability = () => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    setCanScrollLeft(scrollLeft > 6);
+    setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 6);
+  };
+
+  useEffect(() => {
+    checkScrollability();
+    window.addEventListener('resize', checkScrollability);
+    return () => window.removeEventListener('resize', checkScrollability);
+  }, [categories]);
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
-      const scrollAmount = direction === 'left' ? -260 : 260;
+      const scrollAmount = direction === 'left' ? -280 : 280;
       scrollContainerRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    isDragging.current = true;
+    startX.current = e.pageX - el.offsetLeft;
+    scrollLeftPos.current = el.scrollLeft;
+    hasMoved.current = false;
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging.current || !scrollContainerRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - scrollContainerRef.current.offsetLeft;
+    const walk = (x - startX.current) * 1.5;
+    if (Math.abs(walk) > 4) {
+      hasMoved.current = true;
+    }
+    scrollContainerRef.current.scrollLeft = scrollLeftPos.current - walk;
+    checkScrollability();
+  };
+
+  const handleMouseUp = () => {
+    isDragging.current = false;
+  };
+
+  const handleCategoryClick = (id: string) => {
+    // Si el usuario estaba arrastrando para desplazarse, no disparar selección accidental
+    if (hasMoved.current) {
+      hasMoved.current = false;
+      return;
+    }
+    onSelectCategory(id);
   };
 
   return (
@@ -51,6 +107,7 @@ export const CategorySlider: React.FC<CategorySliderProps> = ({
       <button
         type="button"
         onClick={() => scroll('left')}
+        disabled={!canScrollLeft}
         aria-label="Desplazar categorías hacia la izquierda"
         style={{
           width: '36px',
@@ -61,43 +118,55 @@ export const CategorySlider: React.FC<CategorySliderProps> = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#18181B',
-          cursor: 'pointer',
+          color: canScrollLeft ? '#18181B' : '#D4D4D8',
+          cursor: canScrollLeft ? 'pointer' : 'default',
           flexShrink: 0,
-          boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
+          boxShadow: canScrollLeft ? '0 2px 6px rgba(0,0,0,0.04)' : 'none',
+          opacity: canScrollLeft ? 1 : 0.45,
           transition: 'all 0.15s ease',
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = '#18181B';
-          e.currentTarget.style.color = '#FFFFFF';
+          if (canScrollLeft) {
+            e.currentTarget.style.backgroundColor = '#18181B';
+            e.currentTarget.style.color = '#FFFFFF';
+          }
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = '#FFFFFF';
-          e.currentTarget.style.color = '#18181B';
+          if (canScrollLeft) {
+            e.currentTarget.style.backgroundColor = '#FFFFFF';
+            e.currentTarget.style.color = '#18181B';
+          }
         }}
       >
         <Icon name="chevron-left" size={16} />
       </button>
 
-      {/* Contenedor deslizante de píldoras */}
+      {/* Contenedor deslizante de píldoras con soporte drag & scroll */}
       <div
         ref={scrollContainerRef}
+        onScroll={checkScrollability}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
         style={{
           display: 'flex',
           alignItems: 'center',
           gap: '10px',
           overflowX: 'auto',
-          scrollBehavior: 'smooth',
+          scrollBehavior: isDragging.current ? 'auto' : 'smooth',
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
           padding: '4px 2px',
           flex: 1,
+          cursor: isDragging.current ? 'grabbing' : 'grab',
+          userSelect: 'none',
         }}
       >
         {/* Píldora "Todos" */}
         <button
           type="button"
-          onClick={() => onSelectCategory('')}
+          onClick={() => handleCategoryClick('')}
           style={{
             padding: '9px 18px',
             borderRadius: '999px',
@@ -114,6 +183,7 @@ export const CategorySlider: React.FC<CategorySliderProps> = ({
             boxShadow:
               selectedCategoryId === '' ? '0 4px 12px rgba(24,24,27,0.18)' : 'none',
             transition: 'all 0.18s ease',
+            flexShrink: 0,
           }}
           onMouseEnter={(e) => {
             if (selectedCategoryId !== '') {
@@ -148,7 +218,7 @@ export const CategorySlider: React.FC<CategorySliderProps> = ({
             <button
               key={cat.id}
               type="button"
-              onClick={() => onSelectCategory(cat.id)}
+              onClick={() => handleCategoryClick(cat.id)}
               style={{
                 padding: '9px 18px',
                 borderRadius: '999px',
@@ -164,6 +234,7 @@ export const CategorySlider: React.FC<CategorySliderProps> = ({
                 color: isSelected ? '#FFFFFF' : '#3F3F46',
                 boxShadow: isSelected ? '0 4px 12px rgba(24,24,27,0.18)' : 'none',
                 transition: 'all 0.18s ease',
+                flexShrink: 0,
               }}
               onMouseEnter={(e) => {
                 if (!isSelected) {
@@ -200,6 +271,7 @@ export const CategorySlider: React.FC<CategorySliderProps> = ({
       <button
         type="button"
         onClick={() => scroll('right')}
+        disabled={!canScrollRight}
         aria-label="Desplazar categorías hacia la derecha"
         style={{
           width: '36px',
@@ -210,19 +282,24 @@ export const CategorySlider: React.FC<CategorySliderProps> = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#18181B',
-          cursor: 'pointer',
+          color: canScrollRight ? '#18181B' : '#D4D4D8',
+          cursor: canScrollRight ? 'pointer' : 'default',
           flexShrink: 0,
-          boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
+          boxShadow: canScrollRight ? '0 2px 6px rgba(0,0,0,0.04)' : 'none',
+          opacity: canScrollRight ? 1 : 0.45,
           transition: 'all 0.15s ease',
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = '#18181B';
-          e.currentTarget.style.color = '#FFFFFF';
+          if (canScrollRight) {
+            e.currentTarget.style.backgroundColor = '#18181B';
+            e.currentTarget.style.color = '#FFFFFF';
+          }
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = '#FFFFFF';
-          e.currentTarget.style.color = '#18181B';
+          if (canScrollRight) {
+            e.currentTarget.style.backgroundColor = '#FFFFFF';
+            e.currentTarget.style.color = '#18181B';
+          }
         }}
       >
         <Icon name="chevron-right" size={16} />

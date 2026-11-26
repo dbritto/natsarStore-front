@@ -20,41 +20,52 @@ export interface EcommerceProductProps {
 }
 
 /**
- * Tarjeta de Producto E-Commerce (Inspirada en el diseño de referencia)
- * Presentación limpia tipo editorial/skincare:
- * Contenedor suave, imagen con render 3D / botánico, nombre, formato/aroma, precio y botón '+' circular.
+ * Tarjeta de Producto E-Commerce de Alta Intuición (Inspirada en el diseño de referencia)
+ * Cuenta con:
+ * - Micro-interacción inmediata al agregar (cambio a verde con checkmark ✓ durante 1.2s)
+ * - Botón de "Vista rápida" al pasar el cursor (Desktop hover)
+ * - Indicador de stock en tiempo real con punto pulsante
+ * - Presentación limpia tipo editorial / skincare escandinavo
  */
 export const EcommerceProductCard: React.FC<EcommerceProductProps> = ({
   name,
   description,
   formattedPrice,
+  brand,
   primaryImageUrl,
   inStock,
+  defaultTaxRate,
   onAddToCart,
   onOpenDetail,
 }) => {
   const [imageError, setImageError] = useState(false);
+  const [isAddedRecently, setIsAddedRecently] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const showImage = Boolean(primaryImageUrl) && !imageError;
 
   // Extraer información de formato o aroma a partir de la descripción (estilo "Cream, Fragrance-free, 200 ml")
   const formatSubtitle = description
     ? description.split('.')[0]
     : inStock
-    ? 'Disponible para compra inmediata'
+    ? 'Fórmula dermatológica certificada'
     : 'Temporalmente agotado';
 
   const handleClickCard = () => {
     if (onOpenDetail) {
       onOpenDetail();
-    } else if (onAddToCart) {
+    } else if (onAddToCart && inStock) {
       onAddToCart();
     }
   };
 
   const handlePlusClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!inStock) return;
+
     if (onAddToCart) {
       onAddToCart();
+      setIsAddedRecently(true);
+      setTimeout(() => setIsAddedRecently(false), 1200);
     } else if (onOpenDetail) {
       onOpenDetail();
     }
@@ -63,28 +74,24 @@ export const EcommerceProductCard: React.FC<EcommerceProductProps> = ({
   return (
     <div
       onClick={handleClickCard}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       style={{
         backgroundColor: '#FFFFFF',
         borderRadius: '24px',
         padding: '12px 12px 16px',
-        border: '1px solid #ECEAE4',
-        boxShadow: '0 4px 16px rgba(0,0,0,0.02)',
+        border: isHovered ? '1px solid #D4D1C9' : '1px solid #ECEAE4',
+        boxShadow: isHovered
+          ? '0 12px 28px rgba(24, 24, 27, 0.08), 0 2px 6px rgba(0,0,0,0.02)'
+          : '0 4px 16px rgba(0,0,0,0.02)',
         display: 'flex',
         flexDirection: 'column',
         gap: '12px',
         cursor: 'pointer',
-        transition: 'transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s ease, border-color 0.18s ease',
+        transition: 'all 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
+        transform: isHovered ? 'translateY(-3px)' : 'translateY(0)',
         position: 'relative',
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateY(-3px)';
-        e.currentTarget.style.boxShadow = '0 12px 28px rgba(24, 24, 27, 0.08)';
-        e.currentTarget.style.borderColor = '#D6D3CB';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.02)';
-        e.currentTarget.style.borderColor = '#ECEAE4';
+        boxSizing: 'border-box',
       }}
     >
       {/* Contenedor de Imagen o Render 3D */}
@@ -113,7 +120,8 @@ export const EcommerceProductCard: React.FC<EcommerceProductProps> = ({
               height: '100%',
               objectFit: 'contain',
               padding: '12px',
-              transition: 'transform 0.25s ease',
+              transition: 'transform 0.3s ease',
+              transform: isHovered ? 'scale(1.04)' : 'scale(1)',
             }}
           />
         ) : (
@@ -143,6 +151,8 @@ export const EcommerceProductCard: React.FC<EcommerceProductProps> = ({
                 alignItems: 'center',
                 justifyContent: 'center',
                 position: 'relative',
+                transition: 'transform 0.3s ease',
+                transform: isHovered ? 'translateY(-2px)' : 'translateY(0)',
               }}
             >
               {/* Tapa del tarro */}
@@ -184,21 +194,64 @@ export const EcommerceProductCard: React.FC<EcommerceProductProps> = ({
           </div>
         )}
 
+        {/* Badge de Marca / Categoría en la esquina superior izquierda */}
+        <div
+          style={{
+            position: 'absolute',
+            top: '8px',
+            left: '8px',
+            backgroundColor: 'rgba(255, 255, 255, 0.92)',
+            backdropFilter: 'blur(6px)',
+            padding: '3px 9px',
+            borderRadius: '999px',
+            fontSize: '0.68rem',
+            fontWeight: 700,
+            color: '#52525B',
+            border: '1px solid rgba(0,0,0,0.05)',
+            letterSpacing: '0.2px',
+          }}
+        >
+          {brand ?? 'Factus'}
+        </div>
+
+        {/* Botón flotante 'Vista Rápida' al hacer hover */}
+        {isHovered && (
+          <div
+            style={{
+              position: 'absolute',
+              bottom: '10px',
+              backgroundColor: 'rgba(24, 24, 27, 0.88)',
+              backdropFilter: 'blur(6px)',
+              color: '#FFFFFF',
+              padding: '5px 12px',
+              borderRadius: '999px',
+              fontSize: '0.74rem',
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              animation: 'fadeIn 0.15s ease',
+            }}
+          >
+            <Icon name="eye" size={13} />
+            <span>Vista rápida</span>
+          </div>
+        )}
+
         {/* Badge de stock si está agotado */}
         {!inStock && (
           <div
             style={{
               position: 'absolute',
               top: '8px',
-              left: '8px',
-              backgroundColor: 'rgba(255, 255, 255, 0.92)',
-              backdropFilter: 'blur(4px)',
+              right: '8px',
+              backgroundColor: 'rgba(239, 68, 68, 0.92)',
+              color: '#FFFFFF',
               padding: '3px 8px',
               borderRadius: '999px',
               fontSize: '0.68rem',
-              fontWeight: 600,
-              color: '#71717A',
-              border: '1px solid #E4E4E7',
+              fontWeight: 700,
             }}
           >
             Agotado
@@ -207,7 +260,7 @@ export const EcommerceProductCard: React.FC<EcommerceProductProps> = ({
       </div>
 
       {/* Textos y metadata */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1, padding: '0 4px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', flex: 1, padding: '0 4px' }}>
         <h3
           style={{
             fontSize: '0.96rem',
@@ -250,10 +303,12 @@ export const EcommerceProductCard: React.FC<EcommerceProductProps> = ({
           padding: '4px 4px 0',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-          <span style={{ fontSize: '1.02rem', fontWeight: 800, color: '#18181B' }}>
-            {formattedPrice}
-          </span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+            <span style={{ fontSize: '1.04rem', fontWeight: 800, color: '#18181B' }}>
+              {formattedPrice}
+            </span>
+          </div>
           <span
             style={{
               fontSize: '0.72rem',
@@ -271,46 +326,69 @@ export const EcommerceProductCard: React.FC<EcommerceProductProps> = ({
                 borderRadius: '50%',
                 backgroundColor: inStock ? '#22C55E' : '#D4D4D8',
                 display: 'inline-block',
+                boxShadow: inStock ? '0 0 6px rgba(34, 197, 94, 0.6)' : 'none',
               }}
             />
-            {inStock ? 'In stock' : 'Out of stock'}
+            {inStock ? 'Disponible' : 'Sin existencias'}
+            {defaultTaxRate !== undefined && defaultTaxRate > 0 && (
+              <span style={{ color: '#A1A1AA', fontSize: '0.68rem', marginLeft: '2px' }}>
+                (IVA {defaultTaxRate}%)
+              </span>
+            )}
           </span>
         </div>
 
-        {/* Botón circular '+' negro exacto a la imagen */}
+        {/* Botón circular '+' con micro-interacción a checkmark verde */}
         <button
           type="button"
           onClick={handlePlusClick}
-          aria-label={`Añadir o ver detalle de ${name}`}
+          aria-label={
+            isAddedRecently
+              ? `${name} agregado a la bolsa`
+              : `Añadir ${name} a la bolsa`
+          }
           style={{
-            width: '34px',
-            height: '34px',
+            width: '36px',
+            height: '36px',
             borderRadius: '999px',
-            backgroundColor: inStock ? '#18181B' : '#E4E4E7',
+            backgroundColor: isAddedRecently
+              ? '#16A34A'
+              : inStock
+              ? '#18181B'
+              : '#E4E4E7',
             border: 'none',
-            color: inStock ? '#FFFFFF' : '#A1A1AA',
+            color: '#FFFFFF',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             cursor: inStock ? 'pointer' : 'not-allowed',
-            transition: 'transform 0.15s ease, background-color 0.15s ease',
-            boxShadow: inStock ? '0 3px 8px rgba(24,24,27,0.18)' : 'none',
+            transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
+            transform: isAddedRecently ? 'scale(1.12)' : 'scale(1)',
+            boxShadow: isAddedRecently
+              ? '0 4px 14px rgba(22, 163, 74, 0.4)'
+              : inStock
+              ? '0 3px 8px rgba(24,24,27,0.18)'
+              : 'none',
             flexShrink: 0,
           }}
           onMouseEnter={(e) => {
-            if (inStock) {
+            if (inStock && !isAddedRecently) {
               e.currentTarget.style.transform = 'scale(1.08)';
               e.currentTarget.style.backgroundColor = '#000000';
             }
           }}
           onMouseLeave={(e) => {
-            if (inStock) {
+            if (inStock && !isAddedRecently) {
               e.currentTarget.style.transform = 'scale(1)';
               e.currentTarget.style.backgroundColor = '#18181B';
             }
           }}
         >
-          <Icon name="plus" size={16} />
+          {isAddedRecently ? (
+            <Icon name="check" size={17} />
+          ) : (
+            <Icon name="plus" size={17} />
+          )}
         </button>
       </div>
     </div>
