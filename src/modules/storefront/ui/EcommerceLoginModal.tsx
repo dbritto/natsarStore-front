@@ -14,9 +14,9 @@ export interface EcommerceLoginModalProps {
 }
 
 /**
- * Modal de Acceso Rápido / Login para Tienda E-Commerce
- * Permite a cajeros, administradores y personal acceder a la aplicación directamente
- * desde el botón de login situado en la parte superior derecha.
+ * Modal de Acceso Rápido / Login para Tienda E-Commerce:
+ * - Unificado con la identidad del Panel Administrativo: Royal Indigo (#4F55F1), bordes #E2E8F0
+ * - Totalmente adaptado para móviles (sin desbordes ni botones sobrepuestos)
  */
 export const EcommerceLoginModal: React.FC<EcommerceLoginModalProps> = ({
   isOpen,
@@ -53,34 +53,33 @@ export const EcommerceLoginModal: React.FC<EcommerceLoginModalProps> = ({
       onClick={onClose}
       style={{
         position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(15, 23, 42, 0.48)',
-        backdropFilter: 'blur(8px)',
+        inset: 0,
+        backgroundColor: 'rgba(15, 23, 42, 0.55)',
+        backdropFilter: 'blur(6px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 110,
-        padding: '20px',
+        padding: '16px',
+        boxSizing: 'border-box',
       }}
     >
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
           backgroundColor: '#FFFFFF',
-          borderRadius: '30px',
+          borderRadius: '24px',
           maxWidth: '440px',
           width: '100%',
           overflow: 'hidden',
-          boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.3)',
-          border: '1px solid #ECEAE4',
+          boxShadow: '0 20px 50px -10px rgba(15, 23, 42, 0.25)',
+          border: '1px solid #E2E8F0',
           display: 'flex',
           flexDirection: 'column',
-          padding: '32px 28px',
+          padding: '28px 24px',
           position: 'relative',
-          animation: 'fadeInScale 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+          boxSizing: 'border-box',
+          maxHeight: '92vh',
         }}
       >
         {/* Botón cerrar 'x' */}
@@ -90,53 +89,48 @@ export const EcommerceLoginModal: React.FC<EcommerceLoginModalProps> = ({
           aria-label="Cerrar modal de login"
           style={{
             position: 'absolute',
-            top: '20px',
-            right: '20px',
+            top: '16px',
+            right: '16px',
             width: '32px',
             height: '32px',
-            borderRadius: '999px',
+            borderRadius: '50%',
             border: 'none',
-            backgroundColor: '#F4F4F5',
-            color: '#71717A',
+            backgroundColor: '#F1F5F9',
+            color: '#64748B',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
             transition: 'background-color 0.15s ease',
           }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#E4E4E7';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = '#F4F4F5';
-          }}
         >
-          <Icon name="x" size={16} />
+          <Icon name="x" size={15} />
         </button>
 
-        {/* Encabezado */}
-        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+        {/* Encabezado con Icono Royal Indigo */}
+        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
           <div
             style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '999px',
-              backgroundColor: '#18181B',
+              width: '46px',
+              height: '46px',
+              borderRadius: '50%',
+              backgroundColor: '#4F55F1',
               color: '#FFFFFF',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              margin: '0 auto 12px',
+              margin: '0 auto 10px',
+              boxShadow: '0 4px 12px rgba(79, 85, 241, 0.3)',
             }}
           >
-            <Icon name="user" size={22} />
+            <Icon name="user" size={20} />
           </div>
           <h2
             style={{
-              fontSize: '1.35rem',
+              fontSize: '1.25rem',
               fontWeight: 800,
-              color: '#18181B',
-              margin: '0 0 6px',
+              color: '#0F172A',
+              margin: '0 0 4px',
               letterSpacing: '-0.3px',
             }}
           >
@@ -144,47 +138,47 @@ export const EcommerceLoginModal: React.FC<EcommerceLoginModalProps> = ({
           </h2>
           <p
             style={{
-              fontSize: '0.84rem',
-              color: '#71717A',
+              fontSize: '0.8rem',
+              color: '#64748B',
               margin: 0,
               lineHeight: 1.4,
             }}
           >
-            Ingresa con tus credenciales para acceder al terminal POS, inventario y facturación electrónica.
+            Ingresa para gestionar el terminal POS, facturación electrónica DIAN e inventarios.
           </p>
         </div>
 
-        {/* Banner de error si las credenciales fallan */}
+        {/* Banner de error */}
         {errorMessage && (
           <div
             style={{
               backgroundColor: '#FEF2F2',
               border: '1px solid #FECACA',
-              borderRadius: '12px',
-              padding: '10px 14px',
+              borderRadius: '10px',
+              padding: '8px 12px',
               color: '#DC2626',
-              fontSize: '0.82rem',
-              marginBottom: '16px',
+              fontSize: '0.8rem',
+              marginBottom: '14px',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
+              gap: '6px',
             }}
           >
-            <Icon name="alert" size={16} />
+            <Icon name="alert" size={15} />
             <span>{errorMessage}</span>
           </div>
         )}
 
         {/* Formulario */}
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
           <div>
             <label
               style={{
                 display: 'block',
-                fontSize: '0.78rem',
+                fontSize: '0.76rem',
                 fontWeight: 600,
-                color: '#3F3F46',
-                marginBottom: '6px',
+                color: '#334155',
+                marginBottom: '4px',
               }}
             >
               Correo Electrónico
@@ -203,10 +197,10 @@ export const EcommerceLoginModal: React.FC<EcommerceLoginModalProps> = ({
             <label
               style={{
                 display: 'block',
-                fontSize: '0.78rem',
+                fontSize: '0.76rem',
                 fontWeight: 600,
-                color: '#3F3F46',
-                marginBottom: '6px',
+                color: '#334155',
+                marginBottom: '4px',
               }}
             >
               Contraseña
@@ -224,8 +218,8 @@ export const EcommerceLoginModal: React.FC<EcommerceLoginModalProps> = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              fontSize: '0.8rem',
-              color: '#71717A',
+              fontSize: '0.78rem',
+              color: '#64748B',
             }}
           >
             <Checkbox
@@ -241,19 +235,20 @@ export const EcommerceLoginModal: React.FC<EcommerceLoginModalProps> = ({
             fullWidth
             isLoading={isLoading}
             style={{
-              backgroundColor: '#18181B',
+              backgroundColor: '#4F55F1',
               borderRadius: '999px',
-              padding: '12px',
+              padding: '11px',
               fontWeight: 700,
-              fontSize: '0.92rem',
-              marginTop: '8px',
+              fontSize: '0.9rem',
+              marginTop: '4px',
+              boxShadow: '0 4px 12px rgba(79, 85, 241, 0.3)',
             }}
           >
-            Entrar a la Aplicación
+            Entrar al Panel POS
           </Button>
 
           {onNavigateToFullLoginPage && (
-            <div style={{ textAlign: 'center', marginTop: '6px' }}>
+            <div style={{ textAlign: 'center', marginTop: '4px' }}>
               <button
                 type="button"
                 onClick={() => {
@@ -263,11 +258,12 @@ export const EcommerceLoginModal: React.FC<EcommerceLoginModalProps> = ({
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: '#71717A',
-                  fontSize: '0.78rem',
+                  color: '#4F55F1',
+                  fontSize: '0.76rem',
                   textDecoration: 'underline',
                   cursor: 'pointer',
-                  padding: '4px',
+                  padding: '2px',
+                  fontWeight: 600,
                 }}
               >
                 Abrir portal de inicio de sesión completo

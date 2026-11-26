@@ -34,11 +34,10 @@ export interface EcommerceStorefrontPageProps {
 const FREE_SHIPPING_THRESHOLD = 150000;
 
 /**
- * Página Principal Tienda E-Commerce (Front Storefront)
- * Inspirada en el diseño visual de referencia (Hollis / Claymorphism escandinavo limpio).
- * Carga productos de la tienda inmediatamente, incluye slider horizontal para filtrar por categoría,
- * buscador inteligente en tiempo real, chips de filtros activos, notificaciones toast,
- * barra de progreso para envío gratis en la bolsa, y botón de login en la parte superior derecha.
+ * Página Principal Tienda E-Commerce Unificada con el Panel Administrativo:
+ * - Paleta Corporativa Idéntica: Canvas #F2F4F9, Royal Indigo #4F55F1, Bordes #E2E8F0, Slate #0F172A
+ * - 100% Mobile Responsive: Cuadrícula móvil de 2 columnas proporcional, sin botones sobrepuestos ni textos gigantes
+ * - Buscador en tiempo real, chips de filtros activos, barra de envío gratis y acceso al POS
  */
 export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = ({
   catalogUseCases,
@@ -71,7 +70,7 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const [activeToast, setActiveToast] = useState<ToastMessage | null>(null);
 
-  // 1. Cargar categorías y productos apenas entren a la aplicación (públicamente sin requerir JWT)
+  // Carga inicial del catálogo público (sin JWT)
   const loadData = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -95,7 +94,7 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
     void loadData();
   }, [loadData]);
 
-  // Manejador para añadir a la bolsa con soporte para cantidad y toast
+  // Manejador para añadir a la bolsa
   const handleAddToCart = (product: EcommerceProductProps, quantityToAdd = 1) => {
     setCartItems((prev) => {
       const existing = prev.find((item) => item.product.id === product.id);
@@ -109,19 +108,17 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
       return [...prev, { product, quantity: quantityToAdd }];
     });
 
-    // Mostrar feedback visual Toast
     setActiveToast({
       id: `${Date.now()}-${product.id}`,
       productName: product.name,
     });
   };
 
-  // Auto-descartar toast después de 3.5 segundos
   useEffect(() => {
     if (!activeToast) return;
     const timer = setTimeout(() => {
       setActiveToast(null);
-    }, 3500);
+    }, 3200);
     return () => clearTimeout(timer);
   }, [activeToast]);
 
@@ -151,11 +148,9 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
     return cartItems.reduce((acc, curr) => acc + curr.product.basePrice * curr.quantity, 0);
   }, [cartItems]);
 
-  // Progreso hacia envío gratis
   const freeShippingProgress = Math.min(100, Math.round((totalCartPrice / FREE_SHIPPING_THRESHOLD) * 100));
   const amountToFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD - totalCartPrice);
 
-  // Preparar opciones de categorías con conteo para el Slider
   const categorySliderItems: CategoryItem[] = useMemo(() => {
     return categories.map((cat) => {
       const count = products.filter((p) => p.categoryId === cat.id).length;
@@ -169,29 +164,26 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
     });
   }, [categories, products]);
 
-  // Obtener información de la categoría activa para el Hero
   const activeCategory = useMemo(() => {
     if (!selectedCategoryId) return null;
     return categories.find((c) => c.id === selectedCategoryId) ?? null;
   }, [categories, selectedCategoryId]);
 
-  const heroTitle = activeCategory ? activeCategory.name : 'Body Care';
+  const heroTitle = activeCategory ? activeCategory.name : 'Catálogo Principal';
   const heroSubtitle = activeCategory?.description
     ? activeCategory.description
-    : 'Creams and balms for daily use, filtered by format, scent, price and stock.';
+    : 'Explora nuestros productos de alta calidad y servicios listos para facturación electrónica DIAN.';
 
-  // Filtrado y ordenamiento de productos
+  // Filtrado y ordenamiento
   const filteredProducts: EcommerceProductProps[] = useMemo(() => {
     const q = filters.search.trim().toLowerCase();
 
     return products
       .filter((p) => {
-        // Filtro por categoría seleccionada en slider o navbar
         if (selectedCategoryId && p.categoryId !== selectedCategoryId) {
           return false;
         }
 
-        // Filtro por búsqueda de texto
         if (q) {
           const matchName = p.name.toLowerCase().includes(q);
           const matchDesc = (p.raw.description ?? '').toLowerCase().includes(q);
@@ -200,7 +192,6 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
           if (!matchName && !matchDesc && !matchRef && !matchBrand) return false;
         }
 
-        // Filtro por formato
         if (filters.format !== 'all') {
           const textToInspect = `${p.name} ${p.raw.description ?? ''} ${p.raw.itemType}`.toLowerCase();
           if (filters.format === 'cream' && !textToInspect.includes('cream') && !textToInspect.includes('crema')) {
@@ -214,12 +205,10 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
           }
         }
 
-        // Filtro por precio máximo
         if (p.basePrice > filters.maxPrice) {
           return false;
         }
 
-        // Filtro por disponibilidad en stock
         const inStock = p.raw.trackInventory !== false;
         if (filters.inStockOnly && !inStock) {
           return false;
@@ -254,7 +243,7 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
         if (sortOption === 'price-asc') return a.basePrice - b.basePrice;
         if (sortOption === 'price-desc') return b.basePrice - a.basePrice;
         if (sortOption === 'name') return a.name.localeCompare(b.name);
-        return 0; // 'featured' por defecto
+        return 0;
       });
   }, [products, selectedCategoryId, filters, sortOption]);
 
@@ -278,15 +267,15 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
   return (
     <div
       style={{
-        backgroundColor: '#F5F4F0',
+        backgroundColor: '#F2F4F9',
         minHeight: '100vh',
         fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-        color: '#18181B',
+        color: '#0F172A',
         display: 'flex',
         flexDirection: 'column',
       }}
     >
-      {/* 1. Header con Buscador Inteligente en Tiempo Real, Logotipo y Botón de Login */}
+      {/* 1. Header con Buscador Inteligente, Marca NatsarStore y Login Superior */}
       <EcommerceHeader
         session={session}
         cartCount={totalCartCount}
@@ -299,8 +288,8 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
         onCartClick={() => setIsCartDrawerOpen(true)}
       />
 
-      <main style={{ width: '100%', padding: '0 32px 60px', flex: 1, boxSizing: 'border-box' }}>
-        {/* 2. Banner Hero Display inspirado en Hollis Body Care */}
+      <main className="storefront-main-layout">
+        {/* 2. Banner Hero Display */}
         <EcommerceHero
           categoryTitle={heroTitle}
           categorySubtitle={heroSubtitle}
@@ -310,8 +299,8 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
           }}
         />
 
-        {/* 3. Slider de Categorías interactivo con botones ‹ › y arrastre suave */}
-        <div style={{ padding: '0 0 10px 0', width: '100%' }}>
+        {/* 3. Slider de Categorías interactivo */}
+        <div style={{ padding: '0 0 6px 0', width: '100%' }}>
           <CategorySlider
             categories={categorySliderItems}
             selectedCategoryId={selectedCategoryId}
@@ -320,82 +309,86 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
           />
         </div>
 
-        {/* 4. Barra Superior de Control de Cuadrícula & Chips de Filtros Activos */}
+        {/* 4. Barra Superior de Control de Cuadrícula (Móvil & Desktop) */}
         <div
           style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: '12px',
-            marginBottom: '20px',
+            gap: '10px',
+            marginBottom: '16px',
             width: '100%',
           }}
         >
-          {/* Fila de Conteo, Botón Móvil y Selector de Ordenamiento */}
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '8px',
               width: '100%',
             }}
           >
-            <div style={{ fontSize: '0.92rem', fontWeight: 700, color: '#18181B', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ fontSize: '0.86rem', fontWeight: 700, color: '#0F172A', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <span>{filteredProducts.length} productos</span>
               {isLoading && (
-                <span style={{ fontSize: '0.78rem', color: '#71717A', fontWeight: 400 }}>
-                  (actualizando...)
+                <span style={{ fontSize: '0.74rem', color: '#64748B', fontWeight: 400 }}>
+                  (cargando...)
                 </span>
               )}
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              {/* Botón flotante para abrir filtros en móvil */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+              {/* Botón para abrir filtros en móvil (sin sobreposiciones) */}
               <button
                 type="button"
                 onClick={() => setIsMobileFiltersOpen(true)}
+                aria-label="Abrir panel de filtros"
+                className="storefront-filter-trigger-btn"
                 style={{
                   display: 'none',
                   alignItems: 'center',
                   gap: '6px',
-                  padding: '7px 14px',
+                  padding: '6px 12px',
                   borderRadius: '999px',
-                  border: '1px solid #E5E5E5',
+                  border: isFilterActive ? '1.5px solid #4F55F1' : '1px solid #E2E8F0',
                   backgroundColor: '#FFFFFF',
-                  fontSize: '0.82rem',
+                  color: isFilterActive ? '#4F55F1' : '#334155',
+                  fontSize: '0.78rem',
                   fontWeight: 600,
                   cursor: 'pointer',
+                  boxShadow: '0 1px 3px rgba(15,23,42,0.04)',
                 }}
-                className="storefront-filter-trigger-btn"
               >
-                <Icon name="filter" size={14} />
+                <Icon name="filter" size={13} />
                 <span>Filtros {isFilterActive && '•'}</span>
               </button>
 
-              {/* Selector de Ordenamiento estilo 'Sort by: Featured v' */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ fontSize: '0.82rem', color: '#71717A', fontWeight: 500 }}>
-                  Ordenar por:
+              {/* Selector de Ordenamiento */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span className="storefront-sort-label" style={{ fontSize: '0.78rem', color: '#64748B', fontWeight: 500 }}>
+                  Ordenar:
                 </span>
                 <select
                   value={sortOption}
                   onChange={(e) => setSortOption(e.target.value as any)}
                   aria-label="Ordenar productos"
                   style={{
-                    padding: '7px 30px 7px 14px',
+                    padding: '6px 26px 6px 10px',
                     borderRadius: '999px',
-                    border: '1px solid #E4E1DB',
+                    border: '1px solid #E2E8F0',
                     backgroundColor: '#FFFFFF',
-                    color: '#18181B',
-                    fontSize: '0.84rem',
+                    color: '#0F172A',
+                    fontSize: '0.78rem',
                     fontWeight: 600,
                     cursor: 'pointer',
                     outline: 'none',
                     appearance: 'none',
-                    backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
+                    backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
                     backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'right 10px center',
-                    backgroundSize: '14px',
-                    boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
+                    backgroundPosition: 'right 8px center',
+                    backgroundSize: '12px',
+                    boxShadow: '0 1px 2px rgba(15,23,42,0.03)',
                   }}
                 >
                   <option value="featured">Destacados</option>
@@ -407,26 +400,24 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
             </div>
           </div>
 
-          {/* CHIPS DE FILTROS ACTIVOS (Mejor práctica de usabilidad y transparencia Baymard Institute) */}
+          {/* Chips de Filtros Activos con colores unificados */}
           {isFilterActive && (
             <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 flexWrap: 'wrap',
-                gap: '8px',
-                padding: '8px 12px',
-                backgroundColor: 'rgba(255,255,255,0.7)',
-                backdropFilter: 'blur(6px)',
-                borderRadius: '16px',
-                border: '1px solid #ECEAE4',
+                gap: '6px',
+                padding: '6px 10px',
+                backgroundColor: '#FFFFFF',
+                borderRadius: '12px',
+                border: '1px solid #E2E8F0',
               }}
             >
-              <span style={{ fontSize: '0.74rem', fontWeight: 600, color: '#71717A', marginRight: '4px' }}>
-                Filtros activos:
+              <span style={{ fontSize: '0.72rem', fontWeight: 600, color: '#64748B', marginRight: '2px' }}>
+                Filtros:
               </span>
 
-              {/* Chip Categoría */}
               {selectedCategoryId && (
                 <button
                   type="button"
@@ -434,23 +425,22 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '6px',
-                    padding: '4px 10px',
+                    gap: '4px',
+                    padding: '3px 8px',
                     borderRadius: '999px',
-                    backgroundColor: '#18181B',
+                    backgroundColor: '#4F55F1',
                     color: '#FFFFFF',
                     border: 'none',
-                    fontSize: '0.76rem',
+                    fontSize: '0.72rem',
                     fontWeight: 600,
                     cursor: 'pointer',
                   }}
                 >
-                  <span>Categoría: {activeCategory?.name ?? 'Seleccionada'}</span>
-                  <Icon name="x" size={12} />
+                  <span>{activeCategory?.name ?? 'Categoría'}</span>
+                  <Icon name="x" size={11} />
                 </button>
               )}
 
-              {/* Chip Búsqueda */}
               {filters.search && (
                 <button
                   type="button"
@@ -458,23 +448,22 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '6px',
-                    padding: '4px 10px',
+                    gap: '4px',
+                    padding: '3px 8px',
                     borderRadius: '999px',
-                    backgroundColor: '#18181B',
+                    backgroundColor: '#4F55F1',
                     color: '#FFFFFF',
                     border: 'none',
-                    fontSize: '0.76rem',
+                    fontSize: '0.72rem',
                     fontWeight: 600,
                     cursor: 'pointer',
                   }}
                 >
-                  <span>Texto: "{filters.search}"</span>
-                  <Icon name="x" size={12} />
+                  <span>"{filters.search}"</span>
+                  <Icon name="x" size={11} />
                 </button>
               )}
 
-              {/* Chip Formato */}
               {filters.format !== 'all' && (
                 <button
                   type="button"
@@ -482,23 +471,22 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '6px',
-                    padding: '4px 10px',
+                    gap: '4px',
+                    padding: '3px 8px',
                     borderRadius: '999px',
-                    backgroundColor: '#18181B',
+                    backgroundColor: '#4F55F1',
                     color: '#FFFFFF',
                     border: 'none',
-                    fontSize: '0.76rem',
+                    fontSize: '0.72rem',
                     fontWeight: 600,
                     cursor: 'pointer',
                   }}
                 >
-                  <span>Formato: {filters.format}</span>
-                  <Icon name="x" size={12} />
+                  <span>{filters.format}</span>
+                  <Icon name="x" size={11} />
                 </button>
               )}
 
-              {/* Chip Precio */}
               {filters.maxPrice < 500000 && (
                 <button
                   type="button"
@@ -506,23 +494,22 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '6px',
-                    padding: '4px 10px',
+                    gap: '4px',
+                    padding: '3px 8px',
                     borderRadius: '999px',
-                    backgroundColor: '#18181B',
+                    backgroundColor: '#4F55F1',
                     color: '#FFFFFF',
                     border: 'none',
-                    fontSize: '0.76rem',
+                    fontSize: '0.72rem',
                     fontWeight: 600,
                     cursor: 'pointer',
                   }}
                 >
-                  <span>Hasta ${filters.maxPrice.toLocaleString('es-CO')}</span>
-                  <Icon name="x" size={12} />
+                  <span>≤ ${filters.maxPrice.toLocaleString('es-CO')}</span>
+                  <Icon name="x" size={11} />
                 </button>
               )}
 
-              {/* Chip Stock */}
               {filters.inStockOnly && (
                 <button
                   type="button"
@@ -530,35 +517,34 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '6px',
-                    padding: '4px 10px',
+                    gap: '4px',
+                    padding: '3px 8px',
                     borderRadius: '999px',
-                    backgroundColor: '#18181B',
+                    backgroundColor: '#4F55F1',
                     color: '#FFFFFF',
                     border: 'none',
-                    fontSize: '0.76rem',
+                    fontSize: '0.72rem',
                     fontWeight: 600,
                     cursor: 'pointer',
                   }}
                 >
-                  <span>Solo en stock</span>
-                  <Icon name="x" size={12} />
+                  <span>En stock</span>
+                  <Icon name="x" size={11} />
                 </button>
               )}
 
-              {/* Botón Limpiar Todo */}
               <button
                 type="button"
                 onClick={handleClearFilters}
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: '#F97316',
-                  fontSize: '0.76rem',
+                  color: '#4F55F1',
+                  fontSize: '0.72rem',
                   fontWeight: 700,
                   cursor: 'pointer',
                   textDecoration: 'underline',
-                  padding: '2px 6px',
+                  padding: '2px 4px',
                 }}
               >
                 Limpiar todo
@@ -567,17 +553,17 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
           )}
         </div>
 
-        {/* 5. Estructura Principal: Sidebar de Filtros (Izquierda) + Grilla de Productos (Derecha) */}
+        {/* 5. Estructura Principal: Sidebar Filtros (Desktop) + Grilla de Productos */}
         <div
           style={{
             display: 'flex',
             alignItems: 'flex-start',
-            gap: '28px',
+            gap: '20px',
             width: '100%',
           }}
         >
           {/* Panel Lateral de Filtros (Desktop) */}
-          <div className="storefront-desktop-filters" style={{ width: '280px', flexShrink: 0 }}>
+          <div className="storefront-desktop-filters" style={{ width: '260px', flexShrink: 0 }}>
             <EcommerceFilters
               filters={filters}
               onFilterChange={setFilters}
@@ -587,96 +573,78 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
             />
           </div>
 
-          {/* Grilla Responsiva de Productos */}
+          {/* Grilla Responsiva de Productos (2 columnas en móvil, 3-4 en desktop) */}
           <div style={{ flex: 1, minWidth: 0, width: '100%' }}>
             {isLoading ? (
-              /* Skeleton Loader suave */
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
-                  gap: '16px',
-                }}
-              >
+              <div className="storefront-product-grid">
                 {[1, 2, 3, 4, 5, 6].map((k) => (
                   <div
                     key={k}
                     style={{
-                      height: '300px',
-                      borderRadius: '24px',
+                      height: '240px',
+                      borderRadius: '18px',
                       backgroundColor: '#FFFFFF',
-                      border: '1px solid #ECEAE4',
+                      border: '1px solid #E2E8F0',
                       opacity: 0.6,
-                      animation: 'pulse 1.5s infinite',
                     }}
                   />
                 ))}
               </div>
             ) : filteredProducts.length === 0 ? (
-              /* Estado sin resultados intuitivo */
               <div
                 style={{
                   backgroundColor: '#FFFFFF',
-                  borderRadius: '28px',
-                  padding: '56px 24px',
+                  borderRadius: '20px',
+                  padding: '40px 20px',
                   textAlign: 'center',
-                  border: '1px solid #ECEAE4',
-                  boxShadow: '0 4px 18px rgba(0,0,0,0.02)',
+                  border: '1px solid #E2E8F0',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
-                  gap: '14px',
+                  gap: '12px',
                 }}
               >
                 <div
                   style={{
-                    width: '60px',
-                    height: '60px',
+                    width: '50px',
+                    height: '50px',
                     borderRadius: '50%',
-                    backgroundColor: '#F5F3ED',
+                    backgroundColor: '#F8FAFC',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: '#71717A',
+                    color: '#94A3B8',
                   }}
                 >
-                  <Icon name="search" size={26} />
+                  <Icon name="search" size={22} />
                 </div>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#18181B', margin: 0 }}>
-                  No encontramos resultados para tu búsqueda
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                  No hay productos con los filtros aplicados
                 </h3>
-                <p style={{ fontSize: '0.88rem', color: '#71717A', margin: 0, maxWidth: '420px', lineHeight: 1.5 }}>
-                  Verifica que los términos estén bien escritos o amplía el rango de precio para explorar más opciones en el catálogo.
+                <p style={{ fontSize: '0.82rem', color: '#64748B', margin: 0, maxWidth: '380px', lineHeight: 1.4 }}>
+                  Intenta ajustar el término de búsqueda o restablecer los filtros para ver todo el catálogo disponible.
                 </p>
                 <button
                   type="button"
                   onClick={handleClearFilters}
                   style={{
-                    marginTop: '6px',
-                    padding: '10px 24px',
+                    marginTop: '4px',
+                    padding: '8px 20px',
                     borderRadius: '999px',
-                    backgroundColor: '#18181B',
+                    backgroundColor: '#4F55F1',
                     color: '#FFFFFF',
                     border: 'none',
                     fontWeight: 700,
-                    fontSize: '0.86rem',
+                    fontSize: '0.82rem',
                     cursor: 'pointer',
-                    boxShadow: '0 4px 12px rgba(24,24,27,0.15)',
+                    boxShadow: '0 2px 8px rgba(79, 85, 241, 0.25)',
                   }}
                 >
-                  Restablecer filtros y ver todo
+                  Ver todo el catálogo
                 </button>
               </div>
             ) : (
-              /* Cuadrícula de productos de alta fidelidad estilo Hollis ocupando todo el ancho */
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-                  gap: '20px',
-                  width: '100%',
-                }}
-              >
+              <div className="storefront-product-grid">
                 {filteredProducts.map((prod) => (
                   <EcommerceProductCard
                     key={prod.id}
@@ -690,52 +658,52 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
           </div>
         </div>
 
-        {/* 6. Barra de Confianza y Propuesta de Valor (Estándar Global E-Commerce) */}
+        {/* 6. Barra de Confianza y Propuesta de Valor */}
         <section
           style={{
-            marginTop: '64px',
-            padding: '36px 28px',
+            marginTop: '48px',
+            padding: '28px 20px',
             backgroundColor: '#FFFFFF',
-            borderRadius: '28px',
-            border: '1px solid #ECEAE4',
+            borderRadius: '20px',
+            border: '1px solid #E2E8F0',
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-            gap: '24px',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+            gap: '20px',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
             <div
               style={{
-                width: '42px',
-                height: '42px',
-                borderRadius: '12px',
-                backgroundColor: '#F5F3ED',
-                color: '#18181B',
+                width: '38px',
+                height: '38px',
+                borderRadius: '10px',
+                backgroundColor: 'rgba(79, 85, 241, 0.08)',
+                color: '#4F55F1',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
               }}
             >
-              <Icon name="truck" size={20} />
+              <Icon name="truck" size={18} />
             </div>
             <div>
-              <h4 style={{ fontSize: '0.9rem', fontWeight: 800, margin: '0 0 4px', color: '#18181B' }}>
+              <h4 style={{ fontSize: '0.86rem', fontWeight: 800, margin: '0 0 2px', color: '#0F172A' }}>
                 Envíos a todo el país
               </h4>
-              <p style={{ fontSize: '0.78rem', color: '#71717A', margin: 0, lineHeight: 1.4 }}>
-                Despacho prioritario y empaque de alta seguridad. Envío gratis desde $150.000.
+              <p style={{ fontSize: '0.74rem', color: '#64748B', margin: 0, lineHeight: 1.35 }}>
+                Despacho prioritario y empaque seguro. Envío gratis desde $150.000.
               </p>
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
             <div
               style={{
-                width: '42px',
-                height: '42px',
-                borderRadius: '12px',
-                backgroundColor: '#F5F3ED',
+                width: '38px',
+                height: '38px',
+                borderRadius: '10px',
+                backgroundColor: 'rgba(249, 115, 22, 0.08)',
                 color: '#F97316',
                 display: 'flex',
                 alignItems: 'center',
@@ -743,78 +711,78 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
                 flexShrink: 0,
               }}
             >
-              <Icon name="receipt" size={20} />
+              <Icon name="receipt" size={18} />
             </div>
             <div>
-              <h4 style={{ fontSize: '0.9rem', fontWeight: 800, margin: '0 0 4px', color: '#18181B' }}>
+              <h4 style={{ fontSize: '0.86rem', fontWeight: 800, margin: '0 0 2px', color: '#0F172A' }}>
                 Facturación DIAN oficial
               </h4>
-              <p style={{ fontSize: '0.78rem', color: '#71717A', margin: 0, lineHeight: 1.4 }}>
-                Trazabilidad tributaria certificada con CUFE, QR y reporte automático.
+              <p style={{ fontSize: '0.74rem', color: '#64748B', margin: 0, lineHeight: 1.35 }}>
+                Emisión electrónica con validación previa DIAN, CUFE y código QR.
               </p>
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
             <div
               style={{
-                width: '42px',
-                height: '42px',
-                borderRadius: '12px',
-                backgroundColor: '#F5F3ED',
-                color: '#16A34A',
+                width: '38px',
+                height: '38px',
+                borderRadius: '10px',
+                backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                color: '#10B981',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
               }}
             >
-              <Icon name="shield" size={20} />
+              <Icon name="shield" size={18} />
             </div>
             <div>
-              <h4 style={{ fontSize: '0.9rem', fontWeight: 800, margin: '0 0 4px', color: '#18181B' }}>
+              <h4 style={{ fontSize: '0.86rem', fontWeight: 800, margin: '0 0 2px', color: '#0F172A' }}>
                 Garantía y Calidad 100%
               </h4>
-              <p style={{ fontSize: '0.78rem', color: '#71717A', margin: 0, lineHeight: 1.4 }}>
-                Productos formulados con pureza certificada y control de lotes estricto.
+              <p style={{ fontSize: '0.74rem', color: '#64748B', margin: 0, lineHeight: 1.35 }}>
+                Productos originales con trazabilidad de inventario en tiempo real.
               </p>
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
             <div
               style={{
-                width: '42px',
-                height: '42px',
-                borderRadius: '12px',
-                backgroundColor: '#F5F3ED',
-                color: '#2563EB',
+                width: '38px',
+                height: '38px',
+                borderRadius: '10px',
+                backgroundColor: 'rgba(79, 85, 241, 0.08)',
+                color: '#4F55F1',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
               }}
             >
-              <Icon name="store" size={20} />
+              <Icon name="store" size={18} />
             </div>
             <div>
-              <h4 style={{ fontSize: '0.9rem', fontWeight: 800, margin: '0 0 4px', color: '#18181B' }}>
-                Integrado a Terminal POS
+              <h4 style={{ fontSize: '0.86rem', fontWeight: 800, margin: '0 0 2px', color: '#0F172A' }}>
+                Conexión con Terminal POS
               </h4>
-              <p style={{ fontSize: '0.78rem', color: '#71717A', margin: 0, lineHeight: 1.4 }}>
-                Sincronización de inventario físico y digital en tiempo real con Factus.
+              <p style={{ fontSize: '0.74rem', color: '#64748B', margin: 0, lineHeight: 1.35 }}>
+                Sincronización instantánea de stock físico con NatsarStore POS.
               </p>
             </div>
           </div>
         </section>
       </main>
 
-      {/* 7. Footer Editorial Minimalista */}
+      {/* 7. Footer Corporativo Unificado */}
       <footer
         style={{
-          borderTop: '1px solid #ECEAE4',
+          borderTop: '1px solid #E2E8F0',
           backgroundColor: '#FFFFFF',
-          padding: '36px 32px 28px',
+          padding: '24px 20px',
           width: '100%',
           boxSizing: 'border-box',
         }}
@@ -825,60 +793,56 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
             flexWrap: 'wrap',
             alignItems: 'center',
             justifyContent: 'space-between',
-            gap: '16px',
-            borderBottom: '1px solid #F4F4F5',
-            paddingBottom: '20px',
-            marginBottom: '20px',
+            gap: '12px',
+            borderBottom: '1px solid #F1F5F9',
+            paddingBottom: '16px',
+            marginBottom: '16px',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '1px' }}>
-            <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#18181B' }}>Factus</span>
-            <span style={{ color: '#F97316', fontWeight: 900, fontSize: '1.25rem' }}>.</span>
-            <span style={{ fontSize: '0.78rem', color: '#71717A', marginLeft: '10px' }}>
-              Comercio Electrónico y Facturación POS
-            </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '1.05rem', fontWeight: 800, color: '#4F55F1' }}>NatsarStore</span>
+            <span style={{ fontSize: '0.74rem', color: '#64748B' }}>• Facturación Electrónica & Catálogo Comercial</span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '0.82rem', color: '#52525B' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', fontSize: '0.78rem', color: '#475569' }}>
             <span style={{ cursor: 'pointer' }} onClick={() => setSelectedCategoryId('')}>Catálogo</span>
             <span>•</span>
-            <span style={{ cursor: 'pointer' }} onClick={onOpenFullLogin}>Acceso Administrativo</span>
+            <span style={{ cursor: 'pointer' }} onClick={onOpenFullLogin}>Acceso al Panel</span>
             <span>•</span>
-            <span style={{ cursor: 'pointer' }} onClick={() => setIsCartDrawerOpen(true)}>Mi Bolsa ({totalCartCount})</span>
+            <span style={{ cursor: 'pointer' }} onClick={() => setIsCartDrawerOpen(true)}>Bolsa ({totalCartCount})</span>
           </div>
         </div>
 
-        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '12px', fontSize: '0.76rem', color: '#A1A1AA' }}>
-          <span>© {new Date().getFullYear()} Factus Store. Todos los derechos reservados. Cumplimiento DIAN Anexo 1.9.</span>
-          <span>Diseño Escandinavo Minimalista de Alta Conversión</span>
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '8px', fontSize: '0.72rem', color: '#94A3B8' }}>
+          <span>© {new Date().getFullYear()} NatsarStore. Cumplimiento DIAN Anexo 1.9.</span>
+          <span>Sincronizado con el Sistema POS</span>
         </div>
       </footer>
 
-      {/* 8. Toast de Notificación Flotante "¡Agregado a la bolsa!" */}
+      {/* 8. Toast de Notificación Flotante */}
       {activeToast && (
         <div
           style={{
             position: 'fixed',
-            bottom: '24px',
-            right: '24px',
-            backgroundColor: '#18181B',
+            bottom: '20px',
+            right: '20px',
+            backgroundColor: '#0F172A',
             color: '#FFFFFF',
             borderRadius: '999px',
-            padding: '10px 18px 10px 14px',
-            boxShadow: '0 12px 36px rgba(0,0,0,0.25)',
+            padding: '8px 16px 8px 12px',
+            boxShadow: '0 10px 30px rgba(15, 23, 42, 0.25)',
             display: 'flex',
             alignItems: 'center',
-            gap: '12px',
+            gap: '10px',
             zIndex: 150,
-            animation: 'slideUpFade 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
           }}
         >
           <div
             style={{
-              width: '24px',
-              height: '24px',
+              width: '22px',
+              height: '22px',
               borderRadius: '50%',
-              backgroundColor: '#16A34A',
+              backgroundColor: '#10B981',
               color: '#FFFFFF',
               display: 'flex',
               alignItems: 'center',
@@ -886,10 +850,10 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
               flexShrink: 0,
             }}
           >
-            <Icon name="check" size={14} />
+            <Icon name="check" size={13} />
           </div>
-          <span style={{ fontSize: '0.84rem', fontWeight: 600 }}>
-            Agregado a la bolsa: {activeToast.productName}
+          <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>
+            {activeToast.productName}
           </span>
           <button
             type="button"
@@ -898,15 +862,15 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
               setIsCartDrawerOpen(true);
             }}
             style={{
-              backgroundColor: '#FFFFFF',
-              color: '#18181B',
+              backgroundColor: '#4F55F1',
+              color: '#FFFFFF',
               border: 'none',
               borderRadius: '999px',
-              padding: '4px 12px',
-              fontSize: '0.76rem',
+              padding: '3px 10px',
+              fontSize: '0.72rem',
               fontWeight: 700,
               cursor: 'pointer',
-              marginLeft: '4px',
+              marginLeft: '2px',
             }}
           >
             Ver bolsa →
@@ -922,7 +886,7 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
         onNavigateToFullLoginPage={onOpenFullLogin}
       />
 
-      {/* 10. Modal de Ficha Técnica / Detalle del Producto */}
+      {/* 10. Modal de Detalle del Producto */}
       <EcommerceProductDetailModal
         product={selectedProductDetail}
         onClose={() => setSelectedProductDetail(null)}
@@ -935,12 +899,9 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
           onClick={() => setIsMobileFiltersOpen(false)}
           style={{
             position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.4)',
-            backdropFilter: 'blur(4px)',
+            inset: 0,
+            backgroundColor: 'rgba(15, 23, 42, 0.45)',
+            backdropFilter: 'blur(3px)',
             zIndex: 120,
             display: 'flex',
             justifyContent: 'flex-start',
@@ -949,16 +910,16 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
-              width: '85%',
-              maxWidth: '320px',
+              width: 'min(300px, 85vw)',
               height: '100%',
               backgroundColor: '#FFFFFF',
-              padding: '24px',
+              padding: '20px 16px',
               overflowY: 'auto',
-              boxShadow: '10px 0 30px rgba(0,0,0,0.15)',
+              boxShadow: '10px 0 30px rgba(15, 23, 42, 0.15)',
+              boxSizing: 'border-box',
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '12px' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
               <button
                 type="button"
                 onClick={() => setIsMobileFiltersOpen(false)}
@@ -967,14 +928,15 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
                   height: '32px',
                   borderRadius: '50%',
                   border: 'none',
-                  backgroundColor: '#F4F4F5',
+                  backgroundColor: '#F1F5F9',
+                  color: '#64748B',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
               >
-                <Icon name="x" size={16} />
+                <Icon name="x" size={15} />
               </button>
             </div>
             <EcommerceFilters
@@ -988,18 +950,15 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
         </div>
       )}
 
-      {/* 12. Drawer Lateral de Bolsa / Bag Mejorado con Barra de Envío Gratis */}
+      {/* 12. Drawer Lateral de Bolsa / Bag */}
       {isCartDrawerOpen && (
         <div
           onClick={() => setIsCartDrawerOpen(false)}
           style={{
             position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.4)',
-            backdropFilter: 'blur(4px)',
+            inset: 0,
+            backgroundColor: 'rgba(15, 23, 42, 0.45)',
+            backdropFilter: 'blur(3px)',
             zIndex: 120,
             display: 'flex',
             justifyContent: 'flex-end',
@@ -1008,31 +967,29 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
-              width: '100%',
-              maxWidth: '400px',
+              width: 'min(380px, 100vw)',
               height: '100%',
               backgroundColor: '#FFFFFF',
-              padding: '28px 24px',
+              padding: '24px 18px',
               display: 'flex',
               flexDirection: 'column',
-              boxShadow: '-10px 0 30px rgba(0,0,0,0.15)',
+              boxShadow: '-10px 0 30px rgba(15, 23, 42, 0.15)',
               boxSizing: 'border-box',
             }}
           >
-            {/* Cabecera del drawer */}
             <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                marginBottom: '16px',
-                paddingBottom: '14px',
-                borderBottom: '1px solid #ECEAE4',
+                marginBottom: '14px',
+                paddingBottom: '12px',
+                borderBottom: '1px solid #E2E8F0',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Icon name="shopping-bag" size={20} />
-                <h3 style={{ fontSize: '1.2rem', fontWeight: 800, margin: 0, color: '#18181B' }}>
+                <Icon name="shopping-bag" size={18} style={{ color: '#4F55F1' }} />
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0, color: '#0F172A' }}>
                   Tu Bolsa ({totalCartCount})
                 </h3>
               </div>
@@ -1041,28 +998,30 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
                 onClick={() => setIsCartDrawerOpen(false)}
                 aria-label="Cerrar bolsa"
                 style={{
-                  width: '32px',
-                  height: '32px',
+                  width: '30px',
+                  height: '30px',
                   borderRadius: '50%',
                   border: 'none',
-                  backgroundColor: '#F4F4F5',
+                  backgroundColor: '#F1F5F9',
+                  color: '#64748B',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
               >
-                <Icon name="x" size={16} />
+                <Icon name="x" size={15} />
               </button>
             </div>
 
             {/* Barra de Progreso de Envío Gratis */}
             <div
               style={{
-                padding: '12px 14px',
-                borderRadius: '16px',
-                backgroundColor: '#F5F4F0',
-                marginBottom: '18px',
+                padding: '10px 12px',
+                borderRadius: '12px',
+                backgroundColor: '#F8FAFC',
+                border: '1px solid #E2E8F0',
+                marginBottom: '14px',
               }}
             >
               <div
@@ -1070,24 +1029,24 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  marginBottom: '8px',
-                  fontSize: '0.78rem',
+                  marginBottom: '6px',
+                  fontSize: '0.74rem',
                   fontWeight: 600,
-                  color: totalCartPrice >= FREE_SHIPPING_THRESHOLD ? '#16A34A' : '#52525B',
+                  color: totalCartPrice >= FREE_SHIPPING_THRESHOLD ? '#10B981' : '#475569',
                 }}
               >
                 <span>
                   {totalCartPrice >= FREE_SHIPPING_THRESHOLD
-                    ? '🎉 ¡Tienes envío gratis a nivel nacional!'
-                    : `Agrega $${amountToFreeShipping.toLocaleString('es-CO')} más para envío gratis`}
+                    ? '🎉 ¡Tienes envío gratis nacional!'
+                    : `Faltan $${amountToFreeShipping.toLocaleString('es-CO')} para envío gratis`}
                 </span>
                 <span>{freeShippingProgress}%</span>
               </div>
               <div
                 style={{
                   width: '100%',
-                  height: '6px',
-                  backgroundColor: '#E5E3DB',
+                  height: '5px',
+                  backgroundColor: '#E2E8F0',
                   borderRadius: '999px',
                   overflow: 'hidden',
                 }}
@@ -1096,7 +1055,7 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
                   style={{
                     height: '100%',
                     width: `${freeShippingProgress}%`,
-                    backgroundColor: totalCartPrice >= FREE_SHIPPING_THRESHOLD ? '#16A34A' : '#18181B',
+                    backgroundColor: totalCartPrice >= FREE_SHIPPING_THRESHOLD ? '#10B981' : '#4F55F1',
                     borderRadius: '999px',
                     transition: 'width 0.3s ease',
                   }}
@@ -1105,31 +1064,31 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
             </div>
 
             {/* Lista de productos en bolsa */}
-            <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {cartItems.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '48px 0', color: '#71717A' }}>
-                  <Icon name="shopping-bag" size={40} style={{ marginBottom: '10px', opacity: 0.3 }} />
-                  <p style={{ fontSize: '0.94rem', fontWeight: 700, margin: '0 0 6px', color: '#18181B' }}>
+                <div style={{ textAlign: 'center', padding: '40px 0', color: '#64748B' }}>
+                  <Icon name="shopping-bag" size={36} style={{ marginBottom: '8px', opacity: 0.3 }} />
+                  <p style={{ fontSize: '0.88rem', fontWeight: 700, margin: '0 0 4px', color: '#0F172A' }}>
                     Tu bolsa está vacía
                   </p>
-                  <p style={{ fontSize: '0.82rem', color: '#71717A', margin: '0 0 16px' }}>
-                    Explora los productos de la tienda y agrégalos con el botón '+'
+                  <p style={{ fontSize: '0.78rem', color: '#94A3B8', margin: '0 0 14px' }}>
+                    Agrega productos explorando el catálogo
                   </p>
                   <button
                     type="button"
                     onClick={() => setIsCartDrawerOpen(false)}
                     style={{
-                      padding: '8px 18px',
+                      padding: '7px 16px',
                       borderRadius: '999px',
-                      backgroundColor: '#18181B',
+                      backgroundColor: '#4F55F1',
                       color: '#FFFFFF',
                       border: 'none',
-                      fontSize: '0.82rem',
+                      fontSize: '0.78rem',
                       fontWeight: 600,
                       cursor: 'pointer',
                     }}
                   >
-                    Ver catálogo de productos
+                    Ver catálogo
                   </button>
                 </div>
               ) : (
@@ -1139,19 +1098,19 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '12px',
-                      padding: '12px',
-                      borderRadius: '16px',
-                      backgroundColor: '#FAFAF9',
-                      border: '1px solid #ECEAE4',
+                      gap: '10px',
+                      padding: '10px',
+                      borderRadius: '12px',
+                      backgroundColor: '#F8FAFC',
+                      border: '1px solid #E2E8F0',
                     }}
                   >
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div
                         style={{
-                          fontSize: '0.86rem',
+                          fontSize: '0.82rem',
                           fontWeight: 700,
-                          color: '#18181B',
+                          color: '#0F172A',
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
@@ -1159,84 +1118,72 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
                       >
                         {product.name}
                       </div>
-                      <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#18181B', marginTop: '2px' }}>
+                      <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#4F55F1', marginTop: '1px' }}>
                         {product.formattedPrice}
                       </div>
                     </div>
 
-                    {/* Controles de cantidad (+ / -) y Eliminar */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <div
                         style={{
                           display: 'flex',
                           alignItems: 'center',
-                          gap: '6px',
+                          gap: '4px',
                           backgroundColor: '#FFFFFF',
                           borderRadius: '999px',
-                          padding: '2px 6px',
-                          border: '1px solid #E4E1DB',
+                          padding: '2px 5px',
+                          border: '1px solid #E2E8F0',
                         }}
                       >
                         <button
                           type="button"
                           onClick={() => handleUpdateCartQuantity(product.id, -1)}
-                          aria-label="Restar una unidad"
                           style={{
-                            width: '22px',
-                            height: '22px',
+                            width: '20px',
+                            height: '20px',
                             border: 'none',
                             background: 'none',
                             cursor: 'pointer',
                             fontWeight: 800,
-                            color: '#71717A',
+                            color: '#64748B',
                           }}
                         >
                           -
                         </button>
-                        <span style={{ fontSize: '0.82rem', fontWeight: 700, minWidth: '16px', textAlign: 'center' }}>
+                        <span style={{ fontSize: '0.78rem', fontWeight: 700, minWidth: '14px', textAlign: 'center' }}>
                           {quantity}
                         </span>
                         <button
                           type="button"
                           onClick={() => handleUpdateCartQuantity(product.id, 1)}
-                          aria-label="Añadir una unidad"
                           style={{
-                            width: '22px',
-                            height: '22px',
+                            width: '20px',
+                            height: '20px',
                             border: 'none',
                             background: 'none',
                             cursor: 'pointer',
                             fontWeight: 800,
-                            color: '#71717A',
+                            color: '#64748B',
                           }}
                         >
                           +
                         </button>
                       </div>
 
-                      {/* Botón eliminar directo */}
                       <button
                         type="button"
                         onClick={() => handleRemoveFromCart(product.id)}
-                        title="Eliminar producto de la bolsa"
+                        title="Eliminar de la bolsa"
                         style={{
                           background: 'none',
                           border: 'none',
-                          color: '#A1A1AA',
+                          color: '#94A3B8',
                           cursor: 'pointer',
-                          padding: '4px',
+                          padding: '3px',
                           display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.color = '#EF4444';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.color = '#A1A1AA';
                         }}
                       >
-                        <Icon name="trash" size={16} />
+                        <Icon name="trash" size={15} />
                       </button>
                     </div>
                   </div>
@@ -1244,21 +1191,21 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
               )}
             </div>
 
-            {/* Total y checkout */}
+            {/* Total y checkout con Royal Indigo */}
             {cartItems.length > 0 && (
-              <div style={{ paddingTop: '16px', borderTop: '1px solid #ECEAE4' }}>
+              <div style={{ paddingTop: '14px', borderTop: '1px solid #E2E8F0' }}>
                 <div
                   style={{
                     display: 'flex',
                     alignItems: 'baseline',
                     justifyContent: 'space-between',
-                    marginBottom: '14px',
+                    marginBottom: '12px',
                   }}
                 >
-                  <span style={{ fontSize: '0.88rem', color: '#71717A', fontWeight: 600 }}>
+                  <span style={{ fontSize: '0.84rem', color: '#64748B', fontWeight: 600 }}>
                     Total estimado
                   </span>
-                  <span style={{ fontSize: '1.35rem', fontWeight: 900, color: '#18181B' }}>
+                  <span style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0F172A' }}>
                     ${totalCartPrice.toLocaleString('es-CO')}
                   </span>
                 </div>
@@ -1276,22 +1223,22 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
                   }}
                   style={{
                     width: '100%',
-                    padding: '14px',
+                    padding: '12px',
                     borderRadius: '999px',
-                    backgroundColor: '#18181B',
+                    backgroundColor: '#4F55F1',
                     color: '#FFFFFF',
                     border: 'none',
                     fontWeight: 700,
-                    fontSize: '0.94rem',
+                    fontSize: '0.9rem',
                     cursor: 'pointer',
-                    boxShadow: '0 4px 14px rgba(24,24,27,0.2)',
+                    boxShadow: '0 4px 14px rgba(79, 85, 241, 0.3)',
                     transition: 'background-color 0.15s ease',
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#000000';
+                    e.currentTarget.style.backgroundColor = '#3F44D9';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#18181B';
+                    e.currentTarget.style.backgroundColor = '#4F55F1';
                   }}
                 >
                   {session ? 'Procesar en Terminal POS' : 'Iniciar sesión para comprar'}
@@ -1302,19 +1249,19 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
         </div>
       )}
 
-      {/* Estilos CSS responsivos integrados y animaciones */}
+      {/* Reglas CSS Responsivas: 2 Columnas en móvil, proporciones equilibradas */}
       <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
+        .storefront-main-layout {
+          width: 100%;
+          padding: 0 24px 48px;
+          flex: 1;
+          box-sizing: border-box;
         }
-        @keyframes fadeInScale {
-          from { opacity: 0; transform: scale(0.96); }
-          to { opacity: 1; transform: scale(1); }
-        }
-        @keyframes slideUpFade {
-          from { opacity: 0; transform: translateY(12px); }
-          to { opacity: 1; transform: translateY(0); }
+        .storefront-product-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+          gap: 16px;
+          width: 100%;
         }
         @media (max-width: 900px) {
           .storefront-desktop-filters {
@@ -1322,6 +1269,18 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
           }
           .storefront-filter-trigger-btn {
             display: flex !important;
+          }
+        }
+        @media (max-width: 640px) {
+          .storefront-main-layout {
+            padding: 0 12px 32px !important;
+          }
+          .storefront-product-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 10px !important;
+          }
+          .storefront-sort-label {
+            display: none !important;
           }
         }
       `}</style>

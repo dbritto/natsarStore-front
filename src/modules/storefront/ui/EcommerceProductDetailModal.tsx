@@ -9,13 +9,9 @@ export interface EcommerceProductDetailModalProps {
 }
 
 /**
- * Modal Detalle de Producto E-Commerce de Alta Conversión
- * Diseñado bajo estándares de Apple Store y Aesop:
- * - Selector interactivo de cantidad
- * - Botón principal con precio total dinámico y micro-animación
- * - Sellos de confianza (Facturación DIAN, Envío y Garantía)
- * - Ficha técnica y trazabilidad de inventario
- * - Soporte para tecla Escape y cierre accesible
+ * Modal Detalle de Producto E-Commerce Unificado con el Panel Administrativo:
+ * - Colores corporativos: Royal Indigo (#4F55F1), bordes #E2E8F0, verde éxito #10B981
+ * - 100% Mobile Safe: Ajuste de altura responsivo, botones que no se sobreponen ni cortan
  */
 export const EcommerceProductDetailModal: React.FC<EcommerceProductDetailModalProps> = ({
   product,
@@ -25,13 +21,11 @@ export const EcommerceProductDetailModal: React.FC<EcommerceProductDetailModalPr
   const [quantity, setQuantity] = useState(1);
   const [justAdded, setJustAdded] = useState(false);
 
-  // Reiniciar cantidad cada vez que cambia el producto
   useEffect(() => {
     setQuantity(1);
     setJustAdded(false);
   }, [product?.id]);
 
-  // Cerrar con Escape
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -67,30 +61,31 @@ export const EcommerceProductDetailModal: React.FC<EcommerceProductDetailModalPr
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundColor: 'rgba(15, 23, 42, 0.45)',
-        backdropFilter: 'blur(8px)',
+        backgroundColor: 'rgba(15, 23, 42, 0.55)',
+        backdropFilter: 'blur(6px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 100,
-        padding: '16px',
+        padding: '12px',
         boxSizing: 'border-box',
       }}
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        className="storefront-detail-dialog"
         style={{
           backgroundColor: '#FFFFFF',
-          borderRadius: '32px',
-          maxWidth: '560px',
+          borderRadius: '24px',
+          maxWidth: '520px',
           width: '100%',
           overflow: 'hidden',
-          boxShadow: '0 25px 60px -12px rgba(0, 0, 0, 0.25)',
-          border: '1px solid #ECEAE4',
+          boxShadow: '0 20px 50px -10px rgba(15, 23, 42, 0.25)',
+          border: '1px solid #E2E8F0',
           display: 'flex',
           flexDirection: 'column',
-          maxHeight: '92vh',
-          animation: 'fadeInScale 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+          maxHeight: '88vh',
+          boxSizing: 'border-box',
         }}
       >
         {/* Encabezado del modal */}
@@ -99,25 +94,26 @@ export const EcommerceProductDetailModal: React.FC<EcommerceProductDetailModalPr
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '20px 24px 12px',
+            padding: '16px 20px 10px',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
             <span
               style={{
-                fontSize: '0.72rem',
+                fontSize: '0.7rem',
                 fontWeight: 700,
                 textTransform: 'uppercase',
-                letterSpacing: '0.5px',
-                color: '#52525B',
-                backgroundColor: '#F4F2EC',
-                padding: '4px 12px',
+                letterSpacing: '0.4px',
+                color: '#4F55F1',
+                backgroundColor: 'rgba(79, 85, 241, 0.08)',
+                padding: '3px 10px',
                 borderRadius: '999px',
+                whiteSpace: 'nowrap',
               }}
             >
-              {product.brand ?? 'Factus Oficial'}
+              {product.brand ?? 'NatsarStore'}
             </span>
-            <span style={{ fontSize: '0.75rem', color: '#A1A1AA' }}>
+            <span style={{ fontSize: '0.72rem', color: '#64748B', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               Ref: {product.codeReference}
             </span>
           </div>
@@ -127,51 +123,47 @@ export const EcommerceProductDetailModal: React.FC<EcommerceProductDetailModalPr
             onClick={onClose}
             aria-label="Cerrar detalle"
             style={{
-              width: '34px',
-              height: '34px',
-              borderRadius: '999px',
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
               border: 'none',
-              backgroundColor: '#F4F4F5',
-              color: '#71717A',
+              backgroundColor: '#F1F5F9',
+              color: '#64748B',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
-              transition: 'background-color 0.15s ease',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#E4E4E7';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#F4F4F5';
+              flexShrink: 0,
             }}
           >
-            <Icon name="x" size={16} />
+            <Icon name="x" size={15} />
           </button>
         </div>
 
         {/* Contenido desplazable */}
-        <div style={{ padding: '0 24px 20px', overflowY: 'auto', flex: 1 }}>
-          {/* Banner visual del producto con iluminación radial */}
+        <div style={{ padding: '0 20px 16px', overflowY: 'auto', flex: 1 }}>
+          {/* Banner visual del producto */}
           <div
+            className="storefront-modal-image-box"
             style={{
               width: '100%',
-              height: '210px',
-              borderRadius: '24px',
-              backgroundColor: '#F5F3ED',
+              height: '180px',
+              borderRadius: '16px',
+              backgroundColor: '#F8FAFC',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              marginBottom: '18px',
+              marginBottom: '14px',
               overflow: 'hidden',
               position: 'relative',
+              border: '1px solid #E2E8F0',
             }}
           >
             {product.primaryImageUrl ? (
               <img
                 src={product.primaryImageUrl}
                 alt={product.name}
-                style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '16px' }}
+                style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '12px' }}
               />
             ) : (
               <div
@@ -180,61 +172,58 @@ export const EcommerceProductDetailModal: React.FC<EcommerceProductDetailModalPr
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '8px',
+                  gap: '6px',
                 }}
               >
                 <div
                   style={{
-                    width: '80px',
-                    height: '60px',
-                    backgroundColor: '#FFFFFF',
-                    borderRadius: '16px',
-                    border: '1.5px solid #D6D3CB',
-                    boxShadow: '0 10px 24px rgba(0,0,0,0.06)',
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '12px',
+                    backgroundColor: 'rgba(79, 85, 241, 0.1)',
+                    color: '#4F55F1',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}
                 >
-                  <span style={{ fontSize: '0.74rem', fontWeight: 800, color: '#18181B' }}>
-                    FACTUS
-                  </span>
+                  <Icon name="package" size={24} />
                 </div>
-                <span style={{ fontSize: '0.78rem', color: '#71717A', fontWeight: 500 }}>
-                  Presentación de grado clínico y cosmético
+                <span style={{ fontSize: '0.74rem', color: '#64748B', fontWeight: 600 }}>
+                  Producto DIAN Oficial
                 </span>
               </div>
             )}
           </div>
 
-          {/* Título, precio individual y descripción */}
-          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: '12px', margin: '0 0 8px' }}>
+          {/* Título y precio individual */}
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: '8px', margin: '0 0 6px' }}>
             <h2
               style={{
-                fontSize: '1.35rem',
+                fontSize: '1.18rem',
                 fontWeight: 800,
-                color: '#18181B',
+                color: '#0F172A',
                 margin: 0,
-                lineHeight: 1.2,
+                lineHeight: 1.25,
               }}
             >
               {product.name}
             </h2>
-            <span style={{ fontSize: '1.25rem', fontWeight: 900, color: '#18181B', flexShrink: 0 }}>
+            <span style={{ fontSize: '1.15rem', fontWeight: 900, color: '#4F55F1', flexShrink: 0 }}>
               {product.formattedPrice}
             </span>
           </div>
 
           <p
             style={{
-              fontSize: '0.88rem',
-              color: '#52525B',
-              lineHeight: 1.5,
-              margin: '0 0 18px',
+              fontSize: '0.84rem',
+              color: '#475569',
+              lineHeight: 1.45,
+              margin: '0 0 14px',
             }}
           >
             {product.description ??
-              'Fórmula dermatológica y producto comercializado con certificación y trazabilidad fiscal DIAN bajo normativa vigente colombiana.'}
+              'Artículo catalogado con trazabilidad de inventario y facturación legal electrónica DIAN.'}
           </p>
 
           {/* Ficha técnica compacta */}
@@ -242,23 +231,23 @@ export const EcommerceProductDetailModal: React.FC<EcommerceProductDetailModalPr
             style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(2, 1fr)',
-              gap: '10px',
-              padding: '14px',
-              backgroundColor: '#FAFAF9',
-              borderRadius: '18px',
-              border: '1px solid #ECEAE4',
-              marginBottom: '18px',
+              gap: '8px',
+              padding: '12px',
+              backgroundColor: '#F8FAFC',
+              borderRadius: '14px',
+              border: '1px solid #E2E8F0',
+              marginBottom: '14px',
             }}
           >
             <div>
-              <span style={{ fontSize: '0.7rem', color: '#71717A', display: 'block' }}>
+              <span style={{ fontSize: '0.68rem', color: '#64748B', display: 'block' }}>
                 Disponibilidad
               </span>
               <span
                 style={{
-                  fontSize: '0.82rem',
+                  fontSize: '0.8rem',
                   fontWeight: 700,
-                  color: product.inStock ? '#16A34A' : '#EF4444',
+                  color: product.inStock ? '#10B981' : '#EF4444',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '4px',
@@ -269,7 +258,7 @@ export const EcommerceProductDetailModal: React.FC<EcommerceProductDetailModalPr
                     width: '6px',
                     height: '6px',
                     borderRadius: '50%',
-                    backgroundColor: product.inStock ? '#22C55E' : '#EF4444',
+                    backgroundColor: product.inStock ? '#10B981' : '#EF4444',
                   }}
                 />
                 {product.inStock ? 'En inventario' : 'Agotado'}
@@ -277,20 +266,20 @@ export const EcommerceProductDetailModal: React.FC<EcommerceProductDetailModalPr
             </div>
 
             <div>
-              <span style={{ fontSize: '0.7rem', color: '#71717A', display: 'block' }}>
-                Régimen DIAN
+              <span style={{ fontSize: '0.68rem', color: '#64748B', display: 'block' }}>
+                Régimen Fiscal
               </span>
-              <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#18181B' }}>
-                {product.defaultTaxRate ? `${product.defaultTaxRate}% IVA/INC Incluido` : 'Excluido 0%'}
+              <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#0F172A' }}>
+                {product.defaultTaxRate ? `${product.defaultTaxRate}% IVA/INC` : 'Excluido 0%'}
               </span>
             </div>
 
             {product.sku && (
               <div>
-                <span style={{ fontSize: '0.7rem', color: '#71717A', display: 'block' }}>
+                <span style={{ fontSize: '0.68rem', color: '#64748B', display: 'block' }}>
                   SKU
                 </span>
-                <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#18181B' }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#0F172A' }}>
                   {product.sku}
                 </span>
               </div>
@@ -298,54 +287,49 @@ export const EcommerceProductDetailModal: React.FC<EcommerceProductDetailModalPr
 
             {product.barcodes && product.barcodes.length > 0 && (
               <div>
-                <span style={{ fontSize: '0.7rem', color: '#71717A', display: 'block' }}>
+                <span style={{ fontSize: '0.68rem', color: '#64748B', display: 'block' }}>
                   Código de Barras
                 </span>
-                <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#18181B' }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#0F172A' }}>
                   {product.barcodes[0].barcode}
                 </span>
               </div>
             )}
           </div>
 
-          {/* Sellos de garantía y confianza */}
+          {/* Sellos de confianza */}
           <div
             style={{
               display: 'flex',
               flexDirection: 'column',
-              gap: '8px',
-              padding: '12px 14px',
-              borderRadius: '16px',
-              backgroundColor: '#F5F3ED',
-              marginBottom: '18px',
-              fontSize: '0.78rem',
-              color: '#52525B',
+              gap: '6px',
+              padding: '10px 12px',
+              borderRadius: '12px',
+              backgroundColor: '#F1F5F9',
+              fontSize: '0.74rem',
+              color: '#475569',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Icon name="receipt" size={15} style={{ color: '#F97316' }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Icon name="receipt" size={14} style={{ color: '#4F55F1' }} />
               <span>Factura electrónica oficial DIAN con CUFE y QR</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Icon name="truck" size={15} style={{ color: '#18181B' }} />
-              <span>Despacho seguro y trazabilidad en tiempo real</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Icon name="shield" size={15} style={{ color: '#16A34A' }} />
-              <span>Garantía de calidad y originalidad de producto</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Icon name="truck" size={14} style={{ color: '#0F172A' }} />
+              <span>Despacho seguro y trazabilidad de sede</span>
             </div>
           </div>
         </div>
 
-        {/* Barra Inferior de Acción y Selector de Cantidad */}
+        {/* Barra Inferior de Acción (Selector + Botón Añadir) */}
         <div
           style={{
-            padding: '16px 24px 20px',
-            borderTop: '1px solid #ECEAE4',
+            padding: '12px 20px 16px',
+            borderTop: '1px solid #E2E8F0',
             backgroundColor: '#FFFFFF',
             display: 'flex',
             alignItems: 'center',
-            gap: '14px',
+            gap: '10px',
           }}
         >
           {/* Selector de cantidad */}
@@ -353,11 +337,11 @@ export const EcommerceProductDetailModal: React.FC<EcommerceProductDetailModalPr
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
-              backgroundColor: '#F5F4F0',
+              gap: '6px',
+              backgroundColor: '#F8FAFC',
               borderRadius: '999px',
-              padding: '4px 8px',
-              border: '1px solid #E5E3DB',
+              padding: '3px 6px',
+              border: '1px solid #E2E8F0',
             }}
           >
             <button
@@ -366,15 +350,15 @@ export const EcommerceProductDetailModal: React.FC<EcommerceProductDetailModalPr
               onClick={() => setQuantity((q) => Math.max(1, q - 1))}
               aria-label="Disminuir cantidad"
               style={{
-                width: '28px',
-                height: '28px',
+                width: '26px',
+                height: '26px',
                 borderRadius: '50%',
                 border: 'none',
                 backgroundColor: '#FFFFFF',
                 cursor: quantity <= 1 || !product.inStock ? 'not-allowed' : 'pointer',
                 fontWeight: 800,
-                color: '#18181B',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+                color: '#0F172A',
+                boxShadow: '0 1px 2px rgba(15,23,42,0.06)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -384,11 +368,11 @@ export const EcommerceProductDetailModal: React.FC<EcommerceProductDetailModalPr
             </button>
             <span
               style={{
-                fontSize: '0.9rem',
+                fontSize: '0.84rem',
                 fontWeight: 700,
-                minWidth: '24px',
+                minWidth: '20px',
                 textAlign: 'center',
-                color: '#18181B',
+                color: '#0F172A',
               }}
             >
               {quantity}
@@ -399,15 +383,15 @@ export const EcommerceProductDetailModal: React.FC<EcommerceProductDetailModalPr
               onClick={() => setQuantity((q) => q + 1)}
               aria-label="Aumentar cantidad"
               style={{
-                width: '28px',
-                height: '28px',
+                width: '26px',
+                height: '26px',
                 borderRadius: '50%',
                 border: 'none',
                 backgroundColor: '#FFFFFF',
                 cursor: !product.inStock ? 'not-allowed' : 'pointer',
                 fontWeight: 800,
-                color: '#18181B',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+                color: '#0F172A',
+                boxShadow: '0 1px 2px rgba(15,23,42,0.06)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -417,53 +401,62 @@ export const EcommerceProductDetailModal: React.FC<EcommerceProductDetailModalPr
             </button>
           </div>
 
-          {/* Botón CTA principal */}
+          {/* Botón CTA con color Royal Indigo (#4F55F1) */}
           <button
             type="button"
             disabled={!product.inStock}
             onClick={handleAdd}
             style={{
               flex: 1,
-              padding: '14px 20px',
+              padding: '11px 16px',
               borderRadius: '999px',
               backgroundColor: justAdded
-                ? '#16A34A'
+                ? '#10B981'
                 : product.inStock
-                ? '#18181B'
-                : '#E4E4E7',
+                ? '#4F55F1'
+                : '#E2E8F0',
               color: '#FFFFFF',
               border: 'none',
-              fontSize: '0.92rem',
+              fontSize: '0.88rem',
               fontWeight: 700,
               cursor: product.inStock ? 'pointer' : 'not-allowed',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '8px',
-              boxShadow: product.inStock
-                ? '0 4px 16px rgba(24, 24, 27, 0.2)'
-                : 'none',
-              transition: 'all 0.18s ease',
+              gap: '6px',
+              boxShadow: product.inStock ? '0 2px 10px rgba(79, 85, 241, 0.28)' : 'none',
+              transition: 'background-color 0.15s ease',
             }}
           >
             {justAdded ? (
               <>
-                <Icon name="check" size={18} />
-                <span>¡Agregado a la bolsa!</span>
+                <Icon name="check" size={16} />
+                <span>¡Añadido!</span>
               </>
             ) : product.inStock ? (
               <>
-                <Icon name="shopping-bag" size={17} />
+                <Icon name="shopping-bag" size={15} />
                 <span>
                   Añadir {quantity > 1 ? `(${quantity})` : ''} • {formattedTotalPrice}
                 </span>
               </>
             ) : (
-              <span>Agotado temporalmente</span>
+              <span>Agotado</span>
             )}
           </button>
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .storefront-detail-dialog {
+            border-radius: 20px !important;
+          }
+          .storefront-modal-image-box {
+            height: 140px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };

@@ -20,12 +20,9 @@ export interface EcommerceProductProps {
 }
 
 /**
- * Tarjeta de Producto E-Commerce de Alta Intuición (Inspirada en el diseño de referencia)
- * Cuenta con:
- * - Micro-interacción inmediata al agregar (cambio a verde con checkmark ✓ durante 1.2s)
- * - Botón de "Vista rápida" al pasar el cursor (Desktop hover)
- * - Indicador de stock en tiempo real con punto pulsante
- * - Presentación limpia tipo editorial / skincare escandinavo
+ * Tarjeta de Producto E-Commerce Unificada con el Panel Administrativo:
+ * - Colores coherentes: Royal Indigo (#4F55F1), bordes #E2E8F0, estados #10B981
+ * - 100% Mobile Safe: Proporciones balanceadas en pantallas pequeñas sin sobreposición de botones ni cortes
  */
 export const EcommerceProductCard: React.FC<EcommerceProductProps> = ({
   name,
@@ -43,12 +40,11 @@ export const EcommerceProductCard: React.FC<EcommerceProductProps> = ({
   const [isHovered, setIsHovered] = useState(false);
   const showImage = Boolean(primaryImageUrl) && !imageError;
 
-  // Extraer información de formato o aroma a partir de la descripción (estilo "Cream, Fragrance-free, 200 ml")
   const formatSubtitle = description
     ? description.split('.')[0]
     : inStock
-    ? 'Fórmula dermatológica certificada'
-    : 'Temporalmente agotado';
+    ? 'Disponible para facturación inmediata'
+    : 'Agotado temporalmente';
 
   const handleClickCard = () => {
     if (onOpenDetail) {
@@ -76,32 +72,33 @@ export const EcommerceProductCard: React.FC<EcommerceProductProps> = ({
       onClick={handleClickCard}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      className="storefront-product-card"
       style={{
         backgroundColor: '#FFFFFF',
-        borderRadius: '24px',
-        padding: '12px 12px 16px',
-        border: isHovered ? '1px solid #D4D1C9' : '1px solid #ECEAE4',
+        borderRadius: '20px',
+        border: isHovered ? '1px solid #CBD5E1' : '1px solid #E2E8F0',
         boxShadow: isHovered
-          ? '0 12px 28px rgba(24, 24, 27, 0.08), 0 2px 6px rgba(0,0,0,0.02)'
-          : '0 4px 16px rgba(0,0,0,0.02)',
+          ? '0 10px 24px rgba(15, 23, 42, 0.08)'
+          : '0 2px 8px rgba(15, 23, 42, 0.02)',
         display: 'flex',
         flexDirection: 'column',
-        gap: '12px',
+        gap: '10px',
         cursor: 'pointer',
-        transition: 'all 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
-        transform: isHovered ? 'translateY(-3px)' : 'translateY(0)',
+        transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
+        transform: isHovered ? 'translateY(-2px)' : 'translateY(0)',
         position: 'relative',
         boxSizing: 'border-box',
+        overflow: 'hidden',
       }}
     >
-      {/* Contenedor de Imagen o Render 3D */}
+      {/* Contenedor de Imagen o Render de Producto */}
       <div
+        className="storefront-card-image-box"
         style={{
           width: '100%',
-          aspectRatio: '4 / 3',
-          minHeight: '160px',
-          borderRadius: '18px',
-          backgroundColor: '#F5F3ED',
+          aspectRatio: '1 / 1',
+          borderRadius: '14px',
+          backgroundColor: '#F8FAFC',
           overflow: 'hidden',
           display: 'flex',
           alignItems: 'center',
@@ -119,13 +116,13 @@ export const EcommerceProductCard: React.FC<EcommerceProductProps> = ({
               width: '100%',
               height: '100%',
               objectFit: 'contain',
-              padding: '12px',
-              transition: 'transform 0.3s ease',
+              padding: '10px',
+              transition: 'transform 0.25s ease',
               transform: isHovered ? 'scale(1.04)' : 'scale(1)',
             }}
           />
         ) : (
-          /* Render visual 3D minimalista inspirado en cosmética / envases */
+          /* Placeholder corporativo limpio */
           <div
             style={{
               display: 'flex',
@@ -134,123 +131,63 @@ export const EcommerceProductCard: React.FC<EcommerceProductProps> = ({
               justifyContent: 'center',
               width: '100%',
               height: '100%',
-              background: 'radial-gradient(circle at 50% 30%, #FFFFFF 0%, #ECE9E1 85%)',
+              background: 'radial-gradient(circle at 50% 30%, #FFFFFF 0%, #EEF2F6 90%)',
+              padding: '12px',
             }}
           >
-            {/* Silueta de tarro / envase cosmético minimalista */}
             <div
               style={{
-                width: '64px',
+                width: '48px',
                 height: '48px',
-                backgroundColor: '#FFFFFF',
                 borderRadius: '12px',
-                border: '1.5px solid #D6D3CB',
-                boxShadow: '0 8px 18px rgba(0,0,0,0.06), inset 0 2px 4px rgba(255,255,255,0.8)',
+                backgroundColor: 'rgba(79, 85, 241, 0.08)',
+                color: '#4F55F1',
                 display: 'flex',
-                flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                position: 'relative',
-                transition: 'transform 0.3s ease',
-                transform: isHovered ? 'translateY(-2px)' : 'translateY(0)',
               }}
             >
-              {/* Tapa del tarro */}
-              <div
-                style={{
-                  width: '68px',
-                  height: '10px',
-                  backgroundColor: name.toLowerCase().includes('balm') ? '#27272A' : '#E4E1DB',
-                  borderRadius: '5px',
-                  position: 'absolute',
-                  top: '-7px',
-                  border: '1px solid #C4C0B6',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.08)',
-                }}
-              />
-              <span
-                style={{
-                  fontSize: '0.62rem',
-                  fontWeight: 700,
-                  letterSpacing: '0.5px',
-                  color: '#52525B',
-                  textTransform: 'uppercase',
-                }}
-              >
-                Factus
-              </span>
+              <Icon name="package" size={24} />
             </div>
-            {/* Sombra proyectada */}
-            <div
-              style={{
-                width: '56px',
-                height: '6px',
-                borderRadius: '50%',
-                backgroundColor: 'rgba(0,0,0,0.06)',
-                marginTop: '10px',
-                filter: 'blur(2px)',
-              }}
-            />
           </div>
         )}
 
-        {/* Badge de Marca / Categoría en la esquina superior izquierda */}
+        {/* Badge de Marca / Sede en la esquina superior izquierda */}
         <div
           style={{
             position: 'absolute',
-            top: '8px',
-            left: '8px',
-            backgroundColor: 'rgba(255, 255, 255, 0.92)',
-            backdropFilter: 'blur(6px)',
-            padding: '3px 9px',
+            top: '6px',
+            left: '6px',
+            backgroundColor: 'rgba(255, 255, 255, 0.94)',
+            backdropFilter: 'blur(4px)',
+            padding: '2px 8px',
             borderRadius: '999px',
-            fontSize: '0.68rem',
+            fontSize: '0.64rem',
             fontWeight: 700,
-            color: '#52525B',
-            border: '1px solid rgba(0,0,0,0.05)',
+            color: '#475569',
+            border: '1px solid #E2E8F0',
             letterSpacing: '0.2px',
+            maxWidth: '75%',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
           }}
         >
-          {brand ?? 'Factus'}
+          {brand ?? 'NatsarStore'}
         </div>
-
-        {/* Botón flotante 'Vista Rápida' al hacer hover */}
-        {isHovered && (
-          <div
-            style={{
-              position: 'absolute',
-              bottom: '10px',
-              backgroundColor: 'rgba(24, 24, 27, 0.88)',
-              backdropFilter: 'blur(6px)',
-              color: '#FFFFFF',
-              padding: '5px 12px',
-              borderRadius: '999px',
-              fontSize: '0.74rem',
-              fontWeight: 600,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-              animation: 'fadeIn 0.15s ease',
-            }}
-          >
-            <Icon name="eye" size={13} />
-            <span>Vista rápida</span>
-          </div>
-        )}
 
         {/* Badge de stock si está agotado */}
         {!inStock && (
           <div
             style={{
               position: 'absolute',
-              top: '8px',
-              right: '8px',
-              backgroundColor: 'rgba(239, 68, 68, 0.92)',
+              top: '6px',
+              right: '6px',
+              backgroundColor: '#EF4444',
               color: '#FFFFFF',
-              padding: '3px 8px',
+              padding: '2px 7px',
               borderRadius: '999px',
-              fontSize: '0.68rem',
+              fontSize: '0.62rem',
               fontWeight: 700,
             }}
           >
@@ -260,60 +197,69 @@ export const EcommerceProductCard: React.FC<EcommerceProductProps> = ({
       </div>
 
       {/* Textos y metadata */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', flex: 1, padding: '0 4px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: 1, padding: '0 2px' }}>
         <h3
           style={{
-            fontSize: '0.96rem',
+            fontSize: '0.88rem',
             fontWeight: 700,
-            color: '#18181B',
+            color: '#0F172A',
             lineHeight: 1.25,
             margin: 0,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             display: '-webkit-box',
-            WebkitLineClamp: 1,
+            WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical',
+            minHeight: '2.2em',
           }}
         >
           {name}
         </h3>
         <p
+          className="storefront-card-desc"
           style={{
-            fontSize: '0.78rem',
-            color: '#71717A',
+            fontSize: '0.74rem',
+            color: '#64748B',
             margin: 0,
-            lineHeight: 1.3,
+            lineHeight: 1.25,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
-            display: '-webkit-box',
-            WebkitLineClamp: 1,
-            WebkitBoxOrient: 'vertical',
+            whiteSpace: 'nowrap',
           }}
         >
           {formatSubtitle}
         </p>
       </div>
 
-      {/* Fila inferior: Precio, Estado de Stock y Botón circular '+' */}
+      {/* Fila inferior: Precio y Botón circular '+' (sin sobreposición) */}
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '4px 4px 0',
+          gap: '6px',
+          paddingTop: '2px',
         }}
       >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-            <span style={{ fontSize: '1.04rem', fontWeight: 800, color: '#18181B' }}>
-              {formattedPrice}
-            </span>
-          </div>
+        <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, flex: 1 }}>
           <span
             style={{
-              fontSize: '0.72rem',
-              fontWeight: 500,
-              color: inStock ? '#16A34A' : '#A1A1AA',
+              fontSize: '0.98rem',
+              fontWeight: 800,
+              color: '#0F172A',
+              letterSpacing: '-0.3px',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {formattedPrice}
+          </span>
+          <span
+            style={{
+              fontSize: '0.68rem',
+              fontWeight: 600,
+              color: inStock ? '#10B981' : '#94A3B8',
               display: 'flex',
               alignItems: 'center',
               gap: '4px',
@@ -321,76 +267,82 @@ export const EcommerceProductCard: React.FC<EcommerceProductProps> = ({
           >
             <span
               style={{
-                width: '6px',
-                height: '6px',
+                width: '5px',
+                height: '5px',
                 borderRadius: '50%',
-                backgroundColor: inStock ? '#22C55E' : '#D4D4D8',
-                display: 'inline-block',
-                boxShadow: inStock ? '0 0 6px rgba(34, 197, 94, 0.6)' : 'none',
+                backgroundColor: inStock ? '#10B981' : '#CBD5E1',
+                flexShrink: 0,
               }}
             />
-            {inStock ? 'Disponible' : 'Sin existencias'}
-            {defaultTaxRate !== undefined && defaultTaxRate > 0 && (
-              <span style={{ color: '#A1A1AA', fontSize: '0.68rem', marginLeft: '2px' }}>
-                (IVA {defaultTaxRate}%)
-              </span>
-            )}
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {inStock ? 'En stock' : 'Sin stock'}
+            </span>
           </span>
         </div>
 
-        {/* Botón circular '+' con micro-interacción a checkmark verde */}
+        {/* Botón circular '+' con color Royal Indigo (#4F55F1) o Verde Éxito (#10B981) */}
         <button
           type="button"
           onClick={handlePlusClick}
           aria-label={
             isAddedRecently
-              ? `${name} agregado a la bolsa`
+              ? `${name} añadido a la bolsa`
               : `Añadir ${name} a la bolsa`
           }
           style={{
-            width: '36px',
-            height: '36px',
-            borderRadius: '999px',
+            width: '32px',
+            height: '32px',
+            borderRadius: '50%',
             backgroundColor: isAddedRecently
-              ? '#16A34A'
+              ? '#10B981'
               : inStock
-              ? '#18181B'
-              : '#E4E4E7',
+              ? '#4F55F1'
+              : '#E2E8F0',
             border: 'none',
             color: '#FFFFFF',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             cursor: inStock ? 'pointer' : 'not-allowed',
-            transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
-            transform: isAddedRecently ? 'scale(1.12)' : 'scale(1)',
-            boxShadow: isAddedRecently
-              ? '0 4px 14px rgba(22, 163, 74, 0.4)'
-              : inStock
-              ? '0 3px 8px rgba(24,24,27,0.18)'
-              : 'none',
+            transition: 'all 0.16s ease',
+            transform: isAddedRecently ? 'scale(1.1)' : 'scale(1)',
+            boxShadow: inStock && !isAddedRecently ? '0 2px 8px rgba(79, 85, 241, 0.3)' : 'none',
             flexShrink: 0,
           }}
           onMouseEnter={(e) => {
             if (inStock && !isAddedRecently) {
-              e.currentTarget.style.transform = 'scale(1.08)';
-              e.currentTarget.style.backgroundColor = '#000000';
+              e.currentTarget.style.backgroundColor = '#3F44D9';
             }
           }}
           onMouseLeave={(e) => {
             if (inStock && !isAddedRecently) {
-              e.currentTarget.style.transform = 'scale(1)';
-              e.currentTarget.style.backgroundColor = '#18181B';
+              e.currentTarget.style.backgroundColor = '#4F55F1';
             }
           }}
         >
           {isAddedRecently ? (
-            <Icon name="check" size={17} />
+            <Icon name="check" size={15} />
           ) : (
-            <Icon name="plus" size={17} />
+            <Icon name="plus" size={15} />
           )}
         </button>
       </div>
+
+      <style>{`
+        .storefront-product-card {
+          padding: 12px;
+        }
+        @media (max-width: 640px) {
+          .storefront-product-card {
+            padding: 8px 8px 10px !important;
+            border-radius: 16px !important;
+            gap: 6px !important;
+          }
+          .storefront-card-desc {
+            display: none !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };

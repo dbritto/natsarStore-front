@@ -17,9 +17,10 @@ export interface CategorySliderProps {
 }
 
 /**
- * Componente Slider de Categorías de Alta Intuición (Organismo E-Commerce)
- * Con desplazamiento táctil/drag suave, máscaras de desvanecimiento en bordes,
- * flechas inteligentes con desactivación automática en extremos y conteos de productos.
+ * Componente Slider de Categorías con Colores del Panel Administrativo:
+ * - Activo: Royal Indigo (#4F55F1)
+ * - Inactivo: Superficie limpia (#FFFFFF / #F1F5F9) con borde #E2E8F0
+ * - 100% Mobile Responsive: En móviles optimiza el espacio horizontal permitiendo deslizamiento táctil fluido
  */
 export const CategorySlider: React.FC<CategorySliderProps> = ({
   categories,
@@ -31,7 +32,7 @@ export const CategorySlider: React.FC<CategorySliderProps> = ({
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
 
-  // Estados para arrastrar con mouse (drag to scroll)
+  // Estados para arrastrar con mouse (drag to scroll en desktop)
   const isDragging = useRef(false);
   const startX = useRef(0);
   const scrollLeftPos = useRef(0);
@@ -53,7 +54,7 @@ export const CategorySlider: React.FC<CategorySliderProps> = ({
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
-      const scrollAmount = direction === 'left' ? -280 : 280;
+      const scrollAmount = direction === 'left' ? -240 : 240;
       scrollContainerRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
@@ -84,7 +85,6 @@ export const CategorySlider: React.FC<CategorySliderProps> = ({
   };
 
   const handleCategoryClick = (id: string) => {
-    // Si el usuario estaba arrastrando para desplazarse, no disparar selección accidental
     if (hasMoved.current) {
       hasMoved.current = false;
       return;
@@ -97,51 +97,40 @@ export const CategorySlider: React.FC<CategorySliderProps> = ({
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '8px',
+        gap: '6px',
         width: '100%',
         position: 'relative',
-        margin: '12px 0 20px',
+        margin: '6px 0 16px',
       }}
     >
-      {/* Botón flecha izquierda */}
+      {/* Botón flecha izquierda (se oculta en móviles pequeños para ganar espacio) */}
       <button
         type="button"
+        className="category-slider-arrow"
         onClick={() => scroll('left')}
         disabled={!canScrollLeft}
         aria-label="Desplazar categorías hacia la izquierda"
         style={{
-          width: '36px',
-          height: '36px',
-          borderRadius: '999px',
+          width: '32px',
+          height: '32px',
+          borderRadius: '50%',
           backgroundColor: '#FFFFFF',
-          border: '1px solid #E5E5E5',
+          border: '1px solid #E2E8F0',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: canScrollLeft ? '#18181B' : '#D4D4D8',
+          color: canScrollLeft ? '#0F172A' : '#CBD5E1',
           cursor: canScrollLeft ? 'pointer' : 'default',
           flexShrink: 0,
-          boxShadow: canScrollLeft ? '0 2px 6px rgba(0,0,0,0.04)' : 'none',
-          opacity: canScrollLeft ? 1 : 0.45,
+          boxShadow: canScrollLeft ? '0 1px 3px rgba(15,23,42,0.06)' : 'none',
+          opacity: canScrollLeft ? 1 : 0.4,
           transition: 'all 0.15s ease',
         }}
-        onMouseEnter={(e) => {
-          if (canScrollLeft) {
-            e.currentTarget.style.backgroundColor = '#18181B';
-            e.currentTarget.style.color = '#FFFFFF';
-          }
-        }}
-        onMouseLeave={(e) => {
-          if (canScrollLeft) {
-            e.currentTarget.style.backgroundColor = '#FFFFFF';
-            e.currentTarget.style.color = '#18181B';
-          }
-        }}
       >
-        <Icon name="chevron-left" size={16} />
+        <Icon name="chevron-left" size={15} />
       </button>
 
-      {/* Contenedor deslizante de píldoras con soporte drag & scroll */}
+      {/* Contenedor deslizante de píldoras con soporte drag & touch */}
       <div
         ref={scrollContainerRef}
         onScroll={checkScrollability}
@@ -152,59 +141,49 @@ export const CategorySlider: React.FC<CategorySliderProps> = ({
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '10px',
+          gap: '8px',
           overflowX: 'auto',
           scrollBehavior: isDragging.current ? 'auto' : 'smooth',
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
-          padding: '4px 2px',
+          padding: '2px 0',
           flex: 1,
-          cursor: isDragging.current ? 'grabbing' : 'grab',
+          WebkitOverflowScrolling: 'touch',
           userSelect: 'none',
         }}
       >
-        {/* Píldora "Todos" */}
+        {/* Píldora "Todos los productos" */}
         <button
           type="button"
           onClick={() => handleCategoryClick('')}
           style={{
-            padding: '9px 18px',
+            padding: '7px 14px',
             borderRadius: '999px',
-            fontSize: '0.86rem',
+            fontSize: '0.82rem',
             fontWeight: 600,
             whiteSpace: 'nowrap',
             cursor: 'pointer',
-            border: 'none',
+            border: selectedCategoryId === '' ? '1.5px solid #4F55F1' : '1px solid #E2E8F0',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px',
-            backgroundColor: selectedCategoryId === '' ? '#18181B' : '#EFECE6',
-            color: selectedCategoryId === '' ? '#FFFFFF' : '#3F3F46',
+            gap: '6px',
+            backgroundColor: selectedCategoryId === '' ? '#4F55F1' : '#FFFFFF',
+            color: selectedCategoryId === '' ? '#FFFFFF' : '#334155',
             boxShadow:
-              selectedCategoryId === '' ? '0 4px 12px rgba(24,24,27,0.18)' : 'none',
-            transition: 'all 0.18s ease',
+              selectedCategoryId === '' ? '0 2px 8px rgba(79, 85, 241, 0.28)' : '0 1px 2px rgba(15,23,42,0.02)',
+            transition: 'all 0.15s ease',
             flexShrink: 0,
-          }}
-          onMouseEnter={(e) => {
-            if (selectedCategoryId !== '') {
-              e.currentTarget.style.backgroundColor = '#E5E2DC';
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (selectedCategoryId !== '') {
-              e.currentTarget.style.backgroundColor = '#EFECE6';
-            }
           }}
         >
           <span>Todos los productos</span>
           <span
             style={{
-              fontSize: '0.72rem',
+              fontSize: '0.68rem',
               fontWeight: 700,
-              padding: '2px 7px',
+              padding: '1px 6px',
               borderRadius: '999px',
-              backgroundColor: selectedCategoryId === '' ? 'rgba(255,255,255,0.2)' : '#DDD9D2',
-              color: selectedCategoryId === '' ? '#FFFFFF' : '#52525B',
+              backgroundColor: selectedCategoryId === '' ? 'rgba(255,255,255,0.22)' : '#F1F5F9',
+              color: selectedCategoryId === '' ? '#FFFFFF' : '#64748B',
             }}
           >
             {totalProductsCount}
@@ -220,43 +199,34 @@ export const CategorySlider: React.FC<CategorySliderProps> = ({
               type="button"
               onClick={() => handleCategoryClick(cat.id)}
               style={{
-                padding: '9px 18px',
+                padding: '7px 14px',
                 borderRadius: '999px',
-                fontSize: '0.86rem',
+                fontSize: '0.82rem',
                 fontWeight: 600,
                 whiteSpace: 'nowrap',
                 cursor: 'pointer',
-                border: 'none',
+                border: isSelected ? '1.5px solid #4F55F1' : '1px solid #E2E8F0',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
-                backgroundColor: isSelected ? '#18181B' : '#EFECE6',
-                color: isSelected ? '#FFFFFF' : '#3F3F46',
-                boxShadow: isSelected ? '0 4px 12px rgba(24,24,27,0.18)' : 'none',
-                transition: 'all 0.18s ease',
+                gap: '6px',
+                backgroundColor: isSelected ? '#4F55F1' : '#FFFFFF',
+                color: isSelected ? '#FFFFFF' : '#334155',
+                boxShadow:
+                  isSelected ? '0 2px 8px rgba(79, 85, 241, 0.28)' : '0 1px 2px rgba(15,23,42,0.02)',
+                transition: 'all 0.15s ease',
                 flexShrink: 0,
-              }}
-              onMouseEnter={(e) => {
-                if (!isSelected) {
-                  e.currentTarget.style.backgroundColor = '#E5E2DC';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isSelected) {
-                  e.currentTarget.style.backgroundColor = '#EFECE6';
-                }
               }}
             >
               <span>{cat.name}</span>
               {typeof cat.count === 'number' && (
                 <span
                   style={{
-                    fontSize: '0.72rem',
+                    fontSize: '0.68rem',
                     fontWeight: 700,
-                    padding: '2px 7px',
+                    padding: '1px 6px',
                     borderRadius: '999px',
-                    backgroundColor: isSelected ? 'rgba(255,255,255,0.2)' : '#DDD9D2',
-                    color: isSelected ? '#FFFFFF' : '#52525B',
+                    backgroundColor: isSelected ? 'rgba(255,255,255,0.22)' : '#F1F5F9',
+                    color: isSelected ? '#FFFFFF' : '#64748B',
                   }}
                 >
                   {cat.count}
@@ -267,43 +237,40 @@ export const CategorySlider: React.FC<CategorySliderProps> = ({
         })}
       </div>
 
-      {/* Botón flecha derecha */}
+      {/* Botón flecha derecha (se oculta en móviles pequeños para ganar espacio) */}
       <button
         type="button"
+        className="category-slider-arrow"
         onClick={() => scroll('right')}
         disabled={!canScrollRight}
         aria-label="Desplazar categorías hacia la derecha"
         style={{
-          width: '36px',
-          height: '36px',
-          borderRadius: '999px',
+          width: '32px',
+          height: '32px',
+          borderRadius: '50%',
           backgroundColor: '#FFFFFF',
-          border: '1px solid #E5E5E5',
+          border: '1px solid #E2E8F0',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: canScrollRight ? '#18181B' : '#D4D4D8',
+          color: canScrollRight ? '#0F172A' : '#CBD5E1',
           cursor: canScrollRight ? 'pointer' : 'default',
           flexShrink: 0,
-          boxShadow: canScrollRight ? '0 2px 6px rgba(0,0,0,0.04)' : 'none',
-          opacity: canScrollRight ? 1 : 0.45,
+          boxShadow: canScrollRight ? '0 1px 3px rgba(15,23,42,0.06)' : 'none',
+          opacity: canScrollRight ? 1 : 0.4,
           transition: 'all 0.15s ease',
         }}
-        onMouseEnter={(e) => {
-          if (canScrollRight) {
-            e.currentTarget.style.backgroundColor = '#18181B';
-            e.currentTarget.style.color = '#FFFFFF';
-          }
-        }}
-        onMouseLeave={(e) => {
-          if (canScrollRight) {
-            e.currentTarget.style.backgroundColor = '#FFFFFF';
-            e.currentTarget.style.color = '#18181B';
-          }
-        }}
       >
-        <Icon name="chevron-right" size={16} />
+        <Icon name="chevron-right" size={15} />
       </button>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .category-slider-arrow {
+            display: none !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };

@@ -17,8 +17,9 @@ export interface EcommerceFiltersProps {
 }
 
 /**
- * Panel Lateral de Filtros E-Commerce (Inspirado en la barra lateral 'Filters' de la imagen)
- * Permite filtrar por texto de búsqueda, formato/tipo de producto, rango de precio y disponibilidad en stock.
+ * Panel Lateral de Filtros E-Commerce Unificado con el Panel Administrativo:
+ * - Colores coherentes: Royal Indigo (#4F55F1), superficies #FFFFFF / #F8FAFC, bordes #E2E8F0
+ * - Permite filtrar por búsqueda de texto, formato, precio máximo y disponibilidad en inventario
  */
 export const EcommerceFilters: React.FC<EcommerceFiltersProps> = ({
   filters,
@@ -34,18 +35,18 @@ export const EcommerceFilters: React.FC<EcommerceFiltersProps> = ({
     <aside
       style={{
         backgroundColor: '#FFFFFF',
-        borderRadius: '28px',
-        padding: '24px 20px',
-        border: '1px solid #ECEAE4',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.02)',
+        borderRadius: '20px',
+        padding: '20px 18px',
+        border: '1px solid #E2E8F0',
+        boxShadow: '0 2px 10px rgba(15, 23, 42, 0.03)',
         display: 'flex',
         flexDirection: 'column',
-        gap: '24px',
-        width: '280px',
-        flexShrink: 0,
+        gap: '20px',
+        width: '100%',
+        boxSizing: 'border-box',
       }}
     >
-      {/* Encabezado: Título 'Filters' y botón 'Limpiar' */}
+      {/* Encabezado: Título 'Filtros' y botón 'Limpiar' */}
       <div
         style={{
           display: 'flex',
@@ -53,8 +54,8 @@ export const EcommerceFilters: React.FC<EcommerceFiltersProps> = ({
           justifyContent: 'space-between',
         }}
       >
-        <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#18181B', margin: 0 }}>
-          Filters
+        <h2 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+          Filtros
         </h2>
         {isFilterActive && (
           <button
@@ -63,9 +64,9 @@ export const EcommerceFilters: React.FC<EcommerceFiltersProps> = ({
             style={{
               background: 'none',
               border: 'none',
-              color: '#F97316',
-              fontSize: '0.78rem',
-              fontWeight: 600,
+              color: '#4F55F1',
+              fontSize: '0.76rem',
+              fontWeight: 700,
               cursor: 'pointer',
               textDecoration: 'underline',
               padding: 0,
@@ -89,7 +90,7 @@ export const EcommerceFilters: React.FC<EcommerceFiltersProps> = ({
             style={{
               position: 'absolute',
               left: '12px',
-              color: '#A1A1AA',
+              color: '#94A3B8',
               display: 'flex',
               alignItems: 'center',
             }}
@@ -103,22 +104,22 @@ export const EcommerceFilters: React.FC<EcommerceFiltersProps> = ({
             onChange={(e) => update({ search: e.target.value })}
             style={{
               width: '100%',
-              padding: '9px 12px 9px 36px',
+              padding: '8px 12px 8px 36px',
               borderRadius: '999px',
-              border: '1px solid #E4E4E7',
-              backgroundColor: '#FBFBFA',
-              fontSize: '0.84rem',
-              color: '#18181B',
+              border: '1.5px solid #E2E8F0',
+              backgroundColor: '#F8FAFC',
+              fontSize: '0.82rem',
+              color: '#0F172A',
               outline: 'none',
-              transition: 'border-color 0.15s ease, background-color 0.15s ease',
+              transition: 'border-color 0.15s ease',
             }}
             onFocus={(e) => {
-              e.currentTarget.style.borderColor = '#18181B';
+              e.currentTarget.style.borderColor = '#4F55F1';
               e.currentTarget.style.backgroundColor = '#FFFFFF';
             }}
             onBlur={(e) => {
-              e.currentTarget.style.borderColor = '#E4E4E7';
-              e.currentTarget.style.backgroundColor = '#FBFBFA';
+              e.currentTarget.style.borderColor = '#E2E8F0';
+              e.currentTarget.style.backgroundColor = '#F8FAFC';
             }}
           />
           {filters.search && (
@@ -130,7 +131,7 @@ export const EcommerceFilters: React.FC<EcommerceFiltersProps> = ({
                 right: '10px',
                 background: 'none',
                 border: 'none',
-                color: '#A1A1AA',
+                color: '#94A3B8',
                 cursor: 'pointer',
                 display: 'flex',
                 padding: '2px',
@@ -142,16 +143,16 @@ export const EcommerceFilters: React.FC<EcommerceFiltersProps> = ({
         </div>
       </div>
 
-      {/* Filtro: Formato (Cream, Balm, Todos) estilo píldoras de la imagen */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        <span style={{ fontSize: '0.78rem', fontWeight: 600, color: '#71717A' }}>
-          Format
+      {/* Filtro: Formato (Cream, Balm, Servicios, Todos) */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <span style={{ fontSize: '0.76rem', fontWeight: 700, color: '#475569' }}>
+          Formato / Tipo
         </span>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
           {[
             { id: 'all', label: 'Todos' },
-            { id: 'cream', label: 'Cream' },
-            { id: 'balm', label: 'Balm' },
+            { id: 'cream', label: 'Crema' },
+            { id: 'balm', label: 'Bálsamo' },
             { id: 'service', label: 'Servicios' },
           ].map((f) => {
             const isSelected = filters.format === f.id;
@@ -161,15 +162,15 @@ export const EcommerceFilters: React.FC<EcommerceFiltersProps> = ({
                 type="button"
                 onClick={() => update({ format: f.id })}
                 style={{
-                  padding: '6px 14px',
+                  padding: '5px 12px',
                   borderRadius: '999px',
-                  border: isSelected ? '1px solid #18181B' : '1px solid #E4E1DB',
-                  backgroundColor: isSelected ? '#18181B' : '#F5F3ED',
-                  color: isSelected ? '#FFFFFF' : '#3F3F46',
-                  fontSize: '0.8rem',
+                  border: isSelected ? '1.5px solid #4F55F1' : '1px solid #E2E8F0',
+                  backgroundColor: isSelected ? '#4F55F1' : '#F8FAFC',
+                  color: isSelected ? '#FFFFFF' : '#334155',
+                  fontSize: '0.78rem',
                   fontWeight: 600,
                   cursor: 'pointer',
-                  transition: 'all 0.15s ease',
+                  transition: 'all 0.14s ease',
                 }}
               >
                 {f.label}
@@ -179,18 +180,18 @@ export const EcommerceFilters: React.FC<EcommerceFiltersProps> = ({
         </div>
       </div>
 
-      {/* Filtro: Precio con Slider Interactivo y Píldoras rápidas */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      {/* Filtro: Precio con Slider y Rangos rápidos */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontSize: '0.78rem', fontWeight: 600, color: '#71717A' }}>
-            Price (Hasta)
+          <span style={{ fontSize: '0.76rem', fontWeight: 700, color: '#475569' }}>
+            Precio Máximo
           </span>
-          <span style={{ fontSize: '0.84rem', fontWeight: 800, color: '#18181B' }}>
+          <span style={{ fontSize: '0.84rem', fontWeight: 800, color: '#4F55F1' }}>
             ${filters.maxPrice.toLocaleString('es-CO')}
           </span>
         </div>
 
-        {/* Input tipo rango deslizante */}
+        {/* Input tipo rango deslizante con acento Royal Indigo */}
         <input
           type="range"
           min="10000"
@@ -200,18 +201,18 @@ export const EcommerceFilters: React.FC<EcommerceFiltersProps> = ({
           onChange={(e) => update({ maxPrice: Number(e.target.value) })}
           style={{
             width: '100%',
-            accentColor: '#18181B',
+            accentColor: '#4F55F1',
             cursor: 'pointer',
           }}
         />
 
-        {/* Rangos rápidos de precio inspirados en la imagen */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+        {/* Rangos rápidos de precio */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
           {[
-            { label: 'Menos de $25.000', value: 25000 },
-            { label: '$25.000 a $40.000', value: 40000 },
-            { label: '$40.000 a $100.000', value: 100000 },
-            { label: 'Todos los precios ($500.000)', value: 500000 },
+            { label: 'Hasta $25.000', value: 25000 },
+            { label: 'Hasta $40.000', value: 40000 },
+            { label: 'Hasta $100.000', value: 100000 },
+            { label: 'Todos los precios', value: 500000 },
           ].map((tier) => {
             const isMatch = filters.maxPrice === tier.value;
             return (
@@ -223,62 +224,55 @@ export const EcommerceFilters: React.FC<EcommerceFiltersProps> = ({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  padding: '6px 10px',
-                  borderRadius: '10px',
+                  padding: '6px 8px',
+                  borderRadius: '8px',
                   border: 'none',
-                  backgroundColor: isMatch ? '#F4F2EC' : 'transparent',
-                  color: isMatch ? '#18181B' : '#52525B',
+                  backgroundColor: isMatch ? 'rgba(79, 85, 241, 0.08)' : 'transparent',
+                  color: isMatch ? '#4F55F1' : '#475569',
                   fontWeight: isMatch ? 700 : 500,
-                  fontSize: '0.78rem',
+                  fontSize: '0.76rem',
                   cursor: 'pointer',
                   textAlign: 'left',
-                  transition: 'background-color 0.12s ease',
-                }}
-                onMouseEnter={(e) => {
-                  if (!isMatch) e.currentTarget.style.backgroundColor = '#FAF9F6';
-                }}
-                onMouseLeave={(e) => {
-                  if (!isMatch) e.currentTarget.style.backgroundColor = 'transparent';
                 }}
               >
                 <span>{tier.label}</span>
-                {isMatch && <span style={{ color: '#16A34A', fontSize: '0.8rem' }}>✓</span>}
+                {isMatch && <span style={{ color: '#4F55F1', fontWeight: 800 }}>✓</span>}
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Filtro: Disponibilidad / Switch 'In stock' */}
+      {/* Filtro: Disponibilidad / Switch 'En stock' */}
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          paddingTop: '10px',
-          borderTop: '1px solid #ECEAE4',
+          paddingTop: '8px',
+          borderTop: '1px solid #F1F5F9',
         }}
       >
         <div>
-          <div style={{ fontSize: '0.78rem', fontWeight: 600, color: '#71717A' }}>
-            Availability
+          <div style={{ fontSize: '0.74rem', fontWeight: 600, color: '#64748B' }}>
+            Disponibilidad
           </div>
-          <div style={{ fontSize: '0.84rem', fontWeight: 700, color: '#18181B' }}>
-            In stock
+          <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#0F172A' }}>
+            Solo en stock
           </div>
         </div>
 
-        {/* Switch Toggle nativo estilizado */}
+        {/* Switch Toggle estilizado con acento Royal Indigo */}
         <button
           type="button"
           onClick={() => update({ inStockOnly: !filters.inStockOnly })}
           role="switch"
           aria-checked={filters.inStockOnly}
           style={{
-            width: '44px',
+            width: '42px',
             height: '24px',
             borderRadius: '999px',
-            backgroundColor: filters.inStockOnly ? '#18181B' : '#E4E4E7',
+            backgroundColor: filters.inStockOnly ? '#4F55F1' : '#E2E8F0',
             border: 'none',
             cursor: 'pointer',
             position: 'relative',
@@ -294,7 +288,7 @@ export const EcommerceFilters: React.FC<EcommerceFiltersProps> = ({
               backgroundColor: '#FFFFFF',
               position: 'absolute',
               top: '2px',
-              left: filters.inStockOnly ? '22px' : '2px',
+              left: filters.inStockOnly ? '20px' : '2px',
               transition: 'left 0.2s ease',
               boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
             }}
