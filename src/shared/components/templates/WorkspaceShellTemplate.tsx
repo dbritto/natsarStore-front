@@ -29,6 +29,7 @@ export interface WorkspaceShellTemplateProps {
   onOpenProfileSettings?: () => void;
   onLogout: () => void;
   onGoToStore?: () => void;
+  onOpenCustomerDisplay?: () => void;
   children: React.ReactNode;
 }
 
@@ -61,6 +62,7 @@ export const WorkspaceShellTemplate: React.FC<WorkspaceShellTemplateProps> = ({
   onOpenProfileSettings,
   onLogout,
   onGoToStore,
+  onOpenCustomerDisplay,
   children,
 }) => {
   const isCompact = useMediaQuery('(max-width: 1100px)');
@@ -211,6 +213,7 @@ export const WorkspaceShellTemplate: React.FC<WorkspaceShellTemplateProps> = ({
           onOpenProfileSettings={onOpenProfileSettings}
           onLogout={onLogout}
           onGoToStore={onGoToStore}
+          onOpenCustomerDisplay={onOpenCustomerDisplay}
         />
 
         <main style={{ width: '100%', minWidth: 0 }}>{children}</main>

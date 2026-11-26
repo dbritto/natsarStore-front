@@ -159,11 +159,22 @@ export function openCustomerDisplayWindow(): Window | null {
   if (typeof window === 'undefined') return null;
 
   const url = `${window.location.origin}${window.location.pathname}?view=customer-display`;
-  const win = window.open(
-    url,
-    'NatsarCustomerDisplayWindow',
-    'width=1100,height=750,menubar=no,toolbar=no,location=no,status=no,resizable=yes'
-  );
+  let win: Window | null = null;
+  try {
+    win = window.open(
+      url,
+      'NatsarCustomerDisplayWindow',
+      'width=1150,height=750,menubar=no,toolbar=no,location=no,status=no,resizable=yes'
+    );
+  } catch {
+    win = null;
+  }
+
+  // Si el navegador bloqueó la ventana emergente tipo popup, abrir como pestaña normal
+  if (!win || win.closed || typeof win.closed === 'undefined') {
+    win = window.open(url, '_blank');
+  }
+
   win?.focus();
   return win;
 }

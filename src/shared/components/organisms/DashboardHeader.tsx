@@ -27,6 +27,7 @@ export interface DashboardHeaderProps {
   onOpenProfileSettings?: () => void;
   onLogout?: () => void;
   onGoToStore?: () => void;
+  onOpenCustomerDisplay?: () => void;
 }
 
 /**
@@ -56,6 +57,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   onOpenProfileSettings,
   onLogout,
   onGoToStore,
+  onOpenCustomerDisplay,
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -170,6 +172,26 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
         className="rsp-header-right"
         style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}
       >
+        {onOpenCustomerDisplay && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={onOpenCustomerDisplay}
+            leftIcon={<Icon name="monitor" size={15} />}
+            title="Abrir pantalla para el cliente en otra pantalla o pestaña"
+            style={{
+              borderRadius: '999px',
+              backgroundColor: '#EEF2FF',
+              borderColor: '#C7D2FE',
+              color: '#4F55F1',
+              fontWeight: 700,
+            }}
+          >
+            Pantalla Cliente
+          </Button>
+        )}
+
         {onGoToStore && (
           <Button
             type="button"

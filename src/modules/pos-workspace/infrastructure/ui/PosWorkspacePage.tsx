@@ -44,6 +44,7 @@ import { SettingsUseCases } from '@modules/settings/application/use-cases/Settin
 import { SettingsModuleView } from '@modules/settings/infrastructure/ui/SettingsModuleView';
 import { PosTerminalUseCases } from '@modules/pos-terminal/application/use-cases/PosTerminalUseCases';
 import { PosTerminalModuleView } from '@modules/pos-terminal/infrastructure/ui/PosTerminalModuleView';
+import { openCustomerDisplayWindow } from '@modules/pos-terminal/infrastructure/sync/CustomerDisplayChannel';
 import { UserProfileModuleView } from '@modules/auth/infrastructure/ui/UserProfileModuleView';
 
 export interface PosWorkspacePageProps {
@@ -716,6 +717,7 @@ export const PosWorkspacePage: React.FC<PosWorkspacePageProps> = ({
       onOpenProfileSettings={() => setActiveSection('profile')}
       onLogout={onLogout}
       onGoToStore={onGoToStore}
+      onOpenCustomerDisplay={openCustomerDisplayWindow}
     >
       {renderActiveContent()}
 

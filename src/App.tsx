@@ -231,11 +231,16 @@ export const App: React.FC = () => {
 
   // 0. Pantalla Secundaria Orientada al Cliente (Customer Facing Display)
   // Accesible en pestaña o monitor secundario y sincronizada en tiempo real con el POS
-  if (
+  const isCustomerDisplay =
     typeof window !== 'undefined' &&
-    (window.location.search.includes('view=customer-display') ||
-      window.location.hash.includes('customer-display'))
-  ) {
+    (window.location.search.toLowerCase().includes('customer-display') ||
+      window.location.search.toLowerCase().includes('pantalla-cliente') ||
+      window.location.pathname.toLowerCase().includes('customer-display') ||
+      window.location.pathname.toLowerCase().includes('pantalla-cliente') ||
+      window.location.hash.toLowerCase().includes('customer-display') ||
+      window.location.hash.toLowerCase().includes('pantalla-cliente'));
+
+  if (isCustomerDisplay) {
     return <CustomerFacingDisplayPage />;
   }
 
