@@ -65,6 +65,7 @@ export interface PosWorkspacePageProps {
   onSimulateExpirationCountdown: (seconds: number) => void;
   onUpdateSession: (updatedSession: UserSession) => void;
   onLogout: () => void;
+  onGoToStore?: () => void;
 }
 
 const PERIOD_OPTIONS: PeriodOption[] = [
@@ -109,6 +110,7 @@ export const PosWorkspacePage: React.FC<PosWorkspacePageProps> = ({
   onSimulateExpirationCountdown,
   onUpdateSession,
   onLogout,
+  onGoToStore,
 }) => {
   const [activeSection, setActiveSection] = useState<WorkspaceSectionId>('dashboard');
   const [period, setPeriod] = useState<AnalyticsPeriod>('weekly');
@@ -713,6 +715,7 @@ export const PosWorkspacePage: React.FC<PosWorkspacePageProps> = ({
       onRefreshSessionToken={() => void onRefreshSessionToken()}
       onOpenProfileSettings={() => setActiveSection('profile')}
       onLogout={onLogout}
+      onGoToStore={onGoToStore}
     >
       {renderActiveContent()}
 

@@ -18,6 +18,7 @@ export interface LoginPageProps {
   initialNotice?: FriendlyNotice | null;
   onClearInitialNotice?: () => void;
   onSubmitLogin: (email: string, password: string, rememberMe: boolean) => Promise<string | null>;
+  onBackToStore?: () => void;
 }
 
 /**
@@ -30,6 +31,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   initialNotice = null,
   onClearInitialNotice,
   onSubmitLogin,
+  onBackToStore,
 }) => {
   const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState('');
@@ -69,6 +71,29 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   return (
     <AuthSplitTemplate>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
+        {onBackToStore && (
+          <div style={{ alignSelf: 'flex-start', marginBottom: '-8px' }}>
+            <button
+              type="button"
+              onClick={onBackToStore}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#475569',
+                fontSize: '0.84rem',
+                fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                cursor: 'pointer',
+                padding: '4px 0',
+              }}
+            >
+              <span>←</span>
+              <span>Volver a la Tienda</span>
+            </button>
+          </div>
+        )}
         {/* Cabecera con Logo NatsarStore y Bienvenida */}
         <div
           style={{

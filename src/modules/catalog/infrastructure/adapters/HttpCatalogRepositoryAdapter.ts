@@ -20,48 +20,314 @@ import {
 
 const INITIAL_CATEGORIES: ProductCategoryProps[] = [
   {
-    id: 'cat-general-001',
-    code: 'GENERAL',
-    name: 'General / Mostrador',
-    description: 'Categoría base protegida del sistema POS',
+    id: 'cat-bodycare-001',
+    code: 'BODY_CARE',
+    name: 'Body Care & Cuidado',
+    description: 'Cremas, bálsamos hidratantes y fórmulas dermatológicas de uso diario',
     parentId: null,
-    colorHex: '#4D53F4',
+    colorHex: '#18181B',
     sortOrder: 0,
     isActive: true,
   },
   {
-    id: 'cat-cafe-002',
-    code: 'CAFE_BEBIDAS',
-    name: 'Cafetería & Bebidas Especiales',
-    description: 'Productos gravados con INC 8% de consumo para cafetería y restaurante',
+    id: 'cat-essentials-002',
+    code: 'DAILY_ESSENTIALS',
+    name: 'Daily Essentials',
+    description: 'Esenciales diarios para regeneración de barrera cutánea y bienestar',
     parentId: null,
-    colorHex: '#10B981',
+    colorHex: '#F97316',
     sortOrder: 1,
     isActive: true,
   },
   {
-    id: 'cat-hardware-003',
-    code: 'HARDWARE_POS',
-    name: 'Terminales & Hardware POS',
-    description: 'Lectores de códigos de barras 2D, impresoras térmicas y cajones monederos',
+    id: 'cat-cafe-003',
+    code: 'CAFE_BEBIDAS',
+    name: 'Cafetería & Bebidas Especiales',
+    description: 'Café de especialidad origen Huila e insumos para barra barista (INC 8%)',
     parentId: null,
-    colorHex: '#6366F1',
+    colorHex: '#10B981',
     sortOrder: 2,
     isActive: true,
   },
   {
-    id: 'cat-cloud-004',
+    id: 'cat-hardware-004',
+    code: 'HARDWARE_POS',
+    name: 'Terminales & Hardware POS',
+    description: 'Lectores 2D, impresoras térmicas de 80mm y terminales táctiles',
+    parentId: null,
+    colorHex: '#6366F1',
+    sortOrder: 3,
+    isActive: true,
+  },
+  {
+    id: 'cat-cloud-005',
     code: 'SERVICIOS_DIAN',
     name: 'Folios & Servicios Cloud DIAN',
     description: 'Suscripciones y paquetes de emisión electrónica UBL 2.1',
     parentId: null,
     colorHex: '#F59E0B',
-    sortOrder: 3,
+    sortOrder: 4,
     isActive: true,
   },
 ];
 
 const INITIAL_ITEMS: CatalogItemProps[] = [
+  {
+    id: 'item-hollis-001',
+    itemType: 'PRODUCT',
+    codeReference: 'HLL-DBC-200',
+    sku: 'SKU-DBC-200',
+    name: 'Daily Body Cream',
+    description: 'Cream, Fragrance-free, 200 ml. Crema hidratante corporal de absorción rápida enriquecida con escualano vegetal y ceramidas esenciales.',
+    categoryId: 'cat-bodycare-001',
+    brand: 'Hollis Botanical',
+    standardCode: '999',
+    unitMeasureCode: '94',
+    basePrice: 28000,
+    unitCost: 12000,
+    isTaxExcluded: false,
+    isTaxIncludedInPrice: true,
+    defaultTaxCode: '01',
+    defaultTaxRate: 19,
+    trackInventory: true,
+    allowFractionalQty: false,
+    primaryImage: null,
+    barcodes: [
+      {
+        barcode: '770999001001',
+        barcodeType: 'EAN13',
+        unitMeasureCode: '94',
+        conversionFactor: 1,
+        isPrimary: true,
+        isActive: true,
+      },
+    ],
+    isActive: true,
+  },
+  {
+    id: 'item-hollis-002',
+    itemType: 'PRODUCT',
+    codeReference: 'HLL-BRC-150',
+    sku: 'SKU-BRC-150',
+    name: 'Barrier Repair Cream',
+    description: 'Cream, Fragrance-free, 150 ml. Fórmula restauradora con niacinamida, ácido hialurónico y lípidos reparadores de la barrera cutánea.',
+    categoryId: 'cat-bodycare-001',
+    brand: 'Hollis Botanical',
+    standardCode: '999',
+    unitMeasureCode: '94',
+    basePrice: 34000,
+    unitCost: 15000,
+    isTaxExcluded: false,
+    isTaxIncludedInPrice: true,
+    defaultTaxCode: '01',
+    defaultTaxRate: 19,
+    trackInventory: true,
+    allowFractionalQty: false,
+    primaryImage: null,
+    barcodes: [
+      {
+        barcode: '770999001002',
+        barcodeType: 'EAN13',
+        unitMeasureCode: '94',
+        conversionFactor: 1,
+        isPrimary: true,
+        isActive: true,
+      },
+    ],
+    isActive: true,
+  },
+  {
+    id: 'item-hollis-003',
+    itemType: 'PRODUCT',
+    codeReference: 'HLL-CBB-060',
+    sku: 'SKU-CBB-60',
+    name: 'Citrus Body Balm',
+    description: 'Balm, Citrus, 60 g. Bálsamo botánico ultra emoliente con notas cítricas naturales de bergamota y mandarina siciliana.',
+    categoryId: 'cat-bodycare-001',
+    brand: 'Hollis Botanical',
+    standardCode: '999',
+    unitMeasureCode: '94',
+    basePrice: 22000,
+    unitCost: 9500,
+    isTaxExcluded: false,
+    isTaxIncludedInPrice: true,
+    defaultTaxCode: '01',
+    defaultTaxRate: 19,
+    trackInventory: true,
+    allowFractionalQty: false,
+    primaryImage: null,
+    barcodes: [
+      {
+        barcode: '770999001003',
+        barcodeType: 'EAN13',
+        unitMeasureCode: '94',
+        conversionFactor: 1,
+        isPrimary: true,
+        isActive: true,
+      },
+    ],
+    isActive: true,
+  },
+  {
+    id: 'item-hollis-004',
+    itemType: 'PRODUCT',
+    codeReference: 'HLL-WSC-200',
+    sku: 'SKU-WSC-200',
+    name: 'Whipped Shea Cream',
+    description: 'Cream, Citrus, 200 ml. Manteca de karité batida al aire con textura soufflé, aceites orgánicos y vitaminas antioxidantes C + E.',
+    categoryId: 'cat-bodycare-001',
+    brand: 'Hollis Botanical',
+    standardCode: '999',
+    unitMeasureCode: '94',
+    basePrice: 32000,
+    unitCost: 13500,
+    isTaxExcluded: false,
+    isTaxIncludedInPrice: true,
+    defaultTaxCode: '01',
+    defaultTaxRate: 19,
+    trackInventory: true,
+    allowFractionalQty: false,
+    primaryImage: null,
+    barcodes: [
+      {
+        barcode: '770999001004',
+        barcodeType: 'EAN13',
+        unitMeasureCode: '94',
+        conversionFactor: 1,
+        isPrimary: true,
+        isActive: true,
+      },
+    ],
+    isActive: true,
+  },
+  {
+    id: 'item-hollis-005',
+    itemType: 'PRODUCT',
+    codeReference: 'HLL-NRB-060',
+    sku: 'SKU-NRB-60',
+    name: 'Night Recovery Balm',
+    description: 'Balm, Fragrance-free, 60 g. Bálsamo nutritivo nocturno para tratamiento intensivo y cicatrización celular (temporalmente agotado).',
+    categoryId: 'cat-essentials-002',
+    brand: 'Hollis Botanical',
+    standardCode: '999',
+    unitMeasureCode: '94',
+    basePrice: 26000,
+    unitCost: 11000,
+    isTaxExcluded: false,
+    isTaxIncludedInPrice: true,
+    defaultTaxCode: '01',
+    defaultTaxRate: 19,
+    trackInventory: false,
+    allowFractionalQty: false,
+    primaryImage: null,
+    barcodes: [
+      {
+        barcode: '770999001005',
+        barcodeType: 'EAN13',
+        unitMeasureCode: '94',
+        conversionFactor: 1,
+        isPrimary: true,
+        isActive: true,
+      },
+    ],
+    isActive: true,
+  },
+  {
+    id: 'item-hollis-006',
+    itemType: 'PRODUCT',
+    codeReference: 'HLL-OSC-250',
+    sku: 'SKU-OSC-250',
+    name: 'Oat Soothing Cream',
+    description: 'Cream, Fragrance-free, 250 ml. Loción calmante formulada con avena coloidal orgánica y centella asiática para pieles sensibles.',
+    categoryId: 'cat-essentials-002',
+    brand: 'Hollis Botanical',
+    standardCode: '999',
+    unitMeasureCode: '94',
+    basePrice: 30000,
+    unitCost: 12500,
+    isTaxExcluded: false,
+    isTaxIncludedInPrice: true,
+    defaultTaxCode: '01',
+    defaultTaxRate: 19,
+    trackInventory: true,
+    allowFractionalQty: false,
+    primaryImage: null,
+    barcodes: [
+      {
+        barcode: '770999001006',
+        barcodeType: 'EAN13',
+        unitMeasureCode: '94',
+        conversionFactor: 1,
+        isPrimary: true,
+        isActive: true,
+      },
+    ],
+    isActive: true,
+  },
+  {
+    id: 'item-hollis-007',
+    itemType: 'PRODUCT',
+    codeReference: 'HLL-MBB-090',
+    sku: 'SKU-MBB-90',
+    name: 'Mineral Body Balm',
+    description: 'Balm, Fragrance-free, 90 g. Bálsamo de sales minerales puras y óxido de zinc con acción protectora antipolución.',
+    categoryId: 'cat-essentials-002',
+    brand: 'Hollis Botanical',
+    standardCode: '999',
+    unitMeasureCode: '94',
+    basePrice: 24000,
+    unitCost: 10000,
+    isTaxExcluded: false,
+    isTaxIncludedInPrice: true,
+    defaultTaxCode: '01',
+    defaultTaxRate: 19,
+    trackInventory: true,
+    allowFractionalQty: false,
+    primaryImage: null,
+    barcodes: [
+      {
+        barcode: '770999001007',
+        barcodeType: 'EAN13',
+        unitMeasureCode: '94',
+        conversionFactor: 1,
+        isPrimary: true,
+        isActive: true,
+      },
+    ],
+    isActive: true,
+  },
+  {
+    id: 'item-hollis-008',
+    itemType: 'PRODUCT',
+    codeReference: 'HLL-CBC-200',
+    sku: 'SKU-CBC-200',
+    name: 'Cloud Body Cream',
+    description: 'Cream, Fragrance-free, 200 ml. Emulsión ultra ligera como una nube con péptidos bioactivos y efecto seda.',
+    categoryId: 'cat-essentials-002',
+    brand: 'Hollis Botanical',
+    standardCode: '999',
+    unitMeasureCode: '94',
+    basePrice: 36000,
+    unitCost: 15500,
+    isTaxExcluded: false,
+    isTaxIncludedInPrice: true,
+    defaultTaxCode: '01',
+    defaultTaxRate: 19,
+    trackInventory: false,
+    allowFractionalQty: false,
+    primaryImage: null,
+    barcodes: [
+      {
+        barcode: '770999001008',
+        barcodeType: 'EAN13',
+        unitMeasureCode: '94',
+        conversionFactor: 1,
+        isPrimary: true,
+        isActive: true,
+      },
+    ],
+    isActive: true,
+  },
   {
     id: 'item-pos-001',
     itemType: 'PRODUCT',
@@ -69,7 +335,7 @@ const INITIAL_ITEMS: CatalogItemProps[] = [
     sku: 'SKU-CAFE-500',
     name: 'Café Especial Origen Huila 500g',
     description: 'Café tostado en grano selección gourmet con Impuesto Nacional al Consumo (INC 8%)',
-    categoryId: 'cat-cafe-002',
+    categoryId: 'cat-cafe-003',
     brand: 'Natsar Coffee Reserve',
     standardCode: '999',
     unitMeasureCode: '94',
@@ -89,14 +355,6 @@ const INITIAL_ITEMS: CatalogItemProps[] = [
         unitMeasureCode: '94',
         conversionFactor: 1,
         isPrimary: true,
-        isActive: true,
-      },
-      {
-        barcode: '17701234500015',
-        barcodeType: 'EAN14',
-        unitMeasureCode: 'BX',
-        conversionFactor: 12,
-        isPrimary: false,
         isActive: true,
       },
     ],
@@ -214,8 +472,9 @@ export class HttpCatalogRepositoryAdapter implements CatalogRepositoryPort {
 
   public async listCategories(search?: string): Promise<Result<ProductCategoryModel[]>> {
     try {
+      // 1. Intentar endpoint público sin requerir JWT
       const response = await this.httpClient.get<{ items: ProductCategoryProps[] }>(
-        '/api/v1/catalog/categories',
+        '/api/v1/public/catalog/categories',
         { params: { page: 1, limit: 50, search } }
       );
 
@@ -223,7 +482,18 @@ export class HttpCatalogRepositoryAdapter implements CatalogRepositoryPort {
         this.localCategories = response.data.items;
       }
     } catch {
-      // Continuar con estado local sincronizado
+      try {
+        // 2. Fallback a endpoint autenticado si existe sesión
+        const authResponse = await this.httpClient.get<{ items: ProductCategoryProps[] }>(
+          '/api/v1/catalog/categories',
+          { params: { page: 1, limit: 50, search } }
+        );
+        if (authResponse.success && authResponse.data?.items && authResponse.data.items.length > 0) {
+          this.localCategories = authResponse.data.items;
+        }
+      } catch {
+        // Continuar con estado local sincronizado
+      }
     }
 
     const q = (search ?? '').trim().toLowerCase();
@@ -325,8 +595,9 @@ export class HttpCatalogRepositoryAdapter implements CatalogRepositoryPort {
 
   public async listItems(filter?: CatalogItemsFilter): Promise<Result<CatalogItemModel[]>> {
     try {
+      // 1. Intentar endpoint público sin requerir JWT
       const response = await this.httpClient.get<{ items: CatalogItemProps[] }>(
-        '/api/v1/catalog/items',
+        '/api/v1/public/catalog/items',
         {
           params: {
             page: 1,
@@ -342,7 +613,26 @@ export class HttpCatalogRepositoryAdapter implements CatalogRepositoryPort {
         this.localItems = response.data.items;
       }
     } catch {
-      // Continuar con estado local sincronizado
+      try {
+        // 2. Fallback a endpoint autenticado si existe sesión
+        const authResponse = await this.httpClient.get<{ items: CatalogItemProps[] }>(
+          '/api/v1/catalog/items',
+          {
+            params: {
+              page: 1,
+              limit: 50,
+              search: filter?.search,
+              categoryId: filter?.categoryId,
+              itemType: filter?.itemType || undefined,
+            },
+          }
+        );
+        if (authResponse.success && authResponse.data?.items && authResponse.data.items.length > 0) {
+          this.localItems = authResponse.data.items;
+        }
+      } catch {
+        // Continuar con estado local sincronizado
+      }
     }
 
     const q = (filter?.search ?? '').trim().toLowerCase();

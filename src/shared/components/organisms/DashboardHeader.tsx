@@ -26,6 +26,7 @@ export interface DashboardHeaderProps {
   onRefreshSessionToken?: () => void;
   onOpenProfileSettings?: () => void;
   onLogout?: () => void;
+  onGoToStore?: () => void;
 }
 
 /**
@@ -54,6 +55,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   onRefreshSessionToken,
   onOpenProfileSettings,
   onLogout,
+  onGoToStore,
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -168,6 +170,19 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
         className="rsp-header-right"
         style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}
       >
+        {onGoToStore && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={onGoToStore}
+            leftIcon={<Icon name="shopping-bag" size={15} />}
+            style={{ borderRadius: '999px', backgroundColor: '#FFFFFF' }}
+          >
+            Tienda E-Commerce
+          </Button>
+        )}
+
         <HeaderIconButton
           icon="search"
           ariaLabel="Buscar en NatsarStore"

@@ -10,6 +10,7 @@ export interface TopNavbarProps {
   primaryRole: string;
   isSuperAdmin: boolean;
   onLogout: () => void;
+  onGoToStore?: () => void;
 }
 
 /**
@@ -21,6 +22,7 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
   primaryRole,
   isSuperAdmin,
   onLogout,
+  onGoToStore,
 }) => {
   return (
     <header
@@ -84,6 +86,18 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
             <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{userEmail}</span>
           </div>
         </div>
+
+        {onGoToStore && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={onGoToStore}
+            leftIcon={<Icon name="shopping-bag" size={15} />}
+          >
+            Ver Tienda
+          </Button>
+        )}
 
         <Button
           type="button"

@@ -28,6 +28,7 @@ import { SettingsUseCases } from '@modules/settings/application/use-cases/Settin
 import { HttpPosTerminalRepositoryAdapter } from '@modules/pos-terminal/infrastructure/adapters/HttpPosTerminalRepositoryAdapter';
 import { PosTerminalUseCases } from '@modules/pos-terminal/application/use-cases/PosTerminalUseCases';
 import { PosWorkspacePage } from '@modules/pos-workspace/infrastructure/ui/PosWorkspacePage';
+import { EcommerceStorefrontPage } from '@modules/storefront';
 
 const SESSION_EXPIRED_NOTICE: FriendlyNotice = {
   title: 'Tu sesión ha finalizado por tiempo',
@@ -102,6 +103,7 @@ export const App: React.FC = () => {
   }, []);
 
   const [session, setSession] = useState<UserSession | null>(initialData.session);
+  const [currentView, setCurrentView] = useState<'store' | 'workspace' | 'login'>('store');
   const [sessionRemainingSeconds, setSessionRemainingSeconds] = useState<number>(() =>
     initialData.session ? initialData.session.getRemainingSeconds() : 0
   );
@@ -118,6 +120,7 @@ export const App: React.FC = () => {
     setSession(null);
     setSessionRemainingSeconds(0);
     setExpiredNotice(SESSION_EXPIRED_NOTICE);
+    setCurrentView('store');
   }, [sessionStorage]);
 
   const handleRefreshSessionToken = useCallback(async (): Promise<boolean> => {
@@ -209,6 +212,7 @@ export const App: React.FC = () => {
     await logoutUseCase.execute();
     setSession(null);
     setSessionRemainingSeconds(0);
+    setCurrentView('store');
   };
 
   const handleUpdateSession = (updatedSession: UserSession) => {
@@ -224,36 +228,63 @@ export const App: React.FC = () => {
     handleUpdateSession(simulated);
   };
 
-  if (!session) {
+  // 1. Vista de Portal de Login Completo
+  if (currentView === 'login') {
     return (
       <LoginPage
         initialEmail={initialData.rememberedEmail}
         initialNotice={expiredNotice}
         onClearInitialNotice={() => setExpiredNotice(null)}
-        onSubmitLogin={handleLogin}
+        onSubmitLogin={async (email, password, rememberMe) => {
+          const err = await handleLogin(email, password, rememberMe);
+          if (!err) {
+            setCurrentView('workspace');
+          }
+          return err;
+        }}
+        onBackToStore={() => setCurrentView('store')}
       />
     );
   }
 
+  // 2. Vista de Panel Administrativo POS Workspace (solo para usuarios autenticados)
+  if (currentView === 'workspace' && session) {
+    return (
+      <PosWorkspacePage
+        session={session}
+        sessionRemainingSeconds={sessionRemainingSeconds}
+        autoRefreshEnabled={autoRefreshEnabled}
+        isRefreshingToken={isRefreshingToken}
+        analyticsUseCase={analyticsUseCase}
+        catalogUseCases={catalogUseCases}
+        inventoryUseCases={inventoryUseCases}
+        logisticsUseCases={logisticsUseCases}
+        customerUseCases={customerUseCases}
+        rbacUseCases={rbacUseCases}
+        establishmentUseCases={establishmentUseCases}
+        settingsUseCases={settingsUseCases}
+        posTerminalUseCases={posTerminalUseCases}
+        onToggleAutoRefresh={setAutoRefreshEnabled}
+        onRefreshSessionToken={handleRefreshSessionToken}
+        onSimulateExpirationCountdown={handleSimulateExpirationCountdown}
+        onUpdateSession={handleUpdateSession}
+        onLogout={handleLogout}
+        onGoToStore={() => setCurrentView('store')}
+      />
+    );
+  }
+
+  // 3. Vista Principal por Defecto: Tienda E-Commerce (Pública y accesible sin login previo)
   return (
-    <PosWorkspacePage
-      session={session}
-      sessionRemainingSeconds={sessionRemainingSeconds}
-      autoRefreshEnabled={autoRefreshEnabled}
-      isRefreshingToken={isRefreshingToken}
-      analyticsUseCase={analyticsUseCase}
+    <EcommerceStorefrontPage
       catalogUseCases={catalogUseCases}
-      inventoryUseCases={inventoryUseCases}
-      logisticsUseCases={logisticsUseCases}
-      customerUseCases={customerUseCases}
-      rbacUseCases={rbacUseCases}
-      establishmentUseCases={establishmentUseCases}
-      settingsUseCases={settingsUseCases}
-      posTerminalUseCases={posTerminalUseCases}
-      onToggleAutoRefresh={setAutoRefreshEnabled}
-      onRefreshSessionToken={handleRefreshSessionToken}
-      onSimulateExpirationCountdown={handleSimulateExpirationCountdown}
-      onUpdateSession={handleUpdateSession}
+      session={session}
+      onOpenFullLogin={() => setCurrentView('login')}
+      onSubmitLogin={async (email, password, rememberMe) => {
+        const err = await handleLogin(email, password, rememberMe);
+        return err;
+      }}
+      onGoToWorkspace={() => setCurrentView('workspace')}
       onLogout={handleLogout}
     />
   );
