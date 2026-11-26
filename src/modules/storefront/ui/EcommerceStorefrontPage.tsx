@@ -31,13 +31,11 @@ export interface EcommerceStorefrontPageProps {
   onLogout: () => void;
 }
 
-const FREE_SHIPPING_THRESHOLD = 150000;
-
 /**
  * Página Principal Tienda E-Commerce Unificada con el Panel Administrativo:
  * - Paleta Corporativa Idéntica: Canvas #F2F4F9, Royal Indigo #4F55F1, Bordes #E2E8F0, Slate #0F172A
  * - 100% Mobile Responsive: Cuadrícula móvil de 2 columnas proporcional, sin botones sobrepuestos ni textos gigantes
- * - Buscador en tiempo real, chips de filtros activos, barra de envío gratis y acceso al POS
+ * - Buscador en tiempo real, chips de filtros activos, resumen de compra y acceso al POS
  */
 export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = ({
   catalogUseCases,
@@ -147,9 +145,6 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
   const totalCartPrice = useMemo(() => {
     return cartItems.reduce((acc, curr) => acc + curr.product.basePrice * curr.quantity, 0);
   }, [cartItems]);
-
-  const freeShippingProgress = Math.min(100, Math.round((totalCartPrice / FREE_SHIPPING_THRESHOLD) * 100));
-  const amountToFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD - totalCartPrice);
 
   const categorySliderItems: CategoryItem[] = useMemo(() => {
     return categories.map((cat) => {
@@ -685,14 +680,14 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
                 flexShrink: 0,
               }}
             >
-              <Icon name="truck" size={18} />
+              <Icon name="sparkles" size={18} />
             </div>
             <div>
               <h4 style={{ fontSize: '0.86rem', fontWeight: 800, margin: '0 0 2px', color: '#0F172A' }}>
-                Envíos a todo el país
+                Software 100% en la Nube
               </h4>
               <p style={{ fontSize: '0.74rem', color: '#64748B', margin: 0, lineHeight: 1.35 }}>
-                Despacho prioritario y empaque seguro. Envío gratis desde $150.000.
+                Acceso inmediato desde cualquier dispositivo sin instalaciones físicas.
               </p>
             </div>
           </div>
@@ -1014,53 +1009,25 @@ export const EcommerceStorefrontPage: React.FC<EcommerceStorefrontPageProps> = (
               </button>
             </div>
 
-            {/* Barra de Progreso de Envío Gratis */}
+            {/* Resumen de Artículos en la Bolsa */}
             <div
               style={{
-                padding: '10px 12px',
+                padding: '10px 14px',
                 borderRadius: '12px',
                 backgroundColor: '#F8FAFC',
                 border: '1px solid #E2E8F0',
                 marginBottom: '14px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
               }}
             >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  marginBottom: '6px',
-                  fontSize: '0.74rem',
-                  fontWeight: 600,
-                  color: totalCartPrice >= FREE_SHIPPING_THRESHOLD ? '#10B981' : '#475569',
-                }}
-              >
-                <span>
-                  {totalCartPrice >= FREE_SHIPPING_THRESHOLD
-                    ? '🎉 ¡Tienes envío gratis nacional!'
-                    : `Faltan $${amountToFreeShipping.toLocaleString('es-CO')} para envío gratis`}
-                </span>
-                <span>{freeShippingProgress}%</span>
-              </div>
-              <div
-                style={{
-                  width: '100%',
-                  height: '5px',
-                  backgroundColor: '#E2E8F0',
-                  borderRadius: '999px',
-                  overflow: 'hidden',
-                }}
-              >
-                <div
-                  style={{
-                    height: '100%',
-                    width: `${freeShippingProgress}%`,
-                    backgroundColor: totalCartPrice >= FREE_SHIPPING_THRESHOLD ? '#10B981' : '#4F55F1',
-                    borderRadius: '999px',
-                    transition: 'width 0.3s ease',
-                  }}
-                />
-              </div>
+              <span style={{ fontSize: '0.76rem', color: '#64748B', fontWeight: 600 }}>
+                Total de artículos agregados:
+              </span>
+              <span style={{ fontSize: '0.82rem', fontWeight: 800, color: '#4F55F1' }}>
+                {totalCartCount} {totalCartCount === 1 ? 'ítem' : 'ítems'}
+              </span>
             </div>
 
             {/* Lista de productos en bolsa */}

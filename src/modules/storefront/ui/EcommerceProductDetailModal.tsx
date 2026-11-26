@@ -315,8 +315,8 @@ export const EcommerceProductDetailModal: React.FC<EcommerceProductDetailModalPr
               <span>Factura electrónica oficial DIAN con CUFE y QR</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Icon name="truck" size={14} style={{ color: '#0F172A' }} />
-              <span>Despacho seguro y trazabilidad de sede</span>
+              <Icon name="shield" size={14} style={{ color: '#10B981' }} />
+              <span>Garantía de servicio y soporte técnico continuo</span>
             </div>
           </div>
         </div>
